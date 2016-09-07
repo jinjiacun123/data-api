@@ -6,8 +6,10 @@
 #include "cJSON.h"
 #define STOCK_NAME_SIZE 16
 #define BUFF_MAX_LEN 10
-#define PACKAGE_HEAD_LEN 10
+#define PACKAGE_HEAD_LEN 50
 #define PACKAGE_MAX_LEN 1024*1024
+#define CLI_REQ_TYPE_LEN 50
+#define SEND_BUFF_LEN 1024
 
 #define REQUEST_FUNC(a) request_##a 
 #define PARSE_FUNC(a) parse_##a

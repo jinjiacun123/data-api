@@ -6,6 +6,7 @@
 #include "./../include/data.h"
 #include "./../include/d_realtime.h"
 
+/*
 typedef t_base_c_request_head * (json_to_request_func)(char *);
 
 struct{
@@ -17,6 +18,7 @@ struct{
 	
   {"000000",}//empty
 };
+*/
 
 
 //send package to client
@@ -39,7 +41,7 @@ struct_to_json()
 }
 
 /*
-{"type":"00010001","length":800,"md5":"xxx"}
+{"type":"00010001","length":800,"md5":"xxx"}(pass test)
 */
 unsigned long
 get_c_request_package_length(char * head){
@@ -78,7 +80,7 @@ json_to_request(char * app_request_type,char * package_body){
 */
 
 //调整要发送的json对象，形成{"type":"00010001","length":xxxxx}{xxxx}
-//返回目标字符串长度
+//返回目标字符串长度,send_buff内容(test-pass)
 unsigned long
 format_json_to_client(json, send_buff, type)
   cJSON * json;
@@ -87,26 +89,28 @@ format_json_to_client(json, send_buff, type)
 {
   char * result = cJSON_Print(json);
   unsigned long package_len = strlen(result);
-  
+  //  printf("type:%s,package_len:%d,result:%s\n", type, package_len, result);
+
   //包装头部Json对象
   cJSON * head = cJSON_CreateObject();     
   cJSON_AddItemToObject(head, "type", cJSON_CreateString(type));
-  cJSON_ADDItemToObject(head, "length", cJSON_CreateNumber(package_len));
+  cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(package_len));
   char * head_str = cJSON_Print(head);
- 
+  
+  // printf("head_str:%s\n", head_str);
   //copy head to head of package
   memcpy(send_buff, head_str, PACKAGE_HEAD_LEN);
   free(head_str);
 
   //copy result to body of body of package
-  memcpy(send_buff, result, strlen(result));
+  memcpy(send_buff+PACKAGE_HEAD_LEN, result, strlen(result));
   free(result);
 
   return (signed long)0;
 }
 
 
-//解析客户端类型，并返回json对象及其类型
+//解析客户端类型，并返回json对象及其类型(test pass)
 int
 parse_client_request(str_request, entity, type)
      char * str_request;
@@ -115,8 +119,14 @@ parse_client_request(str_request, entity, type)
 {
   int result=0;
   cJSON *child;
+  char * out;
+
   entity = cJSON_Parse(str_request);
   child = cJSON_GetObjectItem(entity, "type");
-  strcpy(type, child->string);
+  out = cJSON_Print(child);
+  //printf("out:%s\n", out);
+  strcpy(type, out);
+  free(out);
+  //printf("type:%s\n", type);
   return result;
 }

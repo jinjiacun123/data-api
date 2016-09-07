@@ -15,7 +15,6 @@ data deal
 #include "./../include/d_time_share.h"
 #include "./../include/d_auto_push.h"
 */
-#define CLI_REQ_TYPE_LEN 10
 
 
 
@@ -182,12 +181,13 @@ do_client_request(client_fd, str_request)
      int client_fd;
      char * str_request;
 {
-  cJSON *entity,*result;
+  cJSON * entity,* result;
   char type[CLI_REQ_TYPE_LEN];
   db_back_t * db_back;
-  
+ 
+  memset(type, 0, CLI_REQ_TYPE_LEN);
   //解析客户段请求类型，获取json对象及其类型
-  parse_client_request(str_request, &entity, type);
+  parse_client_request(str_request, entity, type);
 
   //查找sql模板,通过json对象并形成sql
   int i;
@@ -208,7 +208,8 @@ do_client_request(client_fd, str_request)
   }
 
   //解析json对象为字符串
-  char send_buff[1024];
+  char send_buff[SEND_BUFF_LEN];
+  memset(send_buff, 0, SEND_BUFF_LEN);
   unsigned long send_buff_len  = format_json_to_client(result, send_buff, type);
 
   //通过上面获取到的json字符串，发送客户端
