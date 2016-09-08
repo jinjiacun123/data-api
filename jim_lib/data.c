@@ -82,8 +82,8 @@ request_db_parse_t req_db_p_u[] = {
 };
 
 void request_server(int sclient, int type){
-	int i=0;
-	for(i=0; deal[i].d_type != EMPTY; i++){
+	int i = 0;
+	for(i = 0; deal[i].d_type != EMPTY; i++){
 		if(deal[i].d_type == REQUEST
 		&& deal[i].type == type){
 			if(deal[i].func_request){
@@ -191,9 +191,13 @@ do_client_request(client_fd, str_request)
 
   //查找sql模板,通过json对象并形成sql
   int i;
+  memset(sql_buffer, 0, SQL_BUFF_MAX_LEN);
   for(i=0; req_tem_u[i].func ;i++){
     if(req_tem_u[i].func){
-      req_tem_u[i].func(type, entity);
+      req_tem_u[i].func(type, 
+			entity, 
+                        req_tem_u[i].sql_template, 
+			sql_buffer);
       break;
     }
   }

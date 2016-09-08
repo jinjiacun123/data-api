@@ -5,6 +5,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<assert.h>
 
 #ifdef __IS_SERVER__
 #define REMOTE_SERVER "116.226.241.36"

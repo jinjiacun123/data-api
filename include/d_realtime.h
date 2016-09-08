@@ -11,7 +11,7 @@ extern void request_realtime(int sclient, t_base_c_request_head *);
 extern void parse_realtime(buff_t *);
 extern void parse_realtime_pack(buff_t *);
 extern t_base_c_request_head * json_to_request_of_realtime(char *);
-extern int general_sql_of_realtime(char *,cJSON *);
+extern int general_sql_of_realtime(char *, cJSON *, char *, char*);
 extern int general_json_from_db_realtime(char *, db_back_t *, cJSON *);
 
 //单品种请求

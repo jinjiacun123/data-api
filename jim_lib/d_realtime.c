@@ -1,8 +1,8 @@
 #include "./../include/d_realtime.h"
 
 extern  buff_t my_buff;
-
-
+static int general_sql_from_simple_of_realtime(cJSON *,char * ,char *);
+static int general_sql_from_multi_of_realtime(cJSON *,char *,char *);
 
 /*
 	实时行情处理
@@ -95,14 +95,18 @@ void request_realtime_m(int sclient, t_base_c_request_head * head){
 }
 
 t_base_c_request_head *
-json_to_request_of_realtime(char * json_str){
+json_to_request_of_realtime(json_str)
+char * json_str;
+{
 	t_base_c_request_head  head;
 
 	return &head;
 }
 
 
-void parse_realtime(buff_t * my_buff){
+void parse_realtime(my_buff)
+  buff_t * my_buff;
+{
   printf("parse realtime\n");
   /*
 	int c =sizeof(long);
@@ -144,15 +148,102 @@ void parse_realtime_pack(buff_t * my_buff){
 	
 }
 
+/**
+   from json object general to sql sentence
+   
+   code_type
+   code
+
+   simple:
+   {'type':'xxx', 
+    'data':{
+           'code_type':'xxx',
+           'code':'xxx'
+	   }
+   }
+
+   multi:
+   {'type':'xxx',
+    'data_list':[
+       {'code_type':'xxx','code':'xxx'},
+       {'code_type':'xxx','code':'xxx'},
+       ...
+       {'code_type':'xxx','code':'xxx'}
+    ]
+   }
+*/
 int
-general_sql_of_realtime(type, json)
-     char * type;
+general_sql_of_realtime(type, json, template_sql, sql)
+     char  * type;
      cJSON * json;
+     char  * template_sql;
+     char  * sql;
 {
   int result = 0;
-  
-  
+  cJSON * data;
+  cJSON * data_list;
+  char tmp[100];
 
+  //tmp = cJSON_Print(json);
+  //assert(tmp);
+  memset(tmp, 0, 100);
+  assert(json_get_string(json, "type", tmp)==0);
+  printf("type:%s", tmp);
+
+  data = cJSON_GetObjectItem(json, "data");
+  //单个品种请求
+  if(data){
+    printf("simple mode!\n");
+    //    tmp = cJSON_Print(data);
+    printf("data:%s\n", data);
+    general_sql_from_simple_of_realtime(data, template_sql, sql);
+    free(data);
+  }
+  
+  data_list = cJSON_GetObjectItem(json, "data_list");
+  //多个品种请求
+  if(data_list){
+    general_sql_from_multi_of_realtime(data_list, template_sql, sql);
+    free(data_list);
+  }  
+
+  return result;
+}
+
+//单个品种请求
+static int
+general_sql_from_simple_of_realtime(data, template_sql, sql)
+     cJSON * data;
+     char * template_sql;
+     char * sql;
+{
+  int result = 0;
+  char code_type[100];
+  char code[100];
+  memset(code_type, 0, 100);
+  assert(json_get_string(data, "code_type", code_type) == 0);
+  assert(code_type);
+  memset(code, 0, 100);
+  assert(json_get_string(data, "code", code) == 0);
+  assert(code);
+  char tmp_template_sql[] = " code_type = '%s' and code = '%s' ";
+  char tmp[1024];
+  memset(tmp, 0, 1024);
+  assert(sprintf(tmp, tmp_template_sql, code_type, code));
+  printf("tmp:%s\n", tmp);
+  assert(sprintf(sql, template_sql, tmp));
+  assert(sql);
+  return result;
+}
+
+//多个品种请求
+static int
+general_sql_from_multi_of_realtime(json, template_sql, sql)
+     cJSON * json;
+     char * template_sql;
+     char * sql;
+{
+  int result = 0;
 
   return result;
 }

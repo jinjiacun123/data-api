@@ -117,16 +117,69 @@ parse_client_request(str_request, entity, type)
      cJSON * entity;
      char * type;
 {
-  int result=0;
+  int result = 0;
   cJSON *child;
   char * out;
 
   entity = cJSON_Parse(str_request);
-  child = cJSON_GetObjectItem(entity, "type");
-  out = cJSON_Print(child);
+  child  = cJSON_GetObjectItem(entity, "type");
+  out    = cJSON_Print(child);
   //printf("out:%s\n", out);
   strcpy(type, out);
   free(out);
   //printf("type:%s\n", type);
   return result;
 }
+
+
+//通过对象获取值-----being
+int
+json_get_string(json, name, value)//字符串
+  cJSON * json;
+  char * name;
+  char * value;
+{
+  int result = 0;
+  cJSON * child;  
+  child = cJSON_GetObjectItem(json, name);
+  assert(child);
+  if(!child) return -1;
+  else{
+    printf("child!\n");
+    //strcpy(value, cJSON_Print(child));
+    strcpy(value, child->valuestring);
+    assert(value);
+  }
+  return result;
+}
+
+int
+json_get_int(json, name)//整数
+  cJSON * json;
+  char * name;
+{
+  char * out;
+  int value;
+  cJSON * child;
+  child = cJSON_GetObjectItem(json, name);
+  if(!child)return -1;
+  else{
+    out = cJSON_Print(child);
+    value = child->valueint;
+    cJSON_Delete(json);
+    free(out);
+  }
+  return value;
+}
+
+float
+json_get_float(json, name)//浮点数
+  cJSON * json;
+  char * name;
+{
+  float value;
+
+  return value;
+}
+//通过对象获取值-----end
+

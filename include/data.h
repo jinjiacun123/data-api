@@ -10,11 +10,12 @@
 #define PACKAGE_MAX_LEN 1024*1024
 #define CLI_REQ_TYPE_LEN 50
 #define SEND_BUFF_LEN 1024
+#define SQL_BUFF_MAX_LEN 4096
+char * sql_buffer[SQL_BUFF_MAX_LEN];
 
 #define REQUEST_FUNC(a) request_##a 
 #define PARSE_FUNC(a) parse_##a
-#define TO_JSON_FUNC(a) json_to_request_of_##a 
-
+#define TO_JSON_FUNC(a) json_to_request_of_##a
 
 /*number of type as hexadicimal*/
 #define TYPE_EMPTY 	0x0D03 //empty
@@ -50,7 +51,7 @@ typedef union{
 }db_back_t;
 
 //type of request,json package of reqeust
-typedef int (*type_general_sql)(char *, cJSON *);
+typedef int (*type_general_sql)(char *, cJSON *, char *, char *);
 //type of request,back of db, to general json object
 typedef int (*type_general_json)(char *, db_back_t *, cJSON *);
 #define SQL_TEMPLATE_FUN(a) general_sql_of_##a 
