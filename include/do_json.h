@@ -2,7 +2,7 @@
 #define __DO_JSON_H__
 extern unsigned long get_c_request_package_length(char *);
 extern unsigned long format_json_to_client(cJSON *, char *, char *);
-extern int parse_client_request(char *, cJSON *, char *);
+extern int parse_client_request(char *, cJSON **, char *);
 
 extern char * json_get_string(cJSON json, char * name, char * value);
 extern int    json_get_int(cJSON json, char * name);

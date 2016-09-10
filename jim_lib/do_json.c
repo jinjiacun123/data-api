@@ -114,25 +114,27 @@ format_json_to_client(json, send_buff, type)
 int
 parse_client_request(str_request, entity, type)
      char * str_request;
-     cJSON * entity;
+     cJSON ** entity;
      char * type;
 {
-  cJSON * package;
-  int result = 0;
-  cJSON * child;
-  char * out;
+  cJSON * json_package, * tmp_entity;
+  int     result = 0;
+  cJSON * json_type;
+  char  * out;
 
   printf("-----------------------------------\n");
   printf("enter parse_client_request...\n");
 
-  package = cJSON_Parse(str_request); 
+  json_package = cJSON_Parse(str_request); 
 
-  child   = cJSON_GetObjectItem(package, "type");
-  entity  = cJSON_GetObjectItem(package, "data");
-  out     = cJSON_Print(entity);
+  json_type   = cJSON_GetObjectItem(json_package,  "type");
+  tmp_entity  = cJSON_GetObjectItem(json_package,  "data");
+  out         = cJSON_Print(tmp_entity);
+  memcpy(entity, tmp_entity, sizeof(cJSON));
+
   printf("entity:%s\n", out);
-  strcpy(type, child->valuestring);
-  free(child);
+  strcpy(type, json_type->valuestring);
+  free(json_type);
   // free(out);
   //printf("type:%s\n", type);
   return result;

@@ -53,7 +53,6 @@ t_deal deal[] = {
 };
 
 
-
 //客户端请求类型-sql模板(映射表)
 typedef struct
 {
@@ -190,9 +189,10 @@ do_client_request(client_fd, str_request)
   printf("request_body:%s\n", str_request+50);
 
   memset(type, 0, CLI_REQ_TYPE_LEN);
+  entity = (cJSON *)malloc(sizeof(cJSON));
   //解析客户段请求类型，获取json对象及其类型
-  assert(parse_client_request(str_request+PACKAGE_HEAD_LEN, &entity, type) == 0);
-  entity = cJSON_Parse(str_request+PACKAGE_HEAD_LEN);
+  assert(parse_client_request(str_request+PACKAGE_HEAD_LEN, entity, type) == 0);
+  //  entity = cJSON_Parse(str_request+PACKAGE_HEAD_LEN);
 
   printf("out parse_cilent_request...\n");
   printf("type:%s\n", type);
