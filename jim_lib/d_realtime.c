@@ -184,6 +184,7 @@ general_sql_of_realtime(type, json, template_sql, sql)
   cJSON * data_list;
   char tmp[100];
 
+  printf("enter general_sql_of_realtime");
   //tmp = cJSON_Print(json);
   //assert(tmp);
   memset(tmp, 0, 100);
@@ -210,7 +211,7 @@ general_sql_of_realtime(type, json, template_sql, sql)
   return result;
 }
 
-//单个品种请求
+//单个品种请求(test_pass)
 static int
 general_sql_from_simple_of_realtime(data, template_sql, sql)
      cJSON * data;
@@ -248,13 +249,43 @@ general_sql_from_multi_of_realtime(json, template_sql, sql)
   return result;
 }
 
+/**
+  from db result to json object
+
+
+  {'list':[{xxx},{xxx},...,{xxx}]}
+*/
 int
-general_json_from_db_realtime(type, db_back, json)
+general_json_from_db_realtime(type, db_back, list)
      char * type;
      db_back_t * db_back;
-     cJSON * json;
+     cJSON * list;
 {
   int result = 0;
   
+  cJSON * item;
+  MYSQL_ROW row;
+  MYSQL_FIELD * field;
+  int i=0;
+  int num_fields = mysql_num_fields(db_back);
+  assert(num_fields);
+  //printf("num_fields:%d\n", num_fields);
+
+  
+  while((row = mysql_fetch_row(db_back)) != NULL){
+    assert(row);
+    item = cJSON_CreateObject();
+    assert(item);
+    for(i=0; i<num_fields; i++){
+      //创建json对象
+      field = mysql_fetch_field_direct(db_back, i);
+      assert(field);      
+      cJSON_AddStringToObject(item, field->name, row[i]);
+      //printf("%s:%s,", field->name, row[i]); 
+    }
+    cJSON_AddItemToArray(list, item); 
+    // printf("\n");
+  }
+
   return result;
 }

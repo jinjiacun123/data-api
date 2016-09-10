@@ -50,6 +50,7 @@ typedef union{
   MYSQL_RES * result;
 }db_back_t;
 
+
 //type of request,json package of reqeust
 typedef int (*type_general_sql)(char *, cJSON *, char *, char *);
 //type of request,back of db, to general json object

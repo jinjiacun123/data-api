@@ -1,7 +1,11 @@
 #ifndef __DO_MYSQL_H__
 #define __DO_MYSQL_H__
-#include"cJSON.h"
-extern int do_mysql_select(char *, cJSON * json_result, int type);
+#include "cJSON.h"
+#include "data.h"
+//extern int do_mysql_select(char *, cJSON * json_result, int type);
+extern int do_mysql_connect();
+extern int do_mysql_close();
+extern db_back_t * do_mysql_select(char *);
 extern int do_mysql_insert(char *);
 extern int do_mysql_update(char *);
 

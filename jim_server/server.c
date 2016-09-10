@@ -63,6 +63,7 @@ void server(char *ip)
       if(FD_ISSET(server_sockfd, &reset))
         {
 	  client_sockfd = accept(server_sockfd, (struct sockaddr *)&remote_addr, &sin_size);
+	  
           printf("a new connection...\n"); 
 	  for(i=0; i< FD_SETSIZE; i++)
 	    {
@@ -90,24 +91,28 @@ void server(char *ip)
 	if((sockfd = client[i]) <0)
 	  continue;
 	if(FD_ISSET(sockfd, &reset)){       
-	  if(fork()==0)
 	    {
-	      	char head_buff[20];
+	      	char head_buff[50];
 		unsigned long package_length;
-		 
 		while(1){
-	      		memset(head_buff, 0, 20);
+	      		memset(head_buff, 0, 50);
+			int ret = 0;
 			//get head of package
-			if(recv(sockfd, head_buff, 20, 0)>0){
+			if((ret=recv(sockfd, head_buff, 50, 0))>0){
 			   package_length = get_c_request_package_length(head_buff);						
+			}
+			else if(ret == 0){
+			  //客户端断开
+			  break;
 			}
 			memset(buff, 0, 1024);			
 			//get data of request package
 	      		if(recv(sockfd, buff, package_length, 0)>0){
+			  do_client_request(sockfd, buff);
 	    			//strcpy(buff, struct_to_json());
 				//proxy: deal
 				//write client 
-				write(sockfd, buff, sizeof(buff));
+				//write(sockfd, buff, sizeof(buff));
 	      		}
 		}  
 	    }

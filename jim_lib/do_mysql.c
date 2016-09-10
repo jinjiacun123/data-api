@@ -9,7 +9,7 @@
 static MYSQL * conn_ptr;
 
 //connection
-static int
+int
 do_mysql_connect(){
   conn_ptr = mysql_init(NULL);
   if(!conn_ptr){
@@ -28,12 +28,13 @@ do_mysql_connect(){
   return EXIT_SUCCESS;
 }
 
-static int
+int
 do_mysql_close(){
   mysql_close(conn_ptr);
 }
 
 //查询
+/*
 int 
 do_mysql_select(char * sql, cJSON * json_result, int type){
   do_mysql_connect();
@@ -64,7 +65,25 @@ do_mysql_select(char * sql, cJSON * json_result, int type){
 
   do_mysql_close();
   return 0;
-}  
+} 
+*/ 
+//查询返回结果集
+db_back_t *
+do_mysql_select(sql)
+     char * sql;
+{
+  do_mysql_connect();
+
+  if (mysql_query(conn_ptr, sql)){
+    printf("select error\nx");
+  }
+  
+  MYSQL_RES *result = mysql_store_result(conn_ptr);
+  
+  do_mysql_close();
+  
+  return result;
+}
   
 //插入 
 int

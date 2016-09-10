@@ -106,7 +106,7 @@ format_json_to_client(json, send_buff, type)
   memcpy(send_buff+PACKAGE_HEAD_LEN, result, strlen(result));
   free(result);
 
-  return (signed long)0;
+  return (unsigned long)(strlen(result)+PACKAGE_HEAD_LEN);
 }
 
 
@@ -117,22 +117,29 @@ parse_client_request(str_request, entity, type)
      cJSON * entity;
      char * type;
 {
+  cJSON * package;
   int result = 0;
-  cJSON *child;
+  cJSON * child;
   char * out;
 
-  entity = cJSON_Parse(str_request);
-  child  = cJSON_GetObjectItem(entity, "type");
-  out    = cJSON_Print(child);
-  //printf("out:%s\n", out);
-  strcpy(type, out);
-  free(out);
+  printf("-----------------------------------\n");
+  printf("enter parse_client_request...\n");
+
+  package = cJSON_Parse(str_request); 
+
+  child   = cJSON_GetObjectItem(package, "type");
+  entity  = cJSON_GetObjectItem(package, "data");
+  out     = cJSON_Print(entity);
+  printf("entity:%s\n", out);
+  strcpy(type, child->valuestring);
+  free(child);
+  // free(out);
   //printf("type:%s\n", type);
   return result;
 }
 
 
-//通过对象获取值-----being
+//通过对象获取值-----being(test_pass)
 int
 json_get_string(json, name, value)//字符串
   cJSON * json;
