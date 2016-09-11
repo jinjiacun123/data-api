@@ -99,6 +99,8 @@ format_json_to_client(json, send_buff, type)
   
   // printf("head_str:%s\n", head_str);
   //copy head to head of package
+  send_buff = (char *)malloc(package_len+PACKAGE_HEAD_LEN);
+  memset(send_buff, 0, package_len+PACKAGE_HEAD_LEN);
   memcpy(send_buff, head_str, PACKAGE_HEAD_LEN);
   free(head_str);
 
@@ -112,29 +114,33 @@ format_json_to_client(json, send_buff, type)
 
 //解析客户端类型，并返回json对象及其类型(test pass)
 int
-parse_client_request(str_request, entity, type)
-     char * str_request;
-     cJSON ** entity;
-     char * type;
+parse_client_request(package)
+     server_package_t * package;
 {
-  cJSON * json_package, * tmp_entity;
+  cJSON * json_package;
   int     result = 0;
   cJSON * json_type;
   char  * out;
+  server_request_t * req;
+  req = package->request;
 
   printf("-----------------------------------\n");
   printf("enter parse_client_request...\n");
 
-  json_package = cJSON_Parse(str_request); 
+  req->json = cJSON_Parse(req->package_body); 
 
-  json_type   = cJSON_GetObjectItem(json_package,  "type");
-  tmp_entity  = cJSON_GetObjectItem(json_package,  "data");
-  out         = cJSON_Print(tmp_entity);
-  memcpy(entity, tmp_entity, sizeof(cJSON));
+  json_type   = cJSON_GetObjectItem(req->json,  "type");
+  req->data  = cJSON_GetObjectItem(req->json,  "data");
+  if(!req->data){
+    req->data = cJSON_GetObjectItem(req->json, "data_list");
+  }
+  //out         = cJSON_Print(tmp_entity);
+  //entity = json_package;
+  // memcpy(req->data, tmp_entity, sizeof(cJSON));
 
-  printf("entity:%s\n", out);
-  strcpy(type, json_type->valuestring);
-  free(json_type);
+  //printf("entity:%s\n", out);
+  strcpy(req->type, json_type->valuestring);
+  free(json_package);
   // free(out);
   //printf("type:%s\n", type);
   return result;

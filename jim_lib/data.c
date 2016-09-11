@@ -177,71 +177,66 @@ void unpack(buff_t *my_buff){
 
 //作为服务器端，处理客户端请求
 void
-do_client_request(client_fd, str_request)
-     int client_fd;
-     char * str_request;
+do_client_request(package)
+     server_package_t * package;
 {
-  cJSON * entity,* result, * list;
-  char type[CLI_REQ_TYPE_LEN];
-  db_back_t * db_back;
- 
-  printf("request_head:%s\n", str_request);
-  printf("request_body:%s\n", str_request+50);
+  cJSON * entity, * result, * list;
+  server_request_t   * req;
+  server_response_t  * resp;
+  
+  req  = package->request;
+  resp = package->response;
+  
+  //printf("request_head:%s\n", request_str);
+  //printf("request_body:%s\n", request_str+PACKAGE_HEAD_LEN);
 
-  memset(type, 0, CLI_REQ_TYPE_LEN);
-  entity = (cJSON *)malloc(sizeof(cJSON));
   //解析客户段请求类型，获取json对象及其类型
-  assert(parse_client_request(str_request+PACKAGE_HEAD_LEN, entity, type) == 0);
+  assert(parse_client_request(package) == 0);
   //  entity = cJSON_Parse(str_request+PACKAGE_HEAD_LEN);
 
   printf("out parse_cilent_request...\n");
-  printf("type:%s\n", type);
+  printf("type:%s\n", req->type);
 
   //查找sql模板,通过json对象并形成sql
   int i;
-  memset(sql_buffer, 0, SQL_BUFF_MAX_LEN);
   char *tmp = cJSON_Print(entity);
   printf("entity:%s\n", tmp);
   for(i=0; req_tem_u[i].func ;i++){
     if(req_tem_u[i].func){
       printf("get req_tem_u...\n");
-      assert(req_tem_u[i].func(type, 
-			entity, 
-                        req_tem_u[i].sql_template, 
-			       sql_buffer) == 0);
+      package->sql_template = req_tem_u[i].sql_template;
+      assert(req_tem_u[i].func(package) == 0);
       break;
     }
   }
   printf("find sql...\n");
 
   //发送sql数据库请求,返回数据库结果对象或者bool
-  db_back = do_mysql_select(sql_buffer);
-  assert(db_back);
+  package->db_back = do_mysql_select(package->sql_buffer);
+  assert(package->db_back);
   printf("db back...\n");
 
   //解析数据库返回,如果是结果数据库结果对象,形成Json对象
-  result = cJSON_CreateObject();
-  cJSON_AddStringToObject(result, "type", type);
-  cJSON_AddItemToObject(result, "list", list = cJSON_CreateArray());
+  resp->json = cJSON_CreateObject();
+  cJSON_AddStringToObject(resp->json, "type", req->type);
+  cJSON_AddItemToObject(resp->json, "list", resp->list = cJSON_CreateArray());
   for(i=0; req_db_p_u[i].func; i++){
     if(req_db_p_u[i].func){
-      assert(req_db_p_u[i].func(type, db_back, list) == 0);
+      assert(req_db_p_u[i].func(package) == 0);
       break;
     }
   }
   printf("parse db...\n");
 
   //解析json对象为字符串
-  char send_buff[SEND_BUFF_LEN];
-  memset(send_buff, 0, SEND_BUFF_LEN);
-  unsigned long send_buff_len  = format_json_to_client(result, send_buff, type);
+  unsigned long send_buff_len  = format_json_to_client(resp->json, resp->send_buff, req->type);
   printf("format out...\n");
 
-  printf("send_buff_head:%s\n", send_buff);
-  printf("send_buff_body:%s\n", send_buff+PACKAGE_HEAD_LEN);
-  printf("send length:%d\n", send_buff_len);
+  printf("send_buff_head:%s\n", resp->package_head);
+  printf("send_buff_body:%s\n", resp->package_body);
+  printf("send length:%d\n",    resp->send_buff_len);
   //通过上面获取到的json字符串，发送客户端
-  if(write(client_fd, send_buff, send_buff_len)){
+  if(write(package->client_fd, resp->send_buff, resp->send_buff_len)){
     printf("send error");
   }
 }

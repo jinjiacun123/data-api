@@ -44,6 +44,12 @@ char * sql_buffer[SQL_BUFF_MAX_LEN];
 #define TYPE_SERVERINFO_EX   	259   //
 #define TYPE_DAY_CURPOS_EX   	524   //
 
+//服务器包
+typedef struct server_request server_request_t;
+typedef struct server_response server_response_t;
+typedef struct server_package  server_package_t;
+
+
 //back result of database
 typedef union{
   int i_result;
@@ -52,9 +58,9 @@ typedef union{
 
 
 //type of request,json package of reqeust
-typedef int (*type_general_sql)(char *, cJSON *, char *, char *);
+typedef int (*type_general_sql)(server_package_t *);
 //type of request,back of db, to general json object
-typedef int (*type_general_json)(char *, db_back_t *, cJSON *);
+typedef int (*type_general_json)(server_package_t *);
 #define SQL_TEMPLATE_FUN(a) general_sql_of_##a 
 #define DB_TO_JSON_FUN(a) general_json_from_db_##a
 
@@ -77,8 +83,7 @@ typedef struct{
 }t_deal;
 
 //compress package info
-typedef struct 
-{
+typedef struct {
 	unsigned short m_nType;
 	short m_nAlignment;
 	long m_lZipLen;
@@ -88,7 +93,7 @@ typedef struct
 
 
 //result of back include infomation of package(direct parse not compress package)
-struct response_header{
+struct response_header {
 	char str[4];
 	int length;
 };
@@ -121,8 +126,50 @@ typedef struct {
 }buff_t;
 
 
+//作为服务器处理客户端请求
+struct server_package{
+  int client_fd;
+
+  server_request_t * request;
+  server_response_t * response;
+  
+  db_back_t * db_back;
+  char * sql_template;
+  char   sql_buffer[SQL_BUFF_MAX_LEN];
+};
+
+struct server_request{
+  char package_type[20];//type of package
+  char type[20];//type of request
+  
+  //string of request
+  char package_head[PACKAGE_HEAD_LEN];
+  char * package_body;
+  unsigned long package_body_len;
+
+  cJSON * json;  
+
+  cJSON * data;
+};
+
+struct server_response{
+  char package_type[20];//type of package
+  char type[20];//type of response
+  
+  char * send_buff;
+  unsigned long send_buff_len;
+
+  //string of request
+  char          package_head[PACKAGE_HEAD_LEN];
+  char *        package_body;
+  unsigned long package_body_len;
+
+  cJSON * json;
+  cJSON * list;
+};
+
 //public view function
 extern void request_server(int c_client, int type);//作为客户端请求服务器
-extern void do_client_request(int,char *);//作为服务器处理客户端请求(sockfd, string of request)
+extern void do_client_request(server_package_t *);//作为服务器处理客户端请求(sockfd, string of request)
 extern void parse(buff_t *);
 #endif
