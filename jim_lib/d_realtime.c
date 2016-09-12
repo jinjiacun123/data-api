@@ -190,6 +190,7 @@ general_sql_of_realtime(package)
     printf("simple mode!\n");
     general_sql_from_simple_of_realtime(package);
     free(req->data);
+    free(req->json);
     return 0;
   }
   
@@ -198,6 +199,7 @@ general_sql_of_realtime(package)
   if(req->data){
     general_sql_from_multi_of_realtime(package);
     free(req->data);
+    free(req->json);    
   }  
 
   

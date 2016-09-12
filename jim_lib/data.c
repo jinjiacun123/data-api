@@ -196,8 +196,8 @@ do_client_request(package)
 
   //查找sql模板,通过json对象并形成sql
   int i;
-  char *tmp = cJSON_Print(entity);
-  printf("entity:%s\n", tmp);
+  //char *tmp = cJSON_Print(entity);
+  //printf("entity:%s\n", tmp);
   for(i=0; req_tem_u[i].func ;i++){
     if(req_tem_u[i].func){
       printf("get req_tem_u...\n");

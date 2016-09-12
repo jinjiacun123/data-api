@@ -119,7 +119,7 @@ int
 parse_client_request(package)
      server_package_t * package;
 {
-  cJSON * json_package;
+  //  cJSON * json_package;
   int     result = 0;
   cJSON * json_type;
   char  * out;
@@ -129,7 +129,8 @@ parse_client_request(package)
   printf("-----------------------------------\n");
   printf("enter parse_client_request...\n");
 
-  req->json = cJSON_Parse(req->package_body); 
+  req->json = cJSON_Parse(req->package_body);
+  free(req->package_body);
 
   json_type   = cJSON_GetObjectItem(req->json,  "type");
   req->data  = cJSON_GetObjectItem(req->json,  "data");
@@ -142,7 +143,8 @@ parse_client_request(package)
 
   //printf("entity:%s\n", out);
   strcpy(req->type, json_type->valuestring);
-  free(json_package);
+  free(json_type);
+  // free(json_package);
   // free(out);
   //printf("type:%s\n", type);
   return result;

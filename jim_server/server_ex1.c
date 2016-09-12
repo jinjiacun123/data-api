@@ -56,7 +56,7 @@ int main(void)
 
     struct sockaddr_in peeraddr; //传出参数
     socklen_t peerlen = sizeof(peeraddr); //传入传出参数，必须有初始值
-    int conn; // 已连接套接字(变为主动套接字，即可以主动connect)
+    int conn=0; // 已连接套接字(变为主动套接字，即可以主动connect)
 
     pid_t pid;
 
@@ -74,7 +74,9 @@ int main(void)
         {
             // 子进程
             close(listenfd);
-            do_service(conn);
+	    if(conn>0){
+	      do_service(conn);
+	    }
             exit(EXIT_SUCCESS);
         }
         else
@@ -108,21 +110,25 @@ void do_service(int conn)
     package->client_fd = conn;
     while (1)
     {      
+        memset(req->package_head, 0, PACKAGE_HEAD_LEN);
         int ret = read(conn, req->package_head, PACKAGE_HEAD_LEN);
         if (ret == 0)   //客户端关闭了
         {
             printf("client close\n");
-            break;
+	    break;
         }
         else if (ret == -1)
             ERR_EXIT("read head error");
 	printf("head ret:%d\n", ret);
 
+	req->package_body_len = 0;
 	req->package_body_len = get_c_request_package_length(req->package_head);
+	assert(req->package_body_len);
 	printf("recv package head:%s\n", req->package_head);
 	
-	req->package_body = (char * )malloc(req->package_body_len);
-	memset(req->package_body, 0, req->package_body_len);
+	
+	req->package_body = (char * )malloc(req->package_body_len+1);
+	memset(req->package_body, 0, req->package_body_len+1);
 	//memcpy(recvbuff, head_buff, PACKAGE_HEAD_LEN);
 	ret = read(conn, req->package_body, req->package_body_len);
 	if(ret == 0){
