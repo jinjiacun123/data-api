@@ -82,33 +82,35 @@ json_to_request(char * app_request_type,char * package_body){
 //调整要发送的json对象，形成{"type":"00010001","length":xxxxx}{xxxx}
 //返回目标字符串长度,send_buff内容(test-pass)
 unsigned long
-format_json_to_client(json, send_buff, type)
-  cJSON * json;
-  char * send_buff;
-  char * type;
+format_json_to_client(package)
+     server_package_t * package;
 {
-  char * result = cJSON_Print(json);
-  unsigned long package_len = strlen(result);
+  server_response_t * resp;
+  server_request_t * req;
+  resp = package->response;
+  req  = package->request; 
+  assert(resp->package_body = cJSON_Print(resp->json));
+  assert(resp->package_body_len = strlen(resp->package_body));
   //  printf("type:%s,package_len:%d,result:%s\n", type, package_len, result);
 
   //包装头部Json对象
   cJSON * head = cJSON_CreateObject();     
-  cJSON_AddItemToObject(head, "type", cJSON_CreateString(type));
-  cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(package_len));
-  char * head_str = cJSON_Print(head);
+  cJSON_AddItemToObject(head, "type", cJSON_CreateString(req->type));
+  cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(resp->package_body_len));
+  strcpy(resp->package_head ,cJSON_Print(head));
   
   // printf("head_str:%s\n", head_str);
   //copy head to head of package
-  send_buff = (char *)malloc(package_len+PACKAGE_HEAD_LEN);
-  memset(send_buff, 0, package_len+PACKAGE_HEAD_LEN);
-  memcpy(send_buff, head_str, PACKAGE_HEAD_LEN);
-  free(head_str);
+  resp->send_buff = (char *)malloc(resp->package_body_len
+                                   +PACKAGE_HEAD_LEN);
+  resp->send_buff_len = resp->package_body_len + PACKAGE_HEAD_LEN;
+  memset(resp->send_buff, 0, resp->package_body_len + PACKAGE_HEAD_LEN);
 
   //copy result to body of body of package
-  memcpy(send_buff+PACKAGE_HEAD_LEN, result, strlen(result));
-  free(result);
+  memcpy(resp->send_buff, resp->package_head, strlen(resp->package_head));
+  memcpy(resp->send_buff+PACKAGE_HEAD_LEN, resp->package_body, resp->package_body_len);
 
-  return (unsigned long)(strlen(result)+PACKAGE_HEAD_LEN);
+  return resp->send_buff_len;
 }
 
 

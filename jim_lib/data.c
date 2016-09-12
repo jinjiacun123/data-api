@@ -1,4 +1,5 @@
 
+
 /**
 data deal
 **/
@@ -52,7 +53,6 @@ t_deal deal[] = {
 	{EMPTY, 0, NULL, NULL}
 };
 
-
 //客户端请求类型-sql模板(映射表)
 typedef struct
 {
@@ -68,7 +68,6 @@ request_template_t  req_tem_u[]={
 
    {"","",}
 };
-
 
 //客户端请求类型-数据库结果解析(映射表)
 typedef struct{
@@ -123,7 +122,6 @@ void parse(buff_t * my_buff){
 	}
 }
 
-
 static void parse_default(buff_t * my_buff){
 	printf("类型ÐÍ:%x\n", my_buff->p_res_media_h->type);
 	printf("默认");
@@ -150,7 +148,6 @@ void clean_buff(buff_t * my_buff)
 		my_buff->unpack_buff_len = 0;
 	}
 }
-
 
 static
 void unpack(buff_t *my_buff){
@@ -218,6 +215,7 @@ do_client_request(package)
 
   //解析数据库返回,如果是结果数据库结果对象,形成Json对象
   resp->json = cJSON_CreateObject();
+  strcpy(resp->type, req->type);
   cJSON_AddStringToObject(resp->json, "type", req->type);
   cJSON_AddItemToObject(resp->json, "list", resp->list = cJSON_CreateArray());
   for(i=0; req_db_p_u[i].func; i++){
@@ -229,14 +227,14 @@ do_client_request(package)
   printf("parse db...\n");
 
   //解析json对象为字符串
-  unsigned long send_buff_len  = format_json_to_client(resp->json, resp->send_buff, req->type);
+  unsigned long send_buff_len  = format_json_to_client(package);
   printf("format out...\n");
 
   printf("send_buff_head:%s\n", resp->package_head);
   printf("send_buff_body:%s\n", resp->package_body);
   printf("send length:%d\n",    resp->send_buff_len);
   //通过上面获取到的json字符串，发送客户端
-  if(write(package->client_fd, resp->send_buff, resp->send_buff_len)){
+  if(write(package->client_fd, resp->send_buff, resp->send_buff_len)<0){
     printf("send error");
   }
 }
