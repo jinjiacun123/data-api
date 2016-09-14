@@ -31,6 +31,7 @@ void init_socket(){
         	printf("connect() failure!\n");
 		return -1;
 	}       	
+	printf("connect() success\n");
 }
 
 void send_socket(){
@@ -53,7 +54,7 @@ void recv_socket(buff_t * my_buff){
 				my_buff->buff_parse_off = 8;
 				my_buff->buff_len = ret_count;
 				//������ǰ��
-//				parse(my_buff);
+				parse(my_buff);
 				//�˳�
 				break;
 			}
@@ -82,7 +83,7 @@ void recv_socket(buff_t * my_buff){
 				memset(tmp_buff+my_buff->buff_len, 0, tmp_buff_len);
 				my_buff->is_direct = true;
 				my_buff->buff_parse_off = 8;
-//				parse(my_buff);
+				parse(my_buff);
 
 				//�ж��Ƿ��ɽ���
 				while(tmp_buff_len>8)//�ɽ���Ԫ��ͷ��
@@ -104,7 +105,7 @@ void recv_socket(buff_t * my_buff){
 						my_buff->buff_parse_off = 8;
 						my_buff->is_direct = true;
 						//��������
-						//parse();
+						parse(my_buff);
 					}
 				}
 				

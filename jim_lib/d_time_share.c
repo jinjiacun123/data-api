@@ -1,11 +1,14 @@
-#include "d_time_share.h"
-#include "d_time_share.h"
-extern buff_t my_buff;
+#include "./../include/d_time_share.h"
+#include "./../include/data.h"
 /**
  分时走势
 */
 
-void request_time_share(int sclient){
+void 
+client_request_time_share(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
+{
 	char request[1024];
 
 	int test = sizeof(TrendPack);
@@ -27,15 +30,27 @@ void request_time_share(int sclient){
 	printf("分时请求发送完毕\n");
 }
 
-void parse_time_share(){
-	printf("解析分时数据\n");
-	PriceVolItem2* pPriceVolItem = (PriceVolItem2*)my_buff.p_res_media_h + sizeof(AnsTrendData2);
-	AnsTrendData2* pHisData222 = (AnsTrendData2 *)my_buff.p_res_media_h;
-	for(int i=0;i<pHisData222->m_nHisLen;i++)
+void 
+client_parse_time_share(my_buff)
+     buff_t * my_buff;
+{
+	printf("解析分时数据\n");	
+	PriceVolItem2* pPriceVolItem = (PriceVolItem2*)my_buff->p_res_media_h + sizeof(AnsTrendData2);
+	AnsTrendData2* pHisData222 = (AnsTrendData2 *)my_buff->p_res_media_h;
+	int i = 0;
+	for(i=0;i<pHisData222->m_nHisLen;i++)
 	{
 		char name[7]={0};
 		memcpy(name,pHisData222->m_cCode,6);
 		printf("第%d条数据 收到code:%s  new:%ld \n",i+1,name,pPriceVolItem->m_lNewPrice);
 		pPriceVolItem ++;
 	}
+}
+
+/**********服务器处理函数*********************************/
+int
+json_to_request_of_time_share(package)
+     server_package_t * package;
+{
+  return 0;
 }

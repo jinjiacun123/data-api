@@ -4,8 +4,8 @@
 #include "common.h"
 #include "data.h"
 
-extern void request_login(int sclient, t_base_c_request_head * head);
-extern void parse_login(buff_t * my_buff);
+extern void client_request_login(int sclient, t_base_c_request_head * head);
+extern void client_parse_login(buff_t * my_buff);
 extern t_base_c_request_head * json_to_request_of_login(char * json_str);
 
 /**

@@ -26,9 +26,12 @@ $ ./a.out -Wall -o hello.c
 
 extern void request_server();
 
-buff_t client_buff={
+buff_t my_buff;
+/*
+={
 	{NULL,0,0,	0,NULL,0,	NULL,NULL,	0,true}
 };
+*/
 /*int index[BUFF_MAX_LEN] = {0};*/
 int sclient = 0;
 
@@ -154,8 +157,9 @@ main(int argc, char *argv[])
 		switch(atoi(p2)){
 			case 1:
 				{
+				  t_base_c_request_head * head;
 					printf("request of login\n");
-					request_login(sclient);
+					client_request_login(sclient, head);
 				}
 				break;
 		}	
@@ -180,9 +184,27 @@ main(int argc, char *argv[])
         usage(argv[0]);
     }
 
+    t_base_c_request_head * head;
 	while(1){
 		sleep(2);
-		recv_socket();
+		recv_socket(&my_buff);
+
+		//处理心跳(test request)
+		//REQUEST_FUNC(heart)(sclient, head);
+		//recv_socket(&my_buff);
+		
+		//处理实时请求(test request parse)
+		//REQUEST_FUNC(realtime)(sclient,head);
+		//recv_socket(&my_buff);
+
+		//处理历史(test request response)
+		//REQUEST_FUNC(history)(sclient, head);		
+		//recv_socket(&my_buff);
+		
+		//处理分时(test request)
+		REQUEST_FUNC(time_share)(sclient, head);
+		recv_socket(&my_buff);
+		
 	}
 	//pause();	 
     
@@ -200,7 +222,7 @@ my_read(){
 	int ret;
  
 	/* Create input file descriptor */
-	input_fd = open ("type", O_RDONLY);
+	input_fd = open ("./type", O_RDONLY);
 	if (input_fd == -1) {
 		perror ("open");
 	        return 2;
@@ -220,29 +242,48 @@ void sighandler(int signum)
 	1-login 
 	2-init
 	3-heart	
-	4-
-	5-
-	6-
+	4-realtime
+	5-history
+	6-time-sharing
+	7-push
 	*/
 	int type=0;
+	t_base_c_request_head * head;
 	if (signum == SIGUSR1)
 	{
-		type = my_read();
-		switch(type){
-			case 1:
-				printf("request of login\n");
-				request_server(sclient, TYPE_LOGIN);
-				break;
-			case 2:
-				printf("request of init\n");
-				break;
-			case 3:
-				printf("request of heart\n");
-				break;
-			case 4:				
-				break;
-			case 5:
-				break;
+	  type = my_read();
+	  switch(type){
+	  case 1:
+	    printf("request of login\n");
+	    REQUEST_FUNC(login)(sclient, head);
+	    //request_server(sclient, head);
+	    break;
+	  case 2:
+	    printf("request of init\n");
+	    REQUEST_FUNC(init)(sclient,head);
+	    break;
+	  case 3:
+	    printf("request of heart\n");
+	    REQUEST_FUNC(heart)(sclient, head);
+	    break;
+	  case 4:				
+	    printf("request of realtime\n");
+	    REQUEST_FUNC(realtime)(sclient, head);
+	    break;
+	  case 5:
+	    printf("request of history\n");
+	    //REQUEST_FUNC(history)(sclient, head);
+	    break;
+	  case 6:
+	    printf("request of time-share\n");
+	    //REQUEST_FUNC(time_share)(sclient, head);
+	    break;
+	  case 7:
+	    printf("request of push\n ");
+	    //REQUEST_FUNC(push)(sclient, head);
+	    break;
+	  default:
+	    break;
 		}
 	}
 }

@@ -1,7 +1,11 @@
 #include "./../include/d_init.h"
 
 //初始化请求
-void request_init(int sclient, t_base_c_request_head * head){
+void 
+client_request_init(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
+{
   char request[1024];
 	
   InitPack data ;
@@ -19,7 +23,8 @@ void request_init(int sclient, t_base_c_request_head * head){
 }
 
 //初始化解析
-void parse_init(buff_t * my_buff){
+void 
+client_parse_init(buff_t * my_buff){
 	int i;
 	printf("解析初始化数据包\n");
 	AnsInitialData2 * pAnsInitialData = (AnsInitialData2 * )my_buff->p_res_media_h;

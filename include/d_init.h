@@ -3,9 +3,9 @@
 #include "common.h"
 #include "data.h"
 
-extern void request_init(int sclient, t_base_c_request_head * head);
-extern void parse_init(buff_t *);
-extern void parse_init_pack(buff_t *);
+extern void client_request_init(int sclient, t_base_c_request_head * head);
+extern void client_parse_init(buff_t *);
+extern void client_parse_init_pack(buff_t *);
 extern t_base_c_request_head * json_to_request_of_init(char *);
 
 //≥ı ºªØ«Î«Û

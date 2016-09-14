@@ -1,6 +1,6 @@
 CC = gcc-4.4
 MYSQL = -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient
-LIST_O = do_json.o cJSON.o d_login.o data.o d_init.o d_heart.o d_realtime.o do_mysql.o
+LIST_O = do_json.o cJSON.o d_login.o data.o d_init.o d_heart.o d_realtime.o d_auto_push.o d_history.o d_time_share.o do_mysql.o
 libjim.so:$(LIST_O)
 	cc -g -w $(LIST_O) -fpic -shared -o libjim.so -lm
 do_json.o:do_json.c
@@ -17,6 +17,12 @@ d_heart.o:d_heart.c
 	cc -g -w -c d_heart.c $(MYSQL)
 d_realtime.o:d_realtime.c
 	cc -g -w -c d_realtime.c $(MYSQL)
+d_history.o:d_history.c
+	cc -g -w -c d_history.c $(MYSQL)
+d_auto_push.o:d_auto_push.c
+	cc -g -w -c d_auto_push.c $(MYSQL)
+d_time_share.o:d_time_share.c
+	cc -g -w -c d_time_share.c $(MYSQL)
 do_mysql.o:do_mysql.c 
 	gcc -g -w -c do_mysql.c $(MYSQL)
 #gcc -o connect -g connect.c  -I /usr/local/mysql/include/ -L /usr/local/mysql/lib/ -l mysqlclient	

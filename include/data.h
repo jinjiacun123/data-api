@@ -13,8 +13,8 @@
 #define SQL_BUFF_MAX_LEN 4096
 char * sql_buffer[SQL_BUFF_MAX_LEN];
 
-#define REQUEST_FUNC(a) request_##a 
-#define PARSE_FUNC(a) parse_##a
+#define REQUEST_FUNC(a) client_request_##a 
+#define PARSE_FUNC(a) client_parse_##a
 #define TO_JSON_FUNC(a) json_to_request_of_##a
 
 /*number of type as hexadicimal*/

@@ -1,11 +1,13 @@
-#include "d_history.h"
+#include "./../include/d_history.h"
 /*
 	历史
 **/
 
-extern buff_t my_buff;
-
-void request_history(int sclient){
+void 
+client_request_history(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
+{
 	char request[1024];
 
 	TeachPack data;
@@ -35,14 +37,18 @@ void request_history(int sclient){
 	printf("历史请求\n");
 }
 
-void parse_history(){
-	printf("解析历史\n");	
-	AnsDayDataEx2 * g = (AnsDayDataEx2* )my_buff.p_res_media_h;//历史数据对上了这个结构体
+void 
+client_parse_history(my_buff)
+     buff_t * my_buff;
+{
+	printf("client_parse_history\n");		
+	AnsDayDataEx2 * g = (AnsDayDataEx2* )my_buff->p_res_media_h;//历史数据对上了这个结构体
 	StockCompDayDataEx2 *stockData = (StockCompDayDataEx2*)g->m_sdData;
 	int lengthaa = sizeof(AnsDayDataEx2)-4+sizeof(StockCompDayDataEx2)*g->m_nSize;
 	printf("数据包有效长度%d",lengthaa);
-				
-	for (int i =0;i<g->m_nSize;i++)
+	
+	int i = 0;
+	for (i =0;i<g->m_nSize;i++)
 	{
 		char name[7]={0};
 		memcpy(name,g->m_cCode,6);
@@ -57,3 +63,13 @@ void parse_history(){
 		stockData++;
 	}
 }
+
+
+/**********服务器端处理函数***************************/
+int 
+json_to_request_of_history(package)
+     server_package_t * package;
+{
+
+  return 0;
+} 

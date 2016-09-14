@@ -5,8 +5,8 @@
 /**
 	ĞÄÌø
 */
-extern void request_heart(int sclient, t_base_c_request_head *);
-extern void parse_heart(buff_t *);
+extern void client_request_heart(int sclient, t_base_c_request_head *);
+extern void client_parse_heart(buff_t *);
 extern t_base_c_request_head * json_to_request_of_heart(char *);
 
 typedef struct

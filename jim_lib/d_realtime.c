@@ -1,153 +1,230 @@
 #include "./../include/d_realtime.h"
 
-extern  buff_t my_buff;
 static int general_sql_from_simple_of_realtime(server_package_t *);
 static int general_sql_from_multi_of_realtime(server_package_t *);
+static int check_code_type_category(buff_t *);//检查code type属于类别
+static void do_foreign_exchange(char *,buff_t *,int);//处理外汇
+static void do_no_foreign_exchange(char *,buff_t *,int);//处理非外汇
+static void do_norm(char *,buff_t *,int);//处理指标
+static void do_stock(char *,buff_t *,int);//处理股票
 
 /*
 	实时行情处理
 */
+/**********客户处理函数******************************/
 char	g_cPacketIndex = 10;
 #define PACKET_FLAG_NUM	4
+
 //单条请求
-void request_realtime(int sclient, t_base_c_request_head * head){
-  printf("realtime request\n");
-  /*
+void 
+client_request_realtime(sclient, head)
+  int sclient;
+  t_base_c_request_head * head;
+{
+        printf("realtime request\n");
+  
 	char request[1024];
 
 	RealPack data ;
 	memset(&data,0x00,sizeof(RealPack));
 	memcpy(data.m_head, HEADER, 4);
-	data.m_length =  sizeof(RealPack) - 8;
-	data.m_nType = TYPE_REALTIME;
+	data.m_length =  sizeof(RealPack) - 8+ sizeof(CodeInfo)*1;
+	data.m_nType = TYPE_REALTIME_EX;
 	data.m_nSize =1;
 	data.m_nOption	= 0x0080;
-	memcpy(data.m_cCode2,"EURUSD",6);
-	data.m_cCodeType2 = 0x8100;
+	
+	#define SIZE 1
+	CodeInfo ary[1];
+	memset(ary, 0, sizeof(CodeInfo));
+	
+	/*非外汇*/
+	/*
+	  CodeInfo ary[1];
+	  memset(ary, 0, sizeof(CodeInfo));
+	  memcpy(ary[0].m_cCode2, "XAU", 6);
+	  ary[0].m_cCodeType2 = 0x5b00;
+	*/
 
+	/*外汇:pass*/
+	/*
+	memcpy(ary[0].m_cCode2,"AUDUSD",6);
+	ary[0].m_cCodeType2 = 0xffff8100;
+	*/
+	
+	//指数:pass	
+	//memcpy(ary[0].m_cCode2, "2A01", 6);
+	//ary[0].m_cCodeType2 = 0x1200;
+	
+	
+	//股票:pass
+	memcpy(ary[0].m_cCode2, "600000", 6);
+	ary[0].m_cCodeType2 = 0x1101;
+	
 	memset(request, 0, sizeof(data));
 	memcpy(request, &data, sizeof(data));
-	int r = send(sclient, request, sizeof(data), 0);  
-	printf("r:%d\n", r);
+	memcpy(request+sizeof(data), &ary, sizeof(CodeInfo));
+	int r = send(sclient, request, sizeof(data)+sizeof(CodeInfo), 0);  
+	printf("r:%d\n", request);
 	printf("实时请求\n");
-  */
 }
 
 //多条请求
-void request_realtime_m(int sclient, t_base_c_request_head * head){
-  /*
-	CodeInfo ary;
-	memcpy(ary.m_cCode,"XAGUSD",6);
-	ary.m_cCodeType = 0x5a00;
-	//单个包
-	short lLen2 = ASKDATA_HEAD_COUNT + sizeof(CodeInfo);
-	AskData ask2;
-	memset(&ask2,0x1,sizeof(AskData));
-	ask2.m_nType	= TYPE_REALTIME_EX;  // auto_push
-	ask2.m_nSize	= 1;
-
-	ask2.m_nIndex = g_cPacketIndex++;
-	char chBuf[1024];
-	memcpy(chBuf,(char *)&ask2,ASKDATA_HEAD_COUNT);
-	memcpy(chBuf+ASKDATA_HEAD_COUNT,(char *)&ary,sizeof(CodeInfo));
-
-	long nAlloc = ASKDATA_HEAD_COUNT +sizeof(CodeInfo) + PACKET_FLAG_NUM + sizeof(int);
-	/*
-	CDataBuffer *pBuffer = NULL;
-	int leng = ASKDATA_HEAD_COUNT + sizeof(CodeInfo);
-	int leng2 =sizeof(AskData);
-	pBuffer = new CDataBuffer;
-	if (pBuffer == NULL)
-	{
-		return FALSE;
-	}
-	pBuffer->Alloc(nAlloc);
-	if (!pBuffer->m_pszBuffer)
-	{
-		return FALSE;
-	}
-	char *psz2 = pBuffer->m_pszBuffer;
-	strncpy(psz2, PACKET_FLAG, PACKET_FLAG_NUM*sizeof(char));
-	psz2 += PACKET_FLAG_NUM*sizeof(char);
-	*(int*)psz2 = nAlloc;
-	psz2 += sizeof(int);
-	memcpy(psz2, chBuf, nAlloc);
-	*/
-
-  /*
-	char request[1024];
-
-	RealPack login ;
-	memset(&login,0x00,sizeof(RealPack));
-	memcpy(login.m_head, HEADER, 4);
-	login.m_length =  sizeof(RealPack) - 8;
-	login.m_nType = TYPE_REALTIME;
-	login.m_nSize =1;
-	login.m_nOption	= 0x0080;
-	memcpy(login.m_cCode2,"EURUSD",6);
-	login.m_cCodeType2 = 0x8100;
-
-	memset(request, 0, sizeof(login));
-	memcpy(request, &login, sizeof(login));
-	int r = send(sclient, request, sizeof(login), 0);  
-	printf("r:%d\n", r);
-*/
-}
-
-t_base_c_request_head *
-json_to_request_of_realtime(json_str)
-char * json_str;
+void 
+client_request_realtime_m(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
 {
-	t_base_c_request_head  head;
-
-	return &head;
+  
 }
 
-
-void parse_realtime(my_buff)
+void 
+client_parse_realtime(my_buff)
   buff_t * my_buff;
 {
   printf("parse realtime\n");
   /*
-	int c =sizeof(long);
-	int d= sizeof(unsigned short);
-	int a = sizeof(HSQHRealTime2);
-	int b =sizeof(HSQHRealTime);
-	AskData2 *test = (AskData2 *) (my_buff->buff+8);
-	int pre=sizeof(AskData2);
-				
-	CommRealTimeData2* pRealTime1 ;
-		HSQHRealTime2 *pWHRealTime ;
-	for (int i =0 ;i<test->m_nSize;i++)
-	{
-		char name[7]={0};
-					
-		pRealTime1 = (CommRealTimeData2*)(my_buff->buff 
-			                              + 28 
-										  +i*(sizeof(CommRealTimeData2)
-										  +sizeof(HSQHRealTime2)));
- 		if (pRealTime1->m_cCodeType != 0x8100)
- 		{	
- 					
- 			pWHRealTime = (HSQHRealTime2*)(my_buff->buff 
-										   + 28 
-				                           + sizeof(CommRealTimeData2) 
-				                           +i*(sizeof(CommRealTimeData2)
-										   +sizeof(HSQHRealTime2)));  //实时或主推
- 			memcpy(name,pRealTime1->m_cCode,6);
- 			printf("品种%s   最新价%d\n",name,pWHRealTime->m_lNewPrice);
- 		}			
-					
-	}
-			
-	int bbbbbbbb = sizeof(CommRealTimeData2) - 4 +sizeof(HSWHRealTime);
+  int category = check_code_type_category(my_buff);
+  
+  switch(category){
+  case 1:
+    //处理外汇
+    {
+      do_foreign_exchange(my_buff);
+    }
+    break;
+  case 2:
+    //处理非外汇
+    {
+      do_no_foreign_exchange(my_buff);
+    }
+    break;
+  case 3:
+    //处理指标
+    {
+      do_norm(my_buff);
+    }
+    break;
+  case 4:
+    //处理股票
+    {
+      do_stock(my_buff);
+    }
+    break;
+  default:
+    break;
+  }
   */
+  
+  AskData2 * data_head = (AskData2 *)(my_buff->buff+8);
+  char code[7]={0};
+  int i=0;
+
+  for(i=0; i< data_head->m_nSize; i++){
+    CommRealTimeData * data_type = (CommRealTimeData *)(my_buff->buff
+							+ 28
+							+ i*(sizeof(CommRealTimeData)+sizeof(HSQHRealTime2)));
+    memcpy(code, data_type->m_cCode, 6);
+    if(data_type->m_cCodeType == 0x5b00)//非外汇
+      {
+	do_no_foreign_exchange(code, my_buff, i);
+      }
+    else if(data_type->m_cCodeType == 0xffff8100)//外汇
+      {
+	do_foreign_exchange(code, my_buff, i);
+      }
+    //指数（成交量单位（个，万，亿），万和亿只保留两位小数后面加单位(万或亿)
+    else if(data_type->m_cCodeType == 0x1200)
+      {
+	do_norm(code, my_buff, i);
+      }
+    else if(data_type->m_cCodeType == 0x1101)//股票
+      {
+	do_stock(code, my_buff, i);
+      }
+  }
+}
+
+//检查市场类别
+/*
+  1-外汇
+  2-非外汇
+  3-指标
+  4-股票
+*/
+static int
+check_code_type_category(my_buff)
+     buff_t * my_buff;
+{
+  //检查code_type属于那种类别
+  printf("检查code type 类型...\n");
+  return 2;
+}
+
+//处理外汇
+static void
+do_foreign_exchange(code, my_buff, i)
+     char * code;
+     buff_t * my_buff;
+     int i;
+{
+  printf("do_foreign_exchange...\n");
+  HSWHRealTime * entity = (HSWHRealTime*)(my_buff->buff
+					  + 28
+					  + sizeof(CommRealTimeData)
+					  + i*(sizeof(CommRealTimeData)+sizeof(HSWHRealTime)));
+}
+
+//处理非外汇
+static void
+do_no_foreign_exchange(code,my_buff, i)
+     char * code;
+     buff_t * my_buff;
+     int i;
+{
+  printf("do_no_foreign_exchange...\n");
+  
+  HSQHRealTime2 * entity = (HSQHRealTime2*)(my_buff->buff
+						+28
+						+sizeof(CommRealTimeData2)
+						+i*(sizeof(CommRealTimeData2)+sizeof(HSQHRealTime2)));
+      printf("品种:%s, 最新价:%d\n", code, entity->m_lNewPrice);
+  
+}
+
+//处理指数
+static void
+do_norm(code, my_buff, i)
+     char * code;
+     buff_t * my_buff;
+     int i;
+{
+  printf("处理指标...\n");
+  HSIndexRealTime * tmp = (HSIndexRealTime*)(my_buff->buff
+					     +28
+					     +sizeof(CommRealTimeData)
+					     + i*(sizeof(CommRealTimeData)+sizeof(HSIndexRealTime)));
+}
+
+//处理股票
+static void
+do_stock(code, my_buff, i)
+    char * code;
+    buff_t * my_buff;
+    int i;
+{
+  printf("处理股票...\n");
+  HSStockRealTime * tmp = (HSStockRealTime *)(my_buff->buff
+					      +28
+					      +sizeof(CommRealTimeData)
+					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
 }
 
 void parse_realtime_pack(buff_t * my_buff){
 	
 }
 
+
+/*********服务器处理函数***********************************/
 /**
    from json object general to sql sentence
    
@@ -172,6 +249,15 @@ void parse_realtime_pack(buff_t * my_buff){
     ]
    }
 */
+t_base_c_request_head *
+json_to_request_of_realtime(json_str)
+char * json_str;
+{
+	t_base_c_request_head  head;
+
+	return &head;
+}
+
 int
 general_sql_of_realtime(package)
      server_package_t * package;

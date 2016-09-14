@@ -1,11 +1,15 @@
-#include "d_auto_push.h"
-#include "d_realtime.h"
+#include "./../include/d_auto_push.h"
+#include "./../include/d_realtime.h"
 extern buff_t my_buff;
 
 /**
 	主推
 */
-void request_auto_push(int sclient){
+void 
+client_request_auto_push(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
+{
 	char request[1024];
 
 	RealPack data;
@@ -15,8 +19,8 @@ void request_auto_push(int sclient){
 	data.m_nType = TYPE_AUTO_PUSH_EX;
 	data.m_nSize =1;
 	data.m_nOption	= 0x0080;
-	memcpy(data.m_cCode2,"EURUSD",6);
-	data.m_cCodeType2 = 0x8100;
+	//memcpy(data.m_cCode2,"EURUSD",6);
+	//data.m_cCodeType2 = 0x8100;
 
 	memset(request, 0, sizeof(data));
 	memcpy(request, &data, sizeof(data));
@@ -25,11 +29,12 @@ void request_auto_push(int sclient){
 	printf("主推请求\n");
 }
 
-void parse_auto_push(){
+void 
+client_parse_auto_push(){
 	printf("主推\n");
+	/*
 	AskData2 *test = (AskData2 *) my_buff.p_res_media_h;
-	int pre=sizeof(AskData2);
-				
+	int pre=sizeof(AskData2);				
 	CommRealTimeData2* pRealTime1 ;
 	HSQHRealTime2 *pWHRealTime ;
 				
@@ -50,4 +55,14 @@ void parse_auto_push(){
 			
 
 	int bbbbbbbb = sizeof(CommRealTimeData2) - 4 +sizeof(HSQHRealTime2);
+	*/
+}
+
+
+/*******服务器处理函数********************************/
+int
+json_to_request_of_auto_push(package)
+     server_package_t * package;
+{
+  return 0;
 }

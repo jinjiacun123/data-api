@@ -3,7 +3,11 @@
 /**
 	心跳
 */
-void request_heart(int sclient, t_base_c_request_head * head){
+void 
+client_request_heart(sclient, head)
+  int sclient;
+t_base_c_request_head * head;
+{
 	char request[1024];
 	
 	TestSrvData2 data ;
@@ -19,9 +23,13 @@ void request_heart(int sclient, t_base_c_request_head * head){
 	printf("心跳请求发送完毕\n");
 }
 
-void parse_heart(buff_t * my_buff){
+void 
+client_parse_heart(buff_t * my_buff){
 	printf("解析心跳机制\n");
 }
+
+
+/*******作为服务器处理函数***************/
 
 t_base_c_request_head *
 json_to_request_of_heart(char * json_str){
