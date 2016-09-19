@@ -19,10 +19,10 @@ t_base_c_request_head * head;
 	data.m_nType = TYPE_TIME_SHARE_EX;//0x0301
 	data.m_nSize = 0;
 	data.m_nOption	= 0x0080;
-	memcpy(data.m_cCode,"EURUSD",6);
-	data.m_cCodeType = 0x8100;
-	memcpy(data.m_cCode2,"EURUSD",6);
-	data.m_cCodeType2 = 0x8100;
+	memcpy(data.m_cCode,"XAG",6);
+	data.m_cCodeType = 0x5b00;
+	memcpy(data.m_cCode2,"XAG",6);
+	data.m_cCodeType2 = 0x5b00;
 
 	memset(request, 0, 1024);
 	memcpy(request, &data, sizeof(data));
@@ -35,15 +35,19 @@ client_parse_time_share(my_buff)
      buff_t * my_buff;
 {
 	printf("解析分时数据\n");	
-	PriceVolItem2* pPriceVolItem = (PriceVolItem2*)my_buff->p_res_media_h + sizeof(AnsTrendData2);
+	//PriceVolItem2* pPriceVolItem = (PriceVolItem2*)(my_buff->p_res_media_h + sizeof(AnsTrendData2)+1);
 	AnsTrendData2* pHisData222 = (AnsTrendData2 *)my_buff->p_res_media_h;
-	int i = 0;
-	for(i=0;i<pHisData222->m_nHisLen;i++)
-	{
-		char name[7]={0};
-		memcpy(name,pHisData222->m_cCode,6);
-		printf("第%d条数据 收到code:%s  new:%ld \n",i+1,name,pPriceVolItem->m_lNewPrice);
-		pPriceVolItem ++;
+	if(pHisData222->m_nType == TYPE_TIME_SHARE_EX){
+	    PriceVolItem2 * pPriceVolItem = (PriceVolItem2 *)pHisData222->m_pHisData;
+	  int i = 0;
+	  for(i=0;i<pHisData222->m_nHisLen;i++){
+	    char name[7]={0};
+	    memcpy(name,pHisData222->m_cCode,6);
+	    printf("第%d条数据 收到code:%s  new:%d \n",i+1,
+		   name,
+		   pPriceVolItem->m_lNewPrice);
+	    pPriceVolItem ++;
+	  }
 	}
 }
 

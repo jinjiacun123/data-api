@@ -17,11 +17,11 @@ data deal
 
 
 static void unpack(buff_t *);
-static void clean_buff();
-static void parse_default();
+static void clean_buff(buff_t *);
+static void parse_default(buff_t *);
 static void request_default(int sclient, t_base_c_request_head * head);
 static void json_to_reqest_of_default();
-extern buff_t my_buff;
+//extern buff_t my_buff;
 
 #define DEAL_LEN 5
 t_deal deal[] = {
@@ -105,7 +105,7 @@ void parse(buff_t * my_buff){
 			if(deal[i].d_type == REQUEST
 				&& deal[i].type == my_buff->p_res_media_h->type){
 				if(deal[i].func_response){
-					deal[i].func_response();
+					deal[i].func_response(my_buff);
 					clean_buff(my_buff);
 					return;
 				}

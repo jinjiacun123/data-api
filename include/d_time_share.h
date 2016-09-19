@@ -32,16 +32,17 @@ typedef struct
 
 typedef struct
 {
-	unsigned short	m_nType;
-	char	m_nIndex;
-	char	m_cSrv;
-	long	m_lKey;
-	short	m_cCodeType;
-	char	m_cCode[6];
-	short	m_nHisLen;
-	short 	m_nAlignment;
-	char	m_othData[24];
-	char  	m_otnerdata2[112];
+  unsigned short	m_nType;
+  char	m_nIndex;
+  char	m_cSrv;
+  long	m_lKey;
+  short	m_cCodeType;
+  char	m_cCode[6];
+  short	m_nHisLen;
+  short	m_nAlignment;
+  char	m_othData[24];
+  char 	m_otnerdata2[112];
+  int   m_pHisData[1];
 }AnsTrendData2;
 
 /*********服务器处理函数**************/

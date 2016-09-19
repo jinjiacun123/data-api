@@ -49,6 +49,7 @@ client_parse_history(my_buff)
 	
 	int i = 0;
 	for (i =0;i<g->m_nSize;i++)
+	  //for(i=0 ;i < 3; i++)
 	{
 		char name[7]={0};
 		memcpy(name,g->m_cCode,6);
