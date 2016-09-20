@@ -44,6 +44,12 @@ char * sql_buffer[SQL_BUFF_MAX_LEN];
 #define TYPE_SERVERINFO_EX   	259   //
 #define TYPE_DAY_CURPOS_EX   	524   //
 
+/*history bean type*/
+#define PERIOD_TYPE_DAY 0x0010     //周期:日
+#define PERIOD_TYPE_SECOND1 0x00E0 //周期:1秒
+#define PERIOD_TYPE_MINUTE1 0X00c0 //周期:1分钟
+#define PERIOD_TYPE_MINUTER5 0X0030 //周期:5分钟
+
 //服务器包
 typedef struct server_request server_request_t;
 typedef struct server_response server_response_t;
@@ -64,6 +70,10 @@ typedef int (*type_general_json)(server_package_t *);
 #define SQL_TEMPLATE_FUN(a) general_sql_of_##a 
 #define DB_TO_JSON_FUN(a) general_json_from_db_##a
 
+typedef struct{
+  unsigned short m_cCodeType2;
+  char m_cCode2[6];
+}CodeInfo;
 
 //deal business logic
 typedef void (*request_type)(int);

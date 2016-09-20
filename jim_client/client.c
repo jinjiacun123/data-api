@@ -39,16 +39,42 @@ void send_socket(){
 }
 
 void recv_socket(buff_t * my_buff){
-	int ret_count = 0;	
+	int ret_count = 0;
+	int length = 0;
+	int head_length = sizeof(struct response_header);
+	int off = 0;
+	//接受头部
+	if(ret_count = recv(sclient, my_buff->buff, head_length, 0)){
+	    //获取包长
+	    my_buff->p_res_h = (p_response_header)my_buff->buff;
+	    length = my_buff->p_res_h->length;
+	    //接受剩余包
+	    while(ret_count = recv(sclient, my_buff->buff + head_length+off, length,0)){
+	      if(ret_count >0){
+		if(ret_count == length){
+		  my_buff->is_direct = true;
+		  my_buff->buff_parse_off = 8;
+		  my_buff->buff_len = ret_count;
+		  parse(my_buff);
+		  break;
+	      }
+	      else if(ret_count < length){
+		length = length -ret_count;
+		off = off + ret_count;
+	      }
+	      }
+	    } 
+	  }
+	/*
 	while((ret_count = recv(sclient, my_buff->buff+my_buff->buff_off, MAX_BUFF, 0)) > 0){
 			if(my_buff->buff_len == 0){			
 			my_buff->p_res_h = (p_response_header)my_buff->buff;
 			if(my_buff->p_res_h->length + sizeof(struct response_header)  == ret_count)
 			{
-				/*
-				|---------------------------------------------|
-				1.һ��ȫ�������굱ǰ�����ݰ����ҽ�Ϊһ�����ݰ�;
-				*/
+				//
+				//|---------------------------------------------|
+				//1.һ��ȫ�������굱ǰ�����ݰ����ҽ�Ϊһ�����ݰ�;
+				
 				printf("1.һ��ȫ�������굱ǰ�����ݰ����ҽ�Ϊһ�����ݰ�\n");
 				my_buff->is_direct = true;
 				my_buff->buff_parse_off = 8;
@@ -60,20 +86,18 @@ void recv_socket(buff_t * my_buff){
 			}
 			else if(my_buff->p_res_h->length + 8  > ret_count)//��ǰ��δ��������
 			{
-				/*
-				|----------------------------------------------
-				2.һ�ν��ܲ��굱ǰҪ�������ݰ�����Ҫ���̼��λ��߶��ν��ܲ�����;
-				*/
+				//|----------------------------------------------
+				//2.һ�ν��ܲ��굱ǰҪ�������ݰ�����Ҫ���̼��λ��߶��ν��ܲ�����;
+				
 				printf("һ�ν��ܲ��굱ǰҪ�������ݰ�����Ҫ���̼��λ��߶��ν��ܲ�����");
 				my_buff->buff_off = ret_count;
 			}
 			else if(my_buff->p_res_h->length + 8  < ret_count)
-			{
-				/*
-				|------------------------------------------------|----
-				|----------------------|-------------------------|...
-				5.һ�ν������ݰ���������ֹһ��Ԫ������.
-				*/
+			{				
+				//|------------------------------------------------|----
+				//|----------------------|-------------------------|...
+				//5.һ�ν������ݰ���������ֹһ��Ԫ������.
+				
 				printf("5.һ�ν������ݰ���������ֹһ��Ԫ������.\n");
 				//�����´�Ԫ���ݵ���Ϣ
 				my_buff->buff_len = my_buff->p_res_h->length + 8;
@@ -122,6 +146,7 @@ void recv_socket(buff_t * my_buff){
 		}
 
 	}
+*/
 }
 
 void close_socket(){

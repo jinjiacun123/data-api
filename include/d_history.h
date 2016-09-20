@@ -29,6 +29,7 @@ typedef struct
 	char		m_cCode2[6];
 }TeachPack;
 
+/*
 typedef struct
 {
   unsigned short m_nType;
@@ -43,6 +44,7 @@ typedef struct
   char m_otnerdata2[112];
   int m_pHisData[1];
 }AnsTrendData2;
+*/
 
 /*
 typedef struct
@@ -51,10 +53,12 @@ typedef struct
 }AnsTrendData;
 */
 
+ /*
 typedef struct{
   short m_cCodeType;
   char m_cCode[6];
 }CodeInfo;
+ */
 
 typedef struct{
   CodeInfo m_pCode;

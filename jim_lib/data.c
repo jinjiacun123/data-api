@@ -80,6 +80,7 @@ void request_server(int sclient, int type){
 		&& deal[i].type == type){
 			if(deal[i].func_request){
 				deal[i].func_request(sclient);
+				break;
 			}
 		}
 	}
@@ -96,8 +97,8 @@ void parse(buff_t * my_buff){
         //解压
 	if(my_buff->p_res_media_h->type == TYPE_ZIB_EX){
 		unpack(my_buff);
-		my_buff->is_direct = false;
-		parse(my_buff);
+		//my_buff->is_direct = false;
+		//parse(my_buff);
 	}
 
 	if(my_buff->p_res_media_h){
@@ -157,7 +158,8 @@ void unpack(buff_t *my_buff){
 	&& pRetLen == zheader->m_lOrigLen){
 		my_buff->is_direct = false;	
 		my_buff->p_res_media_h = (p_response_meta_header)my_buff->unpack_buff;
-		parse(my_buff);
+		//	parse(my_buff);
+		//	return;
 	}
 	printf("status:%d\n", unzip);
 }

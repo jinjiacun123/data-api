@@ -23,8 +23,9 @@ $ ./a.out -Wall -o hello.c
 #include <stdbool.h>
 #include "./../include/data.h"
 
-
+CodeInfo my_request_code_info;
 extern void request_server();
+static int get_history();
 
 buff_t my_buff;
 /*
@@ -118,97 +119,99 @@ void init(){
 int 
 main(int argc, char *argv[])
 {
-	int c;
-	const char* p1 = NULL;
-	const char* p2 = NULL;
-	const char* p3 = NULL;
-	
-	init();
+  int c;
+  const char* p1 = NULL;
+  const char* p2 = NULL;
+  const char* p3 = NULL;
+  
+  init();
 
-    while(1)
-    {
-	c = getopt(argc, argv, my_opt);
-	printf("optind: %d\n", optind);
-	if (c < 0)
-	{
-	    break;
-	}
-	printf("option char: %x %c\n", c, c);
-	switch(c)
-	{
-	case 'd':
-	        debug_level = atoi(optarg);
-	        printf("debug level: %d\n", debug_level);
-	        break;
-	case 'O':
-	        printf("optimization flag is open.\n\n");
-	        break;
-	case 'o':
-                printf("the obj is: %s\n\n", optarg);
-                p1 = optarg;
-                break;
-        case 'W':
-                printf("optarg: %s\n\n", optarg);
-                p2 = optarg;
-                break;
-	case 'r':
-		printf("socket request\n\n", optarg);
-		p2 = optarg;	
-		switch(atoi(p2)){
-			case 1:
-				{
-				  t_base_c_request_head * head;
-					printf("request of login\n");
-					client_request_login(sclient, head);
-				}
-				break;
-		}	
-		break;
-	case 'c':
-		printf("close socket\n\n", optarg);
-		p2 = optarg;
-		break;
-        case ':':
-                fprintf(stderr, "miss option char in optstring.\n");
-                break;
-        case '?':
-        case 'h':
-        default:
-                usage(argv[0]);
-                break;
-                //return 0;
-        }
+  /*
+  while(1){
+    c = getopt(argc, argv, my_opt);
+    printf("optind: %d\n", optind);
+    if (c < 0){
+      break;
     }
-    if (optind == 1)
-    {
-        usage(argv[0]);
+    printf("option char: %x %c\n", c, c);
+    switch(c){
+    case 'd':
+      debug_level = atoi(optarg);
+      printf("debug level: %d\n", debug_level);
+      break;
+    case 'O':
+      printf("optimization flag is open.\n\n");
+      break;
+    case 'o':
+      printf("the obj is: %s\n\n", optarg);
+      p1 = optarg;
+      break;
+    case 'W':
+      printf("optarg: %s\n\n", optarg);
+      p2 = optarg;
+      break;
+    case 'r':
+      printf("socket request\n\n", optarg);
+      p2 = optarg;	
+      switch(atoi(p2)){
+      case 1:{
+	  t_base_c_request_head * head;
+	  printf("request of login\n");
+	  client_request_login(sclient, head);
+      }
+	break;
+      }	
+      break;
+    case 'c':
+      printf("close socket\n\n", optarg);
+      p2 = optarg;
+      break;
+    case ':':
+      fprintf(stderr, "miss option char in optstring.\n");
+      break;
+    case '?':
+    case 'h':
+    default:
+      usage(argv[0]);
+      break;
+      //return 0;
     }
+  }
+  if (optind == 1){
+    usage(argv[0]);
+  }
+  */
 
-    t_base_c_request_head * head;
-	while(1){
-		sleep(2);
-		recv_socket(&my_buff);
-
-		//处理心跳(test request)
-		//REQUEST_FUNC(heart)(sclient, head);
-		//recv_socket(&my_buff);
-		
-		//处理实时请求(test request parse)
-		//REQUEST_FUNC(realtime)(sclient,head);
-		//recv_socket(&my_buff);
-
-		//处理历史(test request response)
-		REQUEST_FUNC(history)(sclient, head);		
-		recv_socket(&my_buff);
-		
-		//处理分时(test request response)
-		//REQUEST_FUNC(time_share)(sclient, head);
-		//recv_socket(&my_buff);
-		
-	}
-	//pause();	 
+  t_base_c_request_head * head;
+  client_request_login(sclient, head);
+  recv_socket(&my_buff);
+  
+  assert(get_history() == 0);
+  //REQUEST_FUNC(history)(sclient, head);		
+  //recv_socket(&my_buff);
+  /*
+  while(1){
+    sleep(2);
+    //处理心跳(test request)
+    //REQUEST_FUNC(heart)(sclient, head);
+    //recv_socket(&my_buff);
     
-    ll_printf(MSG_ERROR, "p1: %s p2: %s\n", p1, p2);
+    //处理实时请求(test request parse)
+    //REQUEST_FUNC(realtime)(sclient,head);
+    //recv_socket(&my_buff);
+
+    //处理历史(test request response)
+    REQUEST_FUNC(history)(sclient, head);		
+    recv_socket(&my_buff);
+		
+    //处理分时(test request response)
+    //REQUEST_FUNC(time_share)(sclient, head);
+    //recv_socket(&my_buff);
+    break;
+  }
+  */
+     
+  //ll_printf(MSG_ERROR, "p1: %s p2: %s\n", p1, p2);
     
     return 0;
 }
@@ -234,6 +237,36 @@ my_read(){
 	}
 	close (input_fd);
 	return ret;
+}
+
+
+static int
+get_history(){
+  char * sql= "select company_code,code from hr_entity";
+  db_back_t * result_back = do_mysql_select(sql);
+  MYSQL_ROW row;
+  t_base_c_request_head * head;
+
+  /*
+  while((row = mysql_fetch_row(result_back)) != NULL){
+    assert(row);
+    memset(&my_request_code_info, 0, sizeof(CodeInfo));
+    my_request_code_info.m_cCodeType2 = row[0];
+    memcpy(my_request_code_info.m_cCode2, row[1], 6);
+    //请求历史并处理
+    REQUEST_FUNC(history)(sclient, head);		
+    recv_socket(&my_buff);
+  }
+  */
+  
+  memset(&my_request_code_info, 0, sizeof(CodeInfo));
+  my_request_code_info.m_cCodeType2 = 0x1101;
+  memcpy(my_request_code_info.m_cCode2, "600006", 6);
+  //请求历史并处理
+  REQUEST_FUNC(history)(sclient, head);		
+  recv_socket(&my_buff);
+
+  return 0;
 }
 
 void sighandler(int signum)

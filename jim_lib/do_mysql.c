@@ -88,13 +88,13 @@ do_mysql_select(sql)
 //插入 
 int
 do_mysql_insert(char * sql){
-  do_mysql_connect();
+  //do_mysql_connect();
   
   if(mysql_query(conn_ptr, sql)){
     printf("insert error\n");
   }
 
-  do_mysql_close();
+  //do_mysql_close();
   return 0;
 }
 

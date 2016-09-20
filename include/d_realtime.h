@@ -27,10 +27,6 @@ typedef struct
 	unsigned short m_nOption; 
 }RealPack;
 
-typedef struct{
-  unsigned short m_cCodeType2;
-  char m_cCode2[6];
-}CodeInfo;
 
 //解析实时数据包
 typedef struct {
