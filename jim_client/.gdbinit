@@ -1,5 +1,4 @@
 break main
-break recv_socket
-break client_request_login
+break client_parse_history 
 set args --r 1
 r

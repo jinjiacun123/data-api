@@ -198,12 +198,12 @@ main(int argc, char *argv[])
 		//recv_socket(&my_buff);
 
 		//处理历史(test request response)
-		//REQUEST_FUNC(history)(sclient, head);		
-		//recv_socket(&my_buff);
-		
-		//处理分时(test request)
-		REQUEST_FUNC(time_share)(sclient, head);
+		REQUEST_FUNC(history)(sclient, head);		
 		recv_socket(&my_buff);
+		
+		//处理分时(test request response)
+		//REQUEST_FUNC(time_share)(sclient, head);
+		//recv_socket(&my_buff);
 		
 	}
 	//pause();	 

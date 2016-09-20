@@ -31,15 +31,60 @@ typedef struct
 
 typedef struct
 {
-	unsigned short	m_nType;       
-	char	m_nIndex; 
-	char m_Not;		
-	long	m_lKey;	
-	short	m_cCodeType;
-	char	m_cCode[6];
-	long	m_nSize;
-	int	m_sdData[1];			
-}AnsDayDataEx2;
+  unsigned short m_nType;
+  char m_nIndex;
+  char m_cSrv;
+  long m_lKey;
+  short m_cCodeType;
+  char m_cCode[6];
+  short m_nHisLen;
+  short m_nAlignment;
+  char m_othData[24];
+  char m_otnerdata2[112];
+  int m_pHisData[1];
+}AnsTrendData2;
+
+/*
+typedef struct
+{
+
+}AnsTrendData;
+*/
+
+typedef struct{
+  short m_cCodeType;
+  char m_cCode[6];
+}CodeInfo;
+
+typedef struct{
+  CodeInfo m_pCode;
+}HSPrivateKey;
+
+typedef struct{
+  unsigned short m_nType;
+  char m_nIndex;
+  char m_cNotEmptyPack:2;
+  char m_cOperator:6;
+  long m_lKey;
+  HSPrivateKey m_nPrivateKey;
+}DataHead;
+
+typedef struct{
+  long m_lDate;           //日期
+  long m_lOpenPrice;      //开
+  long m_lMaxPrice;       //高
+  long m_lMinPrice;       //低
+  long m_lClosePrice;     //收
+  long m_lMoney;          //成交金额
+  unsigned long m_lTotal; //成交量
+  long m_lnationalDebtRatio;//国债利率
+}StockCompDayDataEx;
+
+typedef struct{
+  DataHead m_dhHead;
+  long m_nSize;
+  StockCompDayDataEx m_sdData[1];
+}AnsDayDataEx;
 
 typedef struct
 {
