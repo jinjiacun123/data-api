@@ -72,7 +72,7 @@ db_back_t *
 do_mysql_select(sql)
      char * sql;
 {
-  do_mysql_connect();
+  //do_mysql_connect();
 
   if (mysql_query(conn_ptr, sql)){
     printf("select error\nx");
@@ -80,7 +80,7 @@ do_mysql_select(sql)
   
   MYSQL_RES *result = mysql_store_result(conn_ptr);
   
-  do_mysql_close();
+  //do_mysql_close();
   
   return result;
 }

@@ -243,10 +243,11 @@ my_read(){
 static int
 get_history(){
   char * sql= "select company_code,code from hr_entity";
+  do_mysql_connect();
   db_back_t * result_back = do_mysql_select(sql);
   MYSQL_ROW row;
   t_base_c_request_head * head;
-
+  
   /*
   while((row = mysql_fetch_row(result_back)) != NULL){
     assert(row);
@@ -256,8 +257,10 @@ get_history(){
     //请求历史并处理
     REQUEST_FUNC(history)(sclient, head);		
     recv_socket(&my_buff);
+    break;
   }
   */
+  
   
   memset(&my_request_code_info, 0, sizeof(CodeInfo));
   my_request_code_info.m_cCodeType2 = 0x1101;
@@ -265,7 +268,10 @@ get_history(){
   //请求历史并处理
   REQUEST_FUNC(history)(sclient, head);		
   recv_socket(&my_buff);
+  
 
+  do_mysql_close();
+  
   return 0;
 }
 
