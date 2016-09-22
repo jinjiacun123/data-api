@@ -6,13 +6,17 @@
 #include<stdlib.h>
 #include<string.h>
 #include<assert.h>
+//#define __IS_SERVER__
 
 #ifdef __IS_SERVER__
 #define REMOTE_SERVER "116.226.241.36"
 #else
-#define REMOTE_SERVER "192.168.1.201"
+//#define REMOTE_SERVER "192.168.1.201"
+//#define REMOTE_SERVER "dsapp.yz.zjwtj.com"
+#define REMOTE_SERVER "221.6.167.245"
 #endif
-#define REMOTE_PORT 9999
+//#define REMOTE_PORT 9999
+#define REMOTE_PORT 8881
 
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"

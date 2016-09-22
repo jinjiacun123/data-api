@@ -22,6 +22,7 @@ static void parse_default(buff_t *);
 static void request_default(int sclient, t_base_c_request_head * head);
 static void json_to_reqest_of_default();
 //extern buff_t my_buff;
+extern bool is_exit;
 
 #define DEAL_LEN 5
 t_deal deal[] = {
@@ -100,6 +101,21 @@ void parse(buff_t * my_buff){
 		//my_buff->is_direct = false;
 		//parse(my_buff);
 	}
+
+	//空包立即返回
+	if(my_buff->p_res_media_h->type == TYPE_EMPTY_EX){	  
+	  printf("empty package!\n");
+	  clean_buff(my_buff);
+	  is_exit = true;
+	  return ;
+	}
+
+	if(my_buff->p_res_media_h->type == TYPE_DAY_CURPOS_EX){
+	  printf("day current line\n");
+	  clean_buff(my_buff);
+	  return;
+	}
+	
 
 	if(my_buff->p_res_media_h){
 		for(i=0; deal[i].d_type != EMPTY; i++){

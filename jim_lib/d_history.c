@@ -7,6 +7,8 @@
 static int
 insert_into(unsigned short,char * ,long, long, long,long, long, long, long);
 extern CodeInfo my_request_code_info;
+extern unsigned long current_index;
+extern bool is_exit;
    
 void 
 client_request_history(sclient, head)
@@ -23,16 +25,16 @@ t_base_c_request_head * head;
 	data.m_nSize =1;
 	data.m_nIndex	= 0;
 	data.m_nOption	= 0x0080;
-	memcpy(data.m_cCode, my_request_code_info.m_cCode2,6);
+	strcpy(data.m_cCode, my_request_code_info.m_cCode2);
 	data.m_cCodeType = my_request_code_info.m_cCodeType2;
 
 	//日线请求
-	data.m_cPeriod = PERIOD_TYPE_DAY;  //请求周期类型
-	data.m_lBeginPosition =0;          //请求开始位置
-        data.m_nPeriodNum =1;
-	data.m_nDay = 1000*data.m_nPeriodNum;//请求个数(1000个)
+	data.m_cPeriod = PERIOD_TYPE_DAY;      //请求周期类型	
+	data.m_lBeginPosition = current_index; //请求开始位置
+	data.m_nPeriodNum = 1;
+	data.m_nDay = 400*data.m_nPeriodNum;//请求个数(500个)
 	data.m_nSize2 =0;
-	memcpy(data.m_cCode2,my_request_code_info.m_cCode2, 6);
+	strcpy(data.m_cCode2,my_request_code_info.m_cCode2);
 	data.m_cCodeType2 = my_request_code_info.m_cCodeType2;
 
 	//周线
@@ -85,13 +87,16 @@ client_parse_history(my_buff)
     AnsDayDataEx *g = (AnsDayDataEx*)(pHisData222);
     StockCompDayDataEx *stockData = g->m_sdData;
     int code_len = strlen(g->m_dhHead.m_nPrivateKey.m_pCode.m_cCode2);
+    if(code_len>6) code_len = 6;
     memcpy(my_code,g->m_dhHead.m_nPrivateKey.m_pCode.m_cCode2, code_len);
     code_type = g->m_dhHead.m_nPrivateKey.m_pCode.m_cCodeType2;
     int i = 0;
     // do_mysql_connect();
+    current_index += g->m_nSize;
+    if(g->m_nSize ==0)is_exit = true;
     for (i =0;i<g->m_nSize;i++){				
 	    /*
-	    printf("index:%d code:%s  date:%ld open:%ld, max:%ld min:%ld close:%d,money:%d,total:%ld\n",
+	    printf("index:%d code:%.6s  date:%ld open:%ld, max:%ld min:%ld close:%d,money:%d,total:%ld\n",
 		   i+1,
 		   code,
 		   stockData->m_lDate,

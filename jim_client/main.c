@@ -24,6 +24,8 @@ $ ./a.out -Wall -o hello.c
 #include "./../include/data.h"
 
 CodeInfo my_request_code_info;
+unsigned long current_index = 0;
+bool is_exit = false;
 extern void request_server();
 static int get_history();
 
@@ -252,28 +254,41 @@ get_history(){
   while((row = mysql_fetch_row(result_back)) != NULL){
     assert(row);
     memset(&my_request_code_info, 0, sizeof(CodeInfo));
-    my_request_code_info.m_cCodeType2 = row[0];
-    memcpy(my_request_code_info.m_cCode2, row[1], 6);
-    //请求历史并处理
-    REQUEST_FUNC(history)(sclient, head);		
-    recv_socket(&my_buff);
-    break;
+    my_request_code_info.m_cCodeType2 = strtol(row[0], NULL, 16);
+    memcpy(my_request_code_info.m_cCode2, row[1], strlen(row[1]));
+    while(1){
+      //请求历史并处理
+      REQUEST_FUNC(history)(sclient, head);		
+      recv_socket(&my_buff);
+      printf("finish code_type:%ld,code:%.6s, current_index:%d\n", 
+	     my_request_code_info.m_cCodeType2,
+	     my_request_code_info.m_cCode2, current_index);
+    }
   }
   */
   
-  
-  memset(&my_request_code_info, 0, sizeof(CodeInfo));
-  my_request_code_info.m_cCodeType2 = 0x1101;
-  memcpy(my_request_code_info.m_cCode2, "600006", 6);
-  //请求历史并处理
-  REQUEST_FUNC(history)(sclient, head);		
-  recv_socket(&my_buff);
+    while(1){
+      if(is_exit == true){
+	printf("finish total:%ld\n", current_index);
+	break;
+      }
+      memset(&my_request_code_info, 0, sizeof(CodeInfo));
+      my_request_code_info.m_cCodeType2 = 0x5b00;
+      memcpy(my_request_code_info.m_cCode2, "XAU", 3);
+      //请求历史并处理
+      REQUEST_FUNC(history)(sclient, head);		
+      recv_socket(&my_buff);
+      printf("current_index:%d\n", current_index);
+      sleep(10);
+    }
   
 
   do_mysql_close();
   
   return 0;
 }
+
+
 
 void sighandler(int signum)
 {
