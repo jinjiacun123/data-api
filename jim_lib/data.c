@@ -77,7 +77,7 @@ request_template_t  req_tem_u[]={
    },*/
   
   {"000100040001", 
-   "select * from hr_history_day_%s limit %d,%d",
+   "select * from hr_history_%s limit %d,%d",
    SQL_TEMPLATE_FUN(history)
    },
 

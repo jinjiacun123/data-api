@@ -21,9 +21,10 @@ json2:	{"type":"000100010001","data":{"code_type":"CODE_TYPE","code":"CODE"}}<br
 <br/>
 	<b>历史数据请求格式</b>:<br/>
 json1:  {"type":"000100040001","length":PACKAGE_LENGTH}<br/>
-json2:  {"type":"000100040001","data":{"code_type":"CODE_TYPE","code":"CODE","index":INDEX,"size":SIZE}}<br/>
+json2:  {"type":"000100040001","data":{"code_type":"CODE_TYPE","code":"CODE","index":INDEX,"size":SIZE,"circle":"CIRCLE"}}<br/>
 	<br/>
 	SIZE:请求返回的条数<br/>
 	INDEX:请求的第几个SIZE，从当前时间向前推第几个SIZE<br/>
+	CIRCLE:请求的周期(minite_5,minite_15,minite_30,minite_60,minite_120,day,week,month)
 	<br/>
 <br/>

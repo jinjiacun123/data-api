@@ -116,6 +116,7 @@ general_sql_from_simple(package)
   int result = 0;
   char code_type[100];
   char code[100];
+  char circle[20];
   unsigned int index;
   unsigned int size;
   
@@ -125,23 +126,28 @@ general_sql_from_simple(package)
   assert(code_type);
   memset(code, 0, 100);
   assert(json_get_string(req->data, "code", code) == 0);
-  assert(code);  
+  assert(code); 
+  memset(circle, 0, 20);
+  assert(json_get_string(req->data, "circle", circle) == 0);
+  assert(circle);
   size = json_get_int(req->data, "size"); 
   assert(size != -1);
   index = json_get_int(req->data, "index");
   assert(index != -1); 
-  char table_ex_template_sql[] = "%s_%s";
+  char table_ex_template_sql[] = "%s_%s_%s";
   char where[1024];
   char table_ex[20];
   memset(where, 0, 1024);
   memset(table_ex, 0, 20);
-  assert(sprintf(table_ex, table_ex_template_sql, tolower(code_type), tolower(code)));
+  assert(sprintf(table_ex, table_ex_template_sql, 
+		 circle,tolower(code_type), tolower(code)));
    
   assert(sprintf(package->sql_buffer, 
 		 package->sql_template,
 		 table_ex,
 		 index,
 		 size));
+  printf("sql:%s\n", package->sql_buffer);
   assert(package->sql_buffer);
   return result;
 }
