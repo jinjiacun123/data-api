@@ -1,5 +1,3 @@
-
-
 /**
 data deal
 **/
@@ -12,13 +10,11 @@ data deal
 #include "./../include/d_init.h"
 #include "./../include/d_heart.h"
 #include "./../include/d_realtime.h"
-/*
 #include "./../include/d_history.h"
+/*
 #include "./../include/d_time_share.h"
 #include "./../include/d_auto_push.h"
 */
-
-
 
 static void unpack();
 static void clean_buff();
@@ -36,11 +32,10 @@ t_deal deal[] = {
 	{REQUEST,                 TYPE_HEART_EX,     
 	REQUEST_FUNC(heart),      PARSE_FUNC(heart),    TO_JSON_FUNC(heart)},
 	{REQUEST,                 TYPE_REALTIME_EX,  
-	REQUEST_FUNC(realtime),   PARSE_FUNC(realtime), TO_JSON_FUNC(realtime)},
-	
-	/*	
+	REQUEST_FUNC(realtime),   PARSE_FUNC(realtime), TO_JSON_FUNC(realtime)},	
 	{REQUEST,  TYPE_HISTORY_EX,   
 	REQUEST_FUNC(history),    PARSE_FUNC(history),  TO_JSON_FUNC(history)},	
+	/*
 	{REQUEST,  TYPE_TIME_SHARE_EX,
 	REQUEST_FUNC(time_share), PARSE_FUNC(time_share), TO_JSON_FUNC(time_share)},	
 	{REQUEST,  TYPE_AUTO_PUSH_EX, 
@@ -60,11 +55,31 @@ typedef struct
   char sql_template[100];
   type_general_sql func;//处理函数指针
 }request_template_t;
+/**
+   00010001xxxx realtime
+   00010002xxxx auto_push
+   00010003xxxx time_share
+   00010004xxxx history
+*/
 request_template_t  req_tem_u[]={
-  {"00010010001", 
+  {"000100010001", 
    "select * from hr_realtime where %s",
    SQL_TEMPLATE_FUN(realtime)
   },
+
+  /*{"000100020001", 
+   "select * from hr_realtime where %s",
+   SQL_TEMPLATE_FUN(auto_push)
+  },
+  {"000100030001", 
+   "select * from hr_realtime where %s",
+   SQL_TEMPLATE_FUN(time_share)
+   },*/
+  
+  {"000100040001", 
+   "select * from hr_history_day_%s limit %d,%d",
+   SQL_TEMPLATE_FUN(history)
+   },
 
    {"","",}
 };
@@ -80,7 +95,8 @@ request_db_parse_t req_db_p_u[] = {
   {"",NULL}
 };
 
-void request_server(int sclient, int type){
+void request_server(int sclient, int type)
+{
 	int i = 0;
 	for(i = 0; deal[i].d_type != EMPTY; i++){
 		if(deal[i].d_type == REQUEST
@@ -93,7 +109,8 @@ void request_server(int sclient, int type){
 }
 
 //解析
-void parse(buff_t * my_buff){	
+void parse(buff_t * my_buff)
+{	
 	int i;
 	if(my_buff->is_direct)
 		my_buff->p_res_media_h = (p_response_meta_header)(my_buff->buff+ my_buff->buff_parse_off);
@@ -122,7 +139,8 @@ void parse(buff_t * my_buff){
 	}
 }
 
-static void parse_default(buff_t * my_buff){
+static void parse_default(buff_t * my_buff)
+{
 	printf("类型ÐÍ:%x\n", my_buff->p_res_media_h->type);
 	printf("默认");
 }
@@ -199,11 +217,13 @@ do_client_request(package)
   //char *tmp = cJSON_Print(entity);
   //printf("entity:%s\n", tmp);
   for(i=0; req_tem_u[i].func ;i++){
-    if(req_tem_u[i].func){
-      printf("get req_tem_u...\n");
-      package->sql_template = req_tem_u[i].sql_template;
-      assert(req_tem_u[i].func(package) == 0);
-      break;
+    if(!strcmp(req_tem_u[i].type, req->type)){
+      if(req_tem_u[i].func){
+	printf("get req_tem_u...\n");
+	package->sql_template = req_tem_u[i].sql_template;
+	assert(req_tem_u[i].func(package) == 0);
+	break;
+      }
     }
   }
   printf("find sql...\n");

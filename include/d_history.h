@@ -7,8 +7,10 @@
 **/
 extern void request_history(int sclient);
 extern void parse_history();
+extern t_base_c_request_head * json_to_request_of_history(char *);
+extern int general_sql_of_history(server_package_t *);
 
-struct TeachPack
+typedef struct
 {
 	char m_head[4];                         // 里面放"2010"       4个字节   32 30 31 30
 	int  m_length;                          // 后面数据的长度（包的长度减去8）  4个字节     28 00 00 00 
@@ -27,9 +29,9 @@ struct TeachPack
 	short				m_cPeriod;		    // 周期类型                             2个字节 10 00
 	unsigned short		m_cCodeType2;	    // 证券类型                              2个字节   00 81
 	char				m_cCode2[6];		// 证券代码                          6个字节  45 55 52 55 53 44
-};
+}TeachPack;
 
-struct AnsDayDataEx2
+typedef struct
 {
 	unsigned short		m_nType;        // 请求类型，与请求数据包一致
 	char				m_nIndex;     	// 请求索引，与请求数据包一致
@@ -39,9 +41,9 @@ struct AnsDayDataEx2
 	char				m_cCode[6];		// 证券代码
 	long				m_nSize;		// 日线数据个数	
 	int	m_sdData[1];					// 日线数据
-};
+}AnsDayDataEx2;
 
-struct StockCompDayDataEx2
+typedef struct
 {
 	long			m_lDate;			  // 日期
 	long			m_lOpenPrice;		  // 开
@@ -51,5 +53,5 @@ struct StockCompDayDataEx2
 	long	        m_lMoney;			  // 成交金额
 	unsigned long	m_lTotal;			  // 成交量
 	long			m_lNationalDebtRatio; // 国债利率(单位为0.1分),基金净值(单位为0.1分), 无意义时，须将其设为0 2004年2月26日加入
-};
+}StockCompDayDataEx2;
 #endif

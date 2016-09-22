@@ -1,9 +1,8 @@
-#include "d_history.h"
+#include "./../include/d_history.h"
 /*
-	历史
+  历史
 **/
-
-extern buff_t my_buff;
+static int general_sql_from_simple(server_package_t *);
 
 void request_history(int sclient){
 	char request[1024];
@@ -36,13 +35,15 @@ void request_history(int sclient){
 }
 
 void parse_history(){
-	printf("解析历史\n");	
+	printf("解析历史\n");
+	/*	
 	AnsDayDataEx2 * g = (AnsDayDataEx2* )my_buff.p_res_media_h;//历史数据对上了这个结构体
 	StockCompDayDataEx2 *stockData = (StockCompDayDataEx2*)g->m_sdData;
 	int lengthaa = sizeof(AnsDayDataEx2)-4+sizeof(StockCompDayDataEx2)*g->m_nSize;
 	printf("数据包有效长度%d",lengthaa);
-				
-	for (int i =0;i<g->m_nSize;i++)
+	
+	int i = 0;
+	for (i =0;i<g->m_nSize;i++)
 	{
 		char name[7]={0};
 		memcpy(name,g->m_cCode,6);
@@ -56,4 +57,91 @@ void parse_history(){
 			   stockData->m_lMinPrice);
 		stockData++;
 	}
+	*/
+}
+
+t_base_c_request_head *
+json_to_request_of_history(json)
+char * json;
+{
+  return NULL;
+}
+
+
+
+/**
+   from json object general to sql sentence 
+
+   code type
+   code 
+   
+   simple:
+   {'type':'xxx',
+   'data':{
+          'code_type':'xxx',
+	  'code':'xxx',
+	  'index':'xxx',
+	  'size':'xxx'
+	  }
+   }
+*/
+int
+general_sql_of_history(package)
+     server_package_t * package;
+{
+  server_request_t * req;
+  int result = 0;
+  char tmp[100];
+  req = package->request;
+
+  printf("enter general_sql_of_history...\n");
+  
+  req->data = cJSON_GetObjectItem(req->json, "data");
+  if(req->data){
+    printf("simple mode!\n");
+    general_sql_from_simple(package);
+    free(req->data);
+    free(req->json);
+  }
+
+  return result;
+}
+
+//单个品种请求
+static int
+general_sql_from_simple(package)
+     server_package_t * package;
+{
+  server_request_t * req;
+  int result = 0;
+  char code_type[100];
+  char code[100];
+  unsigned int index;
+  unsigned int size;
+  
+  req = package->request;
+  memset(code_type, 0, 100);
+  assert(json_get_string(req->data, "code_type", code_type) == 0);
+  assert(code_type);
+  memset(code, 0, 100);
+  assert(json_get_string(req->data, "code", code) == 0);
+  assert(code);  
+  size = json_get_int(req->data, "size"); 
+  assert(size != -1);
+  index = json_get_int(req->data, "index");
+  assert(index != -1); 
+  char table_ex_template_sql[] = "%s_%s";
+  char where[1024];
+  char table_ex[20];
+  memset(where, 0, 1024);
+  memset(table_ex, 0, 20);
+  assert(sprintf(table_ex, table_ex_template_sql, tolower(code_type), tolower(code)));
+   
+  assert(sprintf(package->sql_buffer, 
+		 package->sql_template,
+		 table_ex,
+		 index,
+		 size));
+  assert(package->sql_buffer);
+  return result;
 }

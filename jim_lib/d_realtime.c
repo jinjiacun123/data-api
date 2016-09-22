@@ -1,8 +1,11 @@
 #include "./../include/d_realtime.h"
+/*
+  实时
+**/
 
 extern  buff_t my_buff;
-static int general_sql_from_simple_of_realtime(server_package_t *);
-static int general_sql_from_multi_of_realtime(server_package_t *);
+static int general_sql_from_simple(server_package_t *);
+static int general_sql_from_multi(server_package_t *);
 
 /*
 	实时行情处理
@@ -181,14 +184,13 @@ general_sql_of_realtime(package)
   char tmp[100];
   req = package->request;
 
-
   printf("enter general_sql_of_realtime...\n");
 
   req->data = cJSON_GetObjectItem(req->json, "data");
   //单个品种请求
   if(req->data){
     printf("simple mode!\n");
-    general_sql_from_simple_of_realtime(package);
+    general_sql_from_simple(package);
     free(req->data);
     free(req->json);
     return 0;
@@ -197,7 +199,7 @@ general_sql_of_realtime(package)
   req->data = cJSON_GetObjectItem(req->json, "data_list");
   //多个品种请求
   if(req->data){
-    general_sql_from_multi_of_realtime(package);
+    general_sql_from_multi(package);
     free(req->data);
     free(req->json);    
   }  
@@ -208,7 +210,7 @@ general_sql_of_realtime(package)
 
 //单个品种请求(test_pass)
 static int
-general_sql_from_simple_of_realtime(package)
+general_sql_from_simple(package)
      server_package_t * package;
 {
   server_request_t * req;
@@ -235,7 +237,7 @@ general_sql_from_simple_of_realtime(package)
 
 //多个品种请求
 static int
-general_sql_from_multi_of_realtime(package)
+general_sql_from_multi(package)
      server_package_t * package;
 {
   int result = 0;
@@ -261,6 +263,7 @@ general_json_from_db_realtime(package)
   int i=0;
   int num_fields = mysql_num_fields(package->db_back);
   server_response_t * resp;
+  char * str_null = "NULL";
 
   resp = package->response;
   assert(num_fields);
@@ -274,8 +277,13 @@ general_json_from_db_realtime(package)
     for(i=0; i<num_fields; i++){
       //创建json对象
       field = mysql_fetch_field_direct(package->db_back, i);
-      assert(field);      
-      cJSON_AddStringToObject(item, field->name, row[i]);
+      assert(field);
+      if(row[i] != 0){
+	cJSON_AddStringToObject(item, field->name, row[i]);
+      }
+      else{
+	cJSON_AddStringToObject(item, field->name, str_null);
+      }
       //printf("%s:%s,", field->name, row[i]); 
     }
     cJSON_AddItemToArray(resp->list, item); 
