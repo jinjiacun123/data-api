@@ -7,7 +7,7 @@
 <br/>
 <br/>
 请求格式:<br/>
-	实时请求格式：<br/>
+	<b>实时请求格式</b>：<br/>
 json1:	{"type":"000100010001","length":PACKAGE_LENGTH}<br/>
 json2:	{"type":"000100010001","data":{"code_type":"CODE_TYPE","code":"CODE"}}<br/>
 	<br/>
@@ -19,7 +19,7 @@ json2:	{"type":"000100010001","data":{"code_type":"CODE_TYPE","code":"CODE"}}<br
 	json1的总长度为50，实际数据不足50后面追加\0，补充完为50字节为止<br/>
 <br/>
 <br/>
-	历史数据请求格式:<br/>
+	<b>历史数据请求格式</b>:<br/>
 json1:  {"type":"000100040001","length":PACKAGE_LENGTH}<br/>
 json2:  {"type":"000100040001","data":{"code_type":"CODE_TYPE","code":"CODE","index":INDEX,"size":SIZE}}<br/>
 	<br/>
