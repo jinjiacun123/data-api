@@ -31,6 +31,6 @@ json2:  {"type":"000100030001",'data":{"code_type":"CODE_TYPE","code":"code","in
 json1:  {"type":"000100040001","length":PACKAGE_LENGTH}<br/>
 json2:  {"type":"000100040001","data":{"code_type":"CODE_TYPE","code":"CODE","index":INDEX,"size":SIZE,"circle":"CIRCLE"}}<br/>
 	<br/>	
-	CIRCLE:请求的周期(minite_5,minite_15,minite_30,minite_60,minite_120,day,week,month)
+	CIRCLE:请求的周期(minite_1,minite_5,minite_15,minite_30,minite_60,minite_120,minite_180,minite_240,day,5day,week,month)
 	<br/>
 <br/>
