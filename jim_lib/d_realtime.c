@@ -2,8 +2,6 @@
 /*
   ʵʱ
 **/
-
-extern  buff_t my_buff;
 static int general_sql_from_simple(server_package_t *);
 static int general_sql_from_multi(server_package_t *);
 

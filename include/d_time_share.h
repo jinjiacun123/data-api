@@ -1,12 +1,16 @@
 #ifndef __D_TIME_SHARE_H__
 #define __D_TIME_SHARE_H__
+#include "common.h"
+#include "data.h"
 /**
  分时走势
 */
 extern void request_time_share(int sclient);
 extern void parse_time_share();
+extern t_base_c_request_head * json_to_request_of_time_share(char *);
+extern int general_sql_of_time_share(server_package_t *);
 
-struct TrendPack
+typedef struct
 {
 
 	char m_head[4];           //里面放"2010"    4个字节      32 30 31 30
@@ -21,13 +25,13 @@ struct TrendPack
 	unsigned short		m_nOption;       // 为了4字节对齐而添加的字段 2个字节   80 00
 	unsigned short		m_cCodeType2;	//证券类型                    2个字节   00 81
 	char				m_cCode2[6];		// 证券代码               6个字节   45 55 52 55 53 44 
-};
+}TrendPack;
 
-struct PriceVolItem2
+typedef struct
 {
 	long			    m_lNewPrice;	// 最新价
 	unsigned long		m_lTotal;		// 成交量(在外汇时，是跳动量)
-};
+}PriceVolItem2;
 struct AnsTrendData2
 {
 	unsigned short		m_nType;         // 请求类型，与请求数据包一致

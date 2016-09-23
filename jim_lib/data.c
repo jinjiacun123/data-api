@@ -11,8 +11,8 @@ data deal
 #include "./../include/d_heart.h"
 #include "./../include/d_realtime.h"
 #include "./../include/d_history.h"
-/*
 #include "./../include/d_time_share.h"
+/*
 #include "./../include/d_auto_push.h"
 */
 
@@ -34,10 +34,10 @@ t_deal deal[] = {
 	{REQUEST,                 TYPE_REALTIME_EX,  
 	REQUEST_FUNC(realtime),   PARSE_FUNC(realtime), TO_JSON_FUNC(realtime)},	
 	{REQUEST,  TYPE_HISTORY_EX,   
-	REQUEST_FUNC(history),    PARSE_FUNC(history),  TO_JSON_FUNC(history)},	
-	/*
+	REQUEST_FUNC(history),    PARSE_FUNC(history),  TO_JSON_FUNC(history)},		
 	{REQUEST,  TYPE_TIME_SHARE_EX,
-	REQUEST_FUNC(time_share), PARSE_FUNC(time_share), TO_JSON_FUNC(time_share)},	
+	REQUEST_FUNC(time_share), PARSE_FUNC(time_share), TO_JSON_FUNC(time_share)},
+	/*
 	{REQUEST,  TYPE_AUTO_PUSH_EX, 
 	REQUEST_FUNC(auto_push),  PARSE_FUNC(auto_push),  TO_JSON_FUNC(auto_push)}, 
 */
@@ -71,10 +71,11 @@ request_template_t  req_tem_u[]={
    "select * from hr_realtime where %s",
    SQL_TEMPLATE_FUN(auto_push)
   },
+  */
   {"000100030001", 
-   "select * from hr_realtime where %s",
+   "select * from hr_time_share_%s limit %d,%d",
    SQL_TEMPLATE_FUN(time_share)
-   },*/
+   },
   
   {"000100040001", 
    "select * from hr_history_%s limit %d,%d",
