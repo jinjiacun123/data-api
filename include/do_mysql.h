@@ -11,10 +11,12 @@ extern int do_mysql_update(char *);
 
 
 /**mysql连接配置信息*/
-#define MYSQL_HOST   "192.168.1.233"
+//#define MYSQL_HOST   "192.168.1.233"
+#define MYSQL_HOST "127.0.0.1"
 #define MYSQL_PORT   "3306"
 #define MYSQL_USER   "root"
-#define MYSQL_PASSWD "123456"
+//#define MYSQL_PASSWD "123456"
+#define MYSQL_PASSWD ""
 #define MYSQL_DB     "market"
 
 #endif

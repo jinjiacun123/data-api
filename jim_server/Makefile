@@ -6,6 +6,8 @@ server_ex:server_ex.c
 
 server_ex1:server_ex1.c
 	gcc -g -o server_ex1 server_ex1.c -ljim $(MYSQL)
+server_mul_thread:server_mul_thread.c
+	gcc -g -o server_mul_thread server_mul_thread.c -ljim $(MYSQL)
 
 clean:
 	rm jim_server
