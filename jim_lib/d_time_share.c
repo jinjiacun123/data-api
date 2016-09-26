@@ -90,8 +90,8 @@ general_sql_from_simple(package)
   int result = 0;
   char code_type[100];
   char code[100];
-  unsigned int index=1;
-  unsigned int size=20;
+  // unsigned int index=1;
+  //unsigned int size=20;
   
   req = package->request;
   memset(code_type, 0, 100);
@@ -100,19 +100,17 @@ general_sql_from_simple(package)
   memset(code, 0, 100);
   assert(json_get_string(req->data, "code", code) == 0);
   assert(code);
-  index = json_get_int(req->data, "index");
-  assert(index != -1);
-  size = json_get_int(req->data, "size");
-  assert(size != -1);
+  //index = json_get_int(req->data, "index");
+  //assert(index != -1);
+  //size = json_get_int(req->data, "size");
+  //assert(size != -1);
   char table_ex_template_sql[] = "%s_%s";
   char table_ex[20];
   memset(table_ex, 0, 20);
   assert(sprintf(table_ex, table_ex_template_sql,
 		 tolower(code_type),tolower(code)));
   assert(sprintf(package->sql_buffer, package->sql_template, 
-		 table_ex, 
-		 index, 
-		 size));
+		 table_ex));
   assert(package->sql_buffer);
   return result;
 }

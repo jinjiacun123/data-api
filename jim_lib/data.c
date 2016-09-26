@@ -73,7 +73,7 @@ request_template_t  req_tem_u[]={
   },
   */
   {"000100030001", 
-   "select * from hr_time_share_%s limit %d,%d",
+   "select * from hr_time_share_%s",
    SQL_TEMPLATE_FUN(time_share)
    },
   
