@@ -188,7 +188,11 @@ main(int argc, char *argv[])
   client_request_login(sclient, head);
   recv_socket(&my_buff);
   
-  assert(get_history() == 0);
+  //assert(get_history() == 0);
+
+  REQUEST_FUNC(time_share)(sclient, head);
+  recv_socket(&my_buff);
+  
   //REQUEST_FUNC(history)(sclient, head);		
   //recv_socket(&my_buff);
   /*
@@ -207,8 +211,8 @@ main(int argc, char *argv[])
     recv_socket(&my_buff);
 		
     //处理分时(test request response)
-    //REQUEST_FUNC(time_share)(sclient, head);
-    //recv_socket(&my_buff);
+    REQUEST_FUNC(time_share)(sclient, head);
+    recv_socket(&my_buff);
     break;
   }
   */
