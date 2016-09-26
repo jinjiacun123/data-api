@@ -107,8 +107,11 @@ general_sql_from_simple(package)
   char table_ex_template_sql[] = "%s_%s";
   char table_ex[20];
   memset(table_ex, 0, 20);
-  assert(sprintf(table_ex, table_ex_template_sql,
-		 tolower(code_type),tolower(code)));
+  assert(strcat(table_ex, code_type));
+  assert(strcat(table_ex, "_"));
+  assert(strcat(table_ex, code));
+  //assert(sprintf(table_ex, table_ex_template_sql,
+  //		 tolower(code_type),tolower(code)));
   assert(sprintf(package->sql_buffer, package->sql_template, 
 		 table_ex));
   assert(package->sql_buffer);
