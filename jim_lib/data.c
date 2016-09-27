@@ -73,7 +73,7 @@ request_template_t  req_tem_u[]={
   },
   */
   {"000100030001", 
-   "select * from hr_time_share_%s",
+   "select * from hr_time_share_%s order by id asc limit %d,%d",
    SQL_TEMPLATE_FUN(time_share)
    },
   
@@ -252,7 +252,7 @@ do_client_request(package)
   printf("format out...\n");
 
   printf("send_buff_head:%s\n", resp->package_head);
-  printf("send_buff_body:%s\n", resp->package_body);
+  //printf("send_buff_body:%s\n", resp->package_body);
   printf("send length:%d\n",    resp->send_buff_len);
   //通过上面获取到的json字符串，发送客户端
   if(write(package->client_fd, resp->send_buff, resp->send_buff_len)<0){

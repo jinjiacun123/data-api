@@ -189,8 +189,8 @@ general_sql_of_realtime(package)
   if(req->data){
     printf("simple mode!\n");
     general_sql_from_simple(package);
-    free(req->data);
-    free(req->json);
+    //free(req->data);
+    //    free(req->json);
     return 0;
   }
   

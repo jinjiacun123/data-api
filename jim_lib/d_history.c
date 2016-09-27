@@ -114,33 +114,36 @@ general_sql_from_simple(package)
 {
   server_request_t * req;
   int result = 0;
-  char code_type[100];
-  char code[100];
-  char circle[20];
+  char code_type[6];
+  char code[6];
+  char circle[10];
   unsigned int index;
   unsigned int size;
   
   req = package->request;
-  memset(code_type, 0, 100);
+  memset(code_type, 0, 6);
   assert(json_get_string(req->data, "code_type", code_type) == 0);
   assert(code_type);
-  memset(code, 0, 100);
+  memset(code, 0,6);
   assert(json_get_string(req->data, "code", code) == 0);
   assert(code); 
-  memset(circle, 0, 20);
+  memset(circle, 0, 10);
   assert(json_get_string(req->data, "circle", circle) == 0);
   assert(circle);
   size = json_get_int(req->data, "size"); 
   assert(size != -1);
   index = json_get_int(req->data, "index");
   assert(index != -1); 
-  char table_ex_template_sql[] = "%s_%s_%s";
-  char where[1024];
+  char * table_ex_template_sql = "%.6s_%.6s_%.10s";
   char table_ex[20];
-  memset(where, 0, 1024);
   memset(table_ex, 0, 20);
-  assert(sprintf(table_ex, table_ex_template_sql, 
-		 circle,tolower(code_type), tolower(code)));
+  assert(strcat(table_ex, circle));
+  assert(strcat(table_ex, "_"));
+  assert(strcat(table_ex, code_type));
+  assert(strcat(table_ex, "_"));
+  assert(strcat(table_ex, code));
+  //assert(sprintf(table_ex, table_ex_template_sql, 
+  //		 circle,tolower(code_type), tolower(code)));
    
   assert(sprintf(package->sql_buffer, 
 		 package->sql_template,

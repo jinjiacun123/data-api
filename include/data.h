@@ -6,9 +6,9 @@
 #include "cJSON.h"
 #define STOCK_NAME_SIZE 16
 #define BUFF_MAX_LEN 10
-#define PACKAGE_HEAD_LEN 50
+#define PACKAGE_HEAD_LEN 80
 #define PACKAGE_MAX_LEN 1024*1024
-#define CLI_REQ_TYPE_LEN 50
+#define CLI_REQ_TYPE_LEN 80
 #define SEND_BUFF_LEN 1024
 #define SQL_BUFF_MAX_LEN 4096
 char * sql_buffer[SQL_BUFF_MAX_LEN];
@@ -43,6 +43,9 @@ char * sql_buffer[SQL_BUFF_MAX_LEN];
 #define TYPE_AUTO_PUSH_EX    	2561  //
 #define TYPE_SERVERINFO_EX   	259   //
 #define TYPE_DAY_CURPOS_EX   	524   //
+
+
+#define COMPRESS_TYPE           "000199990000"
 
 //服务器包
 typedef struct server_request server_request_t;
@@ -163,6 +166,10 @@ struct server_response{
   char          package_head[PACKAGE_HEAD_LEN];
   char *        package_body;
   unsigned long package_body_len;
+  
+  //compress
+  //char * compress_buff;
+  //unsigned long compress_buff_len;
 
   cJSON * json;
   cJSON * list;

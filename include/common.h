@@ -24,4 +24,7 @@ typedef struct{
 	char head[10];
 	unsigned length;
 }t_base_c_request_head;
+
+extern void lower_string(char s[]);
+extern void upper_string(char s[]);
 #endif

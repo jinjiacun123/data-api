@@ -16,7 +16,7 @@ extern int do_mysql_update(char *);
 #define MYSQL_PORT   "3306"
 #define MYSQL_USER   "root"
 #define MYSQL_PASSWD "123456"
-#define MYSQL_PASSWD ""
+//#define MYSQL_PASSWD ""
 #define MYSQL_DB     "market"
 
 #endif

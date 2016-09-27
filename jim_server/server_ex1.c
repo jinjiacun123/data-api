@@ -9,6 +9,7 @@
 #include<string.h>
 #include<signal.h>
 #include "./../include/data.h"
+#define PORT 8888
 
 #define ERR_EXIT(m) \
     do { \
@@ -39,7 +40,7 @@ int main(void)
     struct sockaddr_in servaddr;
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(8888);
+    servaddr.sin_port = htons(PORT);
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     /* servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); */
     /* inet_aton("127.0.0.1", &servaddr.sin_addr); */
