@@ -64,8 +64,11 @@ typedef union{
 typedef int (*type_general_sql)(server_package_t *);
 //type of request,back of db, to general json object
 typedef int (*type_general_json)(server_package_t *);
+//general send buff
+typedef unsigned long (*type_format_json_to_client)(server_package_t *);
 #define SQL_TEMPLATE_FUN(a) general_sql_of_##a 
 #define DB_TO_JSON_FUN(a) general_json_from_db_##a
+#define GENERAL_SEND_BUFF(a) format_json_to_client_##a
 
 
 //deal business logic

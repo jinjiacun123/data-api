@@ -2,19 +2,18 @@
 data deal
 **/
 #include<mysql.h>
-#include "./../include/cJSON.h"
-#include "./../include/data.h"
-#include "./../include/d_login.h"
+#include "cJSON.h"
+#include "data.h"
+#include "d_login.h"
+#include "do_json.h"
 //#include <zlib.h>
 
-#include "./../include/d_init.h"
-#include "./../include/d_heart.h"
-#include "./../include/d_realtime.h"
-#include "./../include/d_history.h"
-#include "./../include/d_time_share.h"
-/*
-#include "./../include/d_auto_push.h"
-*/
+#include "d_init.h"
+#include "d_heart.h"
+#include "d_realtime.h"
+#include "d_history.h"
+#include "d_time_share.h"
+#include "d_auto_push.h"
 
 static void unpack();
 static void clean_buff();
@@ -53,47 +52,43 @@ typedef struct
 {
   char type[CLI_REQ_TYPE_LEN];
   char sql_template[100];
-  type_general_sql func;//处理函数指针
-}request_template_t;
+  type_general_sql func_sql;//处理函数指针(生成sql)
+  type_general_json func_json;//处理函数指针(生成json)
+  type_format_json_to_client func_buff;//生成发送数据包
+}request_t;
 /**
    00010001xxxx realtime
    00010002xxxx auto_push
    00010003xxxx time_share
    00010004xxxx history
 */
-request_template_t  req_tem_u[]={
+request_t  req_u[]={
   {"000100010001", 
    "select * from hr_realtime where %s",
-   SQL_TEMPLATE_FUN(realtime)
+   SQL_TEMPLATE_FUN(realtime),
+   DB_TO_JSON_FUN(realtime),
+   format_json_to_client
   },
-
-  /*{"000100020001", 
-   "select * from hr_realtime where %s",
-   SQL_TEMPLATE_FUN(auto_push)
-  },
-  */
+  {"000100020001", 
+   "",
+   SQL_TEMPLATE_FUN(auto_push),
+   DB_TO_JSON_FUN(auto_push),
+   format_json_to_client
+  },  
   {"000100030001", 
-   "select * from hr_time_share_%s order by id asc limit %d,%d",
-   SQL_TEMPLATE_FUN(time_share)
-   },
-  
+   "select new_price from hr_time_share_%s order by id asc",
+   SQL_TEMPLATE_FUN(time_share),
+   DB_TO_JSON_FUN(time_share),
+   GENERAL_SEND_BUFF(time_share)
+   },  
   {"000100040001", 
    "select * from hr_history_%s limit %d,%d",
-   SQL_TEMPLATE_FUN(history)
+   SQL_TEMPLATE_FUN(history),
+   DB_TO_JSON_FUN(history),
+   format_json_to_client
    },
 
-   {"","",}
-};
-
-//客户端请求类型-数据库结果解析(映射表)
-typedef struct{
-  char type[CLI_REQ_TYPE_LEN];
-  type_general_json func;//处理函数指针
-}request_db_parse_t;
-request_db_parse_t req_db_p_u[] = {
-  {"00010001001", DB_TO_JSON_FUN(realtime)},
-
-  {"",NULL}
+  {"","",NULL,NULL,NULL}
 };
 
 void request_server(int sclient, int type)
@@ -202,13 +197,9 @@ do_client_request(package)
   
   req  = package->request;
   resp = package->response;
-  
-  //printf("request_head:%s\n", request_str);
-  //printf("request_body:%s\n", request_str+PACKAGE_HEAD_LEN);
 
   //解析客户段请求类型，获取json对象及其类型
   assert(parse_client_request(package) == 0);
-  //  entity = cJSON_Parse(str_request+PACKAGE_HEAD_LEN);
 
   printf("out parse_cilent_request...\n");
   printf("type:%s\n", req->type);
@@ -217,12 +208,12 @@ do_client_request(package)
   int i;
   //char *tmp = cJSON_Print(entity);
   //printf("entity:%s\n", tmp);
-  for(i=0; req_tem_u[i].func ;i++){
-    if(!strcmp(req_tem_u[i].type, req->type)){
-      if(req_tem_u[i].func){
+  for(i=0; req_u[i].func_sql ;i++){
+    if(!strcmp(req_u[i].type, req->type)){
+      if(req_u[i].func_sql){
 	printf("get req_tem_u...\n");
-	package->sql_template = req_tem_u[i].sql_template;
-	assert(req_tem_u[i].func(package) == 0);
+	package->sql_template = req_u[i].sql_template;
+	assert(req_u[i].func_sql(package) == 0);
 	break;
       }
     }
@@ -239,23 +230,46 @@ do_client_request(package)
   strcpy(resp->type, req->type);
   cJSON_AddStringToObject(resp->json, "type", req->type);
   cJSON_AddItemToObject(resp->json, "list", resp->list = cJSON_CreateArray());
-  for(i=0; req_db_p_u[i].func; i++){
-    if(req_db_p_u[i].func){
-      assert(req_db_p_u[i].func(package) == 0);
-      break;
+  for(i=0; req_u[i].func_sql; i++){
+    if(!strcmp(req_u[i].type, req->type)){
+      if(req_u[i].func_json){
+	assert(req_u[i].func_json(package) == 0);
+	break;
+      }
     }
   }
   printf("parse db...\n");
 
-  //解析json对象为字符串
-  unsigned long send_buff_len  = format_json_to_client(package);
+  //解析json对象为字符串  
+  unsigned long send_buff_len  = 0;  
+  
+  for(i = 0; req_u[i].func_sql; i++){
+    if(!strcmp(req_u[i].type, req->type)){
+      if(req_u[i].func_buff){
+	send_buff_len = req_u[i].func_buff(package);
+	break;
+      }
+    }
+  }
+  /*
+  if(strcmp(req->type, "000100030001")){
+   send_buff_len = format_json_to_client(package);
+  }
+  else{
+    send_buff_len = 669 * 4 + PACKAGE_HEAD_LEN;
+    resp->send_buff_len = send_buff_len;    
+    memcpy(resp->send_buff, "{\"type\":\"000100030001\",\"length\":2676}", PACKAGE_HEAD_LEN);
+
+    //  strcpy(resp->package_head ,cJSON_Print(head));
+  }
+  */
   printf("format out...\n");
 
   printf("send_buff_head:%s\n", resp->package_head);
   //printf("send_buff_body:%s\n", resp->package_body);
   printf("send length:%d\n",    resp->send_buff_len);
   //通过上面获取到的json字符串，发送客户端
-  if(write(package->client_fd, resp->send_buff, resp->send_buff_len)<0){
+  if(write(package->client_fd, resp->send_buff, send_buff_len)<0){
     printf("send error");
   }
 }

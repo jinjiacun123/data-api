@@ -25,6 +25,8 @@ json2:	{"type":"000100010001","data":{"code_type":"CODE_TYPE","code":"CODE"}}<br
 	<b>分时数据请求格式</b>:<br/>
 json1:  {"type":"000100030001","length":PACKAGE_LENGTH}<br/>
 json2:  {"type":"000100030001",'data":{"code_type":"CODE_TYPE","code":"code"}}<br/>
+	<b>返回:{"type":"000100030001", "length":PACKAGE_LENGTH}<br/>
+	|------------------------struct----------------------------------|
 	<br/>	
 <br/>
 <br/>

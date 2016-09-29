@@ -75,8 +75,8 @@ general_sql_of_time_share(package)
   if(req->data){
     printf("simple mode!\n");
     general_sql_from_simple(package);
-    free(req->data);
-    free(req->json);
+    //free(req->data);
+    //free(req->json);
     return 0;
   }
 }
@@ -90,8 +90,8 @@ general_sql_from_simple(package)
   int result = 0;
   char code_type[100];
   char code[100];
-  unsigned int index=1;
-  unsigned int size=20;
+  //unsigned int index=1;
+  //unsigned int size=20;
   
   req = package->request;
   memset(code_type, 0, 100);
@@ -102,10 +102,12 @@ general_sql_from_simple(package)
   assert(json_get_string(req->data, "code", code) == 0);
   assert(code);
   lower_string(code);
+  /*
   index = json_get_int(req->data, "index");
   assert(index != -1);
   size = json_get_int(req->data, "size");
   assert(size != -1);
+  */
   char table_ex_template_sql[] = "%s_%s";
   char table_ex[20];
   memset(table_ex, 0, 20);
@@ -120,9 +122,81 @@ general_sql_from_simple(package)
   // assert(sprintf(table_ex, table_ex_template_sql,
   //		 tolower(code_type),tolower(code)));
   assert(sprintf(package->sql_buffer, package->sql_template, 
-		 table_ex,
-		 index,
-		 size));
+		 table_ex));
   assert(package->sql_buffer);
   return result;
+}
+
+/**
+   from db result to struct
+
+   |type|code_type|code|new_price|new_price|...|new_price
+*/
+int
+general_json_from_db_time_share(package)
+     server_package_t * package;
+{
+ int result = 0;
+  
+  cJSON * item;
+  MYSQL_ROW row;
+  MYSQL_FIELD * field;
+  int i=0;
+  int num_fields = mysql_num_fields(package->db_back);
+  server_response_t * resp;
+  char * str_null = "NULL";
+
+  resp = package->response;
+  assert(num_fields);
+  //printf("num_fields:%d\n", num_fields);
+
+  resp->send_buff = (char *)malloc(669*4+PACKAGE_HEAD_LEN);
+  memset(resp->send_buff, 0, 669*4+PACKAGE_HEAD_LEN);
+  int off = PACKAGE_HEAD_LEN;
+  unsigned long new_price = 0;
+  int new_price_len = sizeof(unsigned long);
+  while((row = mysql_fetch_row(package->db_back)) != NULL){
+    assert(row);
+    new_price = atol(row[i]);
+    memcpy(resp->send_buff+off, &new_price, new_price_len);
+    off += 4;
+    // item = cJSON_CreateObject();
+    //assert(item);
+    /*
+    for(i=0; i<num_fields; i++){
+      //创建json对象
+      field = mysql_fetch_field_direct(package->db_back, i);
+      assert(field);
+      if(row[i] != 0){
+	cJSON_AddStringToObject(item, field->name, row[i]);
+      }
+      else{
+	cJSON_AddStringToObject(item, field->name, str_null);
+      }
+      //printf("%s:%s,", field->name, row[i]); 
+    }
+    */
+    // cJSON_AddItemToArray(resp->list, item); 
+    // printf("\n");
+  }
+
+  return result;
+}
+
+//调整要发送的json对象，形成{"type":"00010001","length":xxxxx}{xxxx}
+//返回目标字符串长度,send_buff内容(test-pass)
+unsigned long
+format_json_to_client_time_share(package)
+     server_package_t * package;
+{
+  server_response_t * resp;
+  server_request_t * req;
+  resp = package->response;
+  req  = package->request; 
+  
+  resp->send_buff_len = 669 * 4 + PACKAGE_HEAD_LEN;
+  memcpy(resp->send_buff, "{\"type\":\"000100030001\",\"length\":2676}", PACKAGE_HEAD_LEN);
+
+
+  return resp->send_buff_len;
 }

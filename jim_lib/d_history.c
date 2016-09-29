@@ -142,9 +142,7 @@ general_sql_from_simple(package)
   assert(strcat(table_ex, code_type));
   assert(strcat(table_ex, "_"));
   assert(strcat(table_ex, code));
-  //assert(sprintf(table_ex, table_ex_template_sql, 
-  //		 circle,tolower(code_type), tolower(code)));
-   
+  
   assert(sprintf(package->sql_buffer, 
 		 package->sql_template,
 		 table_ex,
@@ -153,4 +151,11 @@ general_sql_from_simple(package)
   printf("sql:%s\n", package->sql_buffer);
   assert(package->sql_buffer);
   return result;
+}
+
+int
+general_json_from_db_history(package)
+     server_package_t * package;
+{
+  return 0;
 }

@@ -80,84 +80,6 @@ json_to_request(char * app_request_type,char * package_body){
 }
 */
 
-//调整要发送的json对象，形成{"type":"00010001","length":xxxxx}{xxxx}
-//返回目标字符串长度,send_buff内容(test-pass)
-unsigned long
-format_json_to_client(package)
-     server_package_t * package;
-{
-  server_response_t * resp;
-  server_request_t * req;
-  resp = package->response;
-  req  = package->request; 
-  assert(resp->package_body = cJSON_Print(resp->json));
-  assert(resp->package_body_len = strlen(resp->package_body));
-  //  printf("type:%s,package_len:%d,result:%s\n", type, package_len, result);
-
-  if(resp->package_body_len < 100000){
-    //包装头部Json对象
-    cJSON * head = cJSON_CreateObject();     
-    cJSON_AddItemToObject(head, "type", cJSON_CreateString(req->type));
-    cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(resp->package_body_len));
-    
-    strcpy(resp->package_head ,cJSON_Print(head));
-  
-    // printf("head_str:%s\n", head_str);
-    //copy head to head of package
-    resp->send_buff = (char *)malloc(resp->package_body_len
-				     +PACKAGE_HEAD_LEN);
-    resp->send_buff_len = resp->package_body_len + PACKAGE_HEAD_LEN;
-    memset(resp->send_buff, 0, resp->package_body_len + PACKAGE_HEAD_LEN);
-
-    //copy result to body of body of package
-    memcpy(resp->send_buff, resp->package_head, strlen(resp->package_head));
-    memcpy(resp->send_buff+PACKAGE_HEAD_LEN, resp->package_body, resp->package_body_len);
-  }
-  else{//较大包进行压缩发送
-    //包装头部Json对象
-    /*
-    cJSON * head = cJSON_CreateObject();    
-    cJSON_AddItemToObject(head, "type", cJSON_CreateString(COMPRESS_TYPE));
-    cJSON_AddItemToObject(head, "src_length", cJSON_CreateNumber(resp->package_body_len));
-    resp->compress_buff = (char*)malloc(resp->package_body_len);
-    memset(resp->compress_buff, 0, resp->package_body_len);
-    int res = compress(resp->compress_buff, 
-		       &resp->compress_buff_len, 
-		       resp->package_body, 
-		       resp->package_body_len);   
-    if(res == Z_BUF_ERROR){
-      printf("compress buf error!\n");
-      exit(0);
-    }
-    if(res == Z_MEM_ERROR){
-      printf("compress mem error!\n");
-      exit(0);
-    }
-    if(res != Z_OK){
-      printf("compress error:%d\n", res);
-      exit(0);
-    }
-    cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(resp->compress_buff_len));    
-    strcpy(resp->package_head ,cJSON_Print(head));
-  
-    // printf("head_str:%s\n", head_str);
-    //copy head to head of package
-    resp->send_buff = (char *)malloc(resp->compress_buff_len
-				     +PACKAGE_HEAD_LEN);
-    resp->send_buff_len = resp->package_body_len + PACKAGE_HEAD_LEN;
-    memset(resp->send_buff, 0, resp->compress_buff_len + PACKAGE_HEAD_LEN);
-
-    //copy result to body of body of package
-    memcpy(resp->send_buff, resp->package_head, 
-	   strlen(resp->package_head));
-    memcpy(resp->send_buff+PACKAGE_HEAD_LEN, 
-	   resp->compress_buff, 
-	   resp->compress_buff_len);
-    */
-  }
-
-  return resp->send_buff_len;
-}
 
 
 //解析客户端类型，并返回json对象及其类型(test pass)
@@ -246,4 +168,38 @@ json_get_float(json, name)//浮点数
   return value;
 }
 //通过对象获取值-----end
+//调整要发送的json对象，形成{"type":"00010001","length":xxxxx}{xxxx}
+//返回目标字符串长度,send_buff内容(test-pass)
+unsigned long
+format_json_to_client(package)
+     server_package_t * package;
+{
+  server_response_t * resp;
+  server_request_t * req;
+  resp = package->response;
+  req  = package->request; 
+  assert(resp->package_body = cJSON_Print(resp->json));
+  assert(resp->package_body_len = strlen(resp->package_body));
+  //  printf("type:%s,package_len:%d,result:%s\n", type, package_len, result);
 
+  if(resp->package_body_len < 100000){
+    //包装头部Json对象
+    cJSON * head = cJSON_CreateObject();     
+    cJSON_AddItemToObject(head, "type", cJSON_CreateString(req->type));
+    cJSON_AddItemToObject(head, "length", cJSON_CreateNumber(resp->package_body_len));
+    
+    strcpy(resp->package_head ,cJSON_Print(head));
+  
+    // printf("head_str:%s\n", head_str);
+    //copy head to head of package
+    resp->send_buff = (char *)malloc(resp->package_body_len
+				     +PACKAGE_HEAD_LEN);
+    resp->send_buff_len = resp->package_body_len + PACKAGE_HEAD_LEN;
+    memset(resp->send_buff, 0, resp->package_body_len + PACKAGE_HEAD_LEN);
+
+    //copy result to body of body of package
+    memcpy(resp->send_buff, resp->package_head, strlen(resp->package_head));
+    memcpy(resp->send_buff+PACKAGE_HEAD_LEN, resp->package_body, resp->package_body_len);
+  }
+  return resp->send_buff_len;
+}

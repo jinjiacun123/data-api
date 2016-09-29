@@ -9,6 +9,7 @@ extern void request_history(int sclient);
 extern void parse_history();
 extern t_base_c_request_head * json_to_request_of_history(char *);
 extern int general_sql_of_history(server_package_t *);
+extern int general_json_from_db_history(server_package_t *);
 
 typedef struct
 {

@@ -1,10 +1,13 @@
 #ifndef __D_AUTO_PUSH_H__
 #define __D_AUTO_PUSH_H__
+#include "data.h"
 /**
 	主推
 */
 extern void request_auto_push(int sclient);
 extern void parse_auto_push();
+extern int general_sql_of_auto_push(server_package_t *);
+extern int general_json_from_db_auto_push(server_package_t *);
 
 /*
 struct AskData2
@@ -28,7 +31,7 @@ struct AskData2
 };
 */
 
-struct StockOtherData2
+typedef struct
 {					
 	unsigned short m_nTime;
 	unsigned short m_nSecond;
@@ -42,7 +45,7 @@ struct StockOtherData2
 					
 
 	long		   m_lSortValue;  // 排名时，为排序后的值
-};
+}StockOtherData2;
 
 /*
 struct CommRealTimeData2
@@ -105,7 +108,7 @@ typedef struct
 }StockOtherDataDetailTime;
 
 // 各股票其他数据
-struct StockOtherData
+typedef struct
 {
 	union
 	{
@@ -137,5 +140,5 @@ struct StockOtherData
 		long		   m_lSortValue;  // 排名时，为排序后的值
 	};
 	
-};
+}StockOtherData;
 #endif

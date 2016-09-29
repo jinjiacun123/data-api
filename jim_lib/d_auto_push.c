@@ -1,7 +1,5 @@
 #include "d_auto_push.h"
 #include "d_realtime.h"
-extern buff_t my_buff;
-
 /**
 	主推
 */
@@ -25,9 +23,10 @@ void request_auto_push(int sclient){
 	printf("主推请求\n");
 }
 
-void parse_auto_push(){
+void parse_auto_push(buff_t * my_buff)  
+{
 	printf("主推\n");
-	AskData2 *test = (AskData2 *) my_buff.p_res_media_h;
+	AskData2 *test = (AskData2 *) my_buff->p_res_media_h;
 	int pre=sizeof(AskData2);
 				
 	CommRealTimeData2* pRealTime1 ;
@@ -36,11 +35,12 @@ void parse_auto_push(){
 	int a = sizeof(StockOtherData);
 	int b= sizeof(StockOtherData);
 	StockOtherData2 * PushTime;
-	for (int i =0 ;i<test->m_nSize;i++)
+	int i=0;
+	for (i =0 ;i<test->m_nSize;i++)
 	{
 		char name[7]={0};
 					
-		pRealTime1 = (CommRealTimeData2*)(my_buff.p_res_media_h + 20 +i*(sizeof(CommRealTimeData2)-4+sizeof(HSQHRealTime2)));
+		pRealTime1 = (CommRealTimeData2*)(my_buff->p_res_media_h + 20 +i*(sizeof(CommRealTimeData2)-4+sizeof(HSQHRealTime2)));
 		pWHRealTime = (HSQHRealTime2*)pRealTime1->m_cNowData;  //实时或主推
 		memcpy(name,pRealTime1->m_cCode,6);
 		PushTime = (StockOtherData2*)pRealTime1->m_othData;
@@ -50,4 +50,18 @@ void parse_auto_push(){
 			
 
 	int bbbbbbbb = sizeof(CommRealTimeData2) - 4 +sizeof(HSQHRealTime2);
+}
+
+int
+general_sql_of_auto_push(package)
+     server_package_t * package;
+{
+  return 0;
+}
+
+int
+general_json_from_db_auto_push(package)
+     server_package_t * package;
+{
+  return 0;
 }

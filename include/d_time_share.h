@@ -9,6 +9,8 @@ extern void request_time_share(int sclient);
 extern void parse_time_share();
 extern t_base_c_request_head * json_to_request_of_time_share(char *);
 extern int general_sql_of_time_share(server_package_t *);
+extern int general_json_from_db_time_share(server_package_t *);
+extern unsigned long format_json_to_client_time_share(server_package_t *);
 
 typedef struct
 {
