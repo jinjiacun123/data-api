@@ -1,0 +1,28 @@
+#include<stdio.h>
+#include<assert.h>
+void test_do_client_request();
+
+int
+main(){
+  test_do_client_request();
+}
+
+void 
+test_do_client_request(){
+  int client_fd = 0;
+  //send package to server
+  char package[1024];
+  char * package_body = "{\"type\":\"000100010001\", \"data\":{\"code_type\":\"0x8100\",\"code\":\"EURUSD\"}}";
+  int package_body_length = strlen(package_body);
+  char * tmp = "{\"type\":\"000100010001\", \"length\":%d}";
+  char package_head[50];
+
+  memset(package_head, 0, 50);
+  assert(sprintf(package_head, tmp, package_body_length));
+
+  memset(package, 0, 1024);
+  memcpy(package, package_head, 50);
+  memcpy(package+50, package_body, package_body_length);
+
+  assert(do_client_request(client_fd, package) == 0);
+}

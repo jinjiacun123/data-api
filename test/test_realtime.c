@@ -1,0 +1,52 @@
+#include<stdio.h>
+#include "./../include/cJSON.h"
+#include "./../include/data.h"
+#include<mysql.h>
+#include<assert.h>
+void test_general_sql_of_realtime();
+void test_general_json_from_db_realtime();
+
+int
+main(){
+//	test_general_sql_of_realtime();
+	test_general_json_from_db_realtime();
+}
+
+void test_general_sql_of_realtime(){
+	char * type = "000100010001";
+	char * json_str = "{\"type\":\"000100010001\",\"data\":{\"code_type\":\"0x8100\",\"code\":\"EURUSD\"}}";
+	cJSON * json;
+	char * template_sql = "select * from hr_realtime where %s";
+	char * sql_buffer[SQL_BUFF_MAX_LEN];
+	json = cJSON_Parse(json_str);
+	
+	memset(sql_buffer, 0, SQL_BUFF_MAX_LEN);
+	if(json){
+		int ret = general_sql_of_realtime(type, json, template_sql, sql_buffer);
+		printf("ret:%d sql_buffer:%s\n", ret, sql_buffer);
+	}
+}
+
+void test_general_json_from_db_realtime(){
+	char * type = "000100010001";	
+	cJSON * json, * list, * item;
+	db_back_t * db_back;
+	char * sql = "select * from hr_realtime";
+	db_back = do_mysql_select(sql);
+	assert(db_back);	
+	
+	json = cJSON_CreateObject();
+	cJSON_AddStringToObject(json, "type", type);
+	cJSON_AddItemToObject(json, "list", list=cJSON_CreateArray());
+	/*
+	item = cJSON_CreateObject();
+	cJSON_AddStringToObject(item, "name", "zhangsan");
+	cJSON_AddItemToArray(list, item);
+	char * out = cJSON_Print(json);
+	printf("out:%s\n", out);
+	*/
+	assert(general_json_from_db_realtime(type, db_back, list) == 0);
+	char * out = cJSON_Print(json);
+	printf("out:%s\n", out);
+	free(out);
+}

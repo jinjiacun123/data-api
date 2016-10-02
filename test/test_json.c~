@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include"./../include/common.h"
+void test_get_c_request_package_length();
+void test_json_to_request();
+extern unsigned long get_c_request_package_length(char * head);
+extern t_base_c_request_head * json_to_request(char * app_request_type, char * package_body);
+
+int
+main(){
+       // test_get_c_request_package_length();
+  char * old_str = "aa";
+  char * new_str = "aa";
+  int result = strcmp(old_str, new_str);
+  if(result)printf("this is test\n");
+  printf("result %d\n", result);
+	   	test_json_to_request();
+        printf("please entre any key to continue...\n");
+}
+
+void test_get_c_request_package_length(){
+	char * head = "{\"type\":\"00010001\", \"length\":800}";        
+	unsigned long length = 0;
+	length = get_c_request_package_length(head);
+	printf("length:%d\n", length);
+}
+
+void test_json_to_request(){
+	char * app_request_type = "00010002";
+	char * package_body = "{\"code\":\"EURUSD\",\"type\":33024}";
+	t_base_c_request_head * head;
+	head = json_to_request(app_request_type, package_body);
+}
+

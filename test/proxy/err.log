@@ -1,0 +1,23 @@
+[ 25568] : SockRecvServer:Listening on port 8001.......
+[ 25568] : accept client connection!
+[ 25599] : SockRecvServer:Listening on port 8001.......
+[ 25599] : accept client connection!
+[ 25696] : SockRecvServer:Listening on port 8001.......
+[ 25696] : accept client connection!
+[ 25696] : g_iCltNum is too much
+[ 25745] : SockRecvServer:Listening on port 8001.......
+[ 25745] : accept client connection!
+[ 25749] : connection to server!
+[ 25749] : recive client request!
+[ 25749] : proxyClientSocketId:3
+[ 25749] : send to server!
+[ 25745]ò[Y· : accept client connection!
+[ 25752] : connection to server!
+[ 25752] : recive client request!
+[ 25752] : proxyClientSocketId:3
+[ 25752] : send to server!
+[ 25745]ò[Y· : accept client connection!
+[ 25754] : connection to server!
+[ 25754] : recive client request!
+[ 25754] : proxyClientSocketId:3
+[ 25754] : send to server!

@@ -1,0 +1,21 @@
+#include<stdio.h>
+typedef struct{
+  int i;
+}test;
+
+int
+main(){
+  char value[10];
+  char *p;
+  int i,j;
+  i = 11;
+  memset(value, 0, 10);
+  p = value;
+  test my_test;
+  my_test.i = 10;
+  memcpy(p, &i, sizeof(int));
+  j = (int)(*p);
+  printf("%s\n", value);
+  printf("%d\n", *j);
+  return 0;
+}
