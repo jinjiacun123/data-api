@@ -49,6 +49,8 @@
 #define PERIOD_TYPE_MINUTE1 0x00C0
 #define PERIOD_TYPE_MINUTERS 0x0030
 
+//response---------------------------------------------------------
+#define RESPONSE_DEAL(param) deal_response_of_##param
 //response of server
 typedef struct{
   //header
@@ -60,10 +62,11 @@ typedef struct{
   char data;
 }response_s_t;
 typedef response_s_t * p_response_s_t;
+//response--------------------------------------------------------
 
-
-//-------------------------------------------------------------------
+//request---------------------------------------------------------
 #define REQUEST_T(param) request_##param##_t
+#define REQUEST_DEAL(param) deal_request_of_##param
 typedef struct{
   char index;
   char no;
@@ -80,11 +83,6 @@ typedef struct{
   char index;
   char operator;
 }request_heart_t;
-
-typedef union{
-  request_login_t login;
-  request_heart_t heart;
-}request_data_u;
   
 typedef struct{
   //header
@@ -98,9 +96,13 @@ typedef struct{
 request_s_t request_data[] = {
   {HEADER, sizeof(REQUEST_T(login))+4, TYPE_LOGIN},//login
   {HEADER, sizeof(REQUEST_T(heart))+4, TYPE_HEART},//heart
+  {HEADER,0, TYPE_REALTIME},//realtime
+  {HEADER,0, TYPE_AUTO_PUSH},//auto_push
+  {HEADER,0, TYPE_TIME_SHARE},//time_share
+  {HEADER,0, TYPE_HISTORY},//history
 
   //empty
   {}
 };
-//-----------------------------------------------------------------
+//request-----------------------------------------------------------
 #endif

@@ -16,6 +16,28 @@ int deal_from_client_to_server(int proxy_client_fd, const char * buf, unsigned l
 //from server to client
 int deal_from_server_to_client(int client_fd, const char * buf, unsigned long buf_len);
 
+//request of realtime
+int deal_request_of_realtime();
+//request of auto_push
+int deal_request_of_auto_push();
+//request of time_share
+int deal_request_of_time_share();
+//request of history
+int deal_request_of_history();
+//request of zib
+int deal_request_of_zlib();
+
+//response of realtime
+int deal_response_of_realtime();
+//response of auto_push
+int deal_response_of_auto_push();
+//response of time_share
+int deal_response_of_time_share();
+//response of history
+int deal_response_of_history();
+//response of zlib
+int deal_response_of_zlib();
+
 void catchcld(int sig)
 {
   int  iStat;
@@ -400,9 +422,29 @@ deal_from_client_to_server(proxy_client_fd, buf, buf_len)
      unsigned long buf_len;
 {
   //parse client's request
+  unsigned short type = 0;
   //deal request of client to request of server
+  if(type == TYPE_ZIB){
+    REQUEST_DEAL(zlib)();
+  }
+  switch(type){    
+  case TYPE_REALTIME:
+    REQUEST_DEAL(realtime);
+    break;
+  case TYPE_AUTO_PUSH:
+    REQUEST_DEAL(auto_push);
+    break;
+  case TYPE_TIME_SHARE:
+    REQUEST_DEAL(time_share);
+    break;
+  case TYPE_HISTORY:
+    REQUEST_DEAL(history);
+    break;
+  }
+  
   //send request of server
-  return 0;
+  
+  return -1;
 }
 
 //from server to client
@@ -411,6 +453,91 @@ deal_from_server_to_client(client_fd, buf, buf_len)
      int client_fd;
      const char * buf;
      unsigned long buf_len;
+{
+  //recive from server
+  unsigned short type = 0;
+  //parse and second deal
+  if(type == TYPE_ZIB){
+
+  }
+  
+  switch(type){
+  case TYPE_REALTIME:
+    RESPONSE_DEAL(realtime)();
+    break;
+  case TYPE_AUTO_PUSH:
+    RESPONSE_DEAL(auto_push)();
+    break;
+  case TYPE_TIME_SHARE:
+    RESPONSE_DEAL(time_share)();
+    break;
+  case TYPE_HISTORY:
+    RESPONSE_DEAL(history)();
+    break;
+  }
+
+  //send to client
+
+
+  return -1;
+}
+
+//request of realtime
+int deal_request_of_realtime()
+{
+  return 0;
+}
+
+//request of auto_push
+int deal_request_of_auto_push()
+{
+  return 0;
+}
+
+//request of time_share
+int deal_request_of_time_share()
+{
+  return 0;
+}
+
+//request of history
+int deal_request_of_history()
+{
+  return 0;
+}
+
+//request of zib
+int deal_request_of_zlib()
+{
+  return 0;
+}
+
+//response of realtime
+int deal_response_of_realtime()
+{
+  return 0;
+}
+
+//response of auto_push
+int deal_response_of_auto_push()
+{
+  return 0;
+}
+
+//response of time_share
+int deal_response_of_time_share()
+{
+  return 0;
+}
+
+//response of history
+int deal_response_of_history()
+{
+  return 0;
+}
+
+//response of zlib
+int deal_response_of_zlib()
 {
   return 0;
 }

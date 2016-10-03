@@ -1,0 +1,8 @@
+#include "api.h"
+//request simple entity of realtime
+//request multi entity of realtime
+//request simple entity of auto_push
+//request multi entity of auto_push
+//request entity of history
+//request entity of time_share
+//request zlib
