@@ -8,6 +8,7 @@
 /*客户端*/
 char *host_name ="127.0.0.1";//需要搜寻服务端IP地址
 int port = 8001;//代理服务器端口号
+//int port = 3333;
 
 int main(int argc, char** argv){
   char buf[8192];
@@ -54,7 +55,7 @@ int main(int argc, char** argv){
       perror("Error connecting to socket \n"); ////
       exit(1);
   }
-  printf("Sending message %s to server \n",str);
+  //printf("Sending message %s to server \n",str);
 
   while(1){
     if(send(socket_descriptor,str,strlen(str),0) == -1){

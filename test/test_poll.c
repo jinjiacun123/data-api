@@ -110,8 +110,10 @@ main(int argc, char * argv[]){
 	  close(sockfd);
 	  client[i].fd = -1;
 	}
-	else
-	  write(sockfd, buf, n);
+	else{	  
+	  printf("%s\n", buf);
+	  write(sockfd, buf, n);	  
+	}
 
 
 	if(--nready <=0)

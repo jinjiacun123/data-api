@@ -7,11 +7,12 @@
 #include <netdb.h>
 #include <stdarg.h>
 //#include <sys/termio.h>
-#include  <sys/socket.h>
-#include  <sys/times.h>
-#include  <sys/select.h>
-#include  <sys/wait.h>
-#include  <errno.h>
+#include <sys/socket.h>
+#include <sys/times.h>
+#include <sys/select.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <poll.h>
 
 #ifndef _SCO_DS
 #include <fcntl.h>
@@ -237,9 +238,79 @@ ConnectSock(){
 }
 
 void deal_proxy(int proxyClientSocketId, int clientSocketId){
+  struct pollfd client[2];
   unsigned char cDataBuf[1024];
+  int n;
   fd_set rset;
   int iRet=0;
+  int maxi=0;
+  int nready;
+  int i;
+  
+  
+  client[0].fd = proxyClientSocketId;
+  client[0].events = POLLIN;
+  client[1].fd = clientSocketId;
+  client[1].events = POLLIN;
+  
+  while(1){
+    nready = poll(client, 2, -1);    
+
+    //recive server info
+    if(client[0].fd > 0){
+      if(client[0].revents & (POLLIN|POLLERR)){
+	if((n = read(client[0].fd, cDataBuf, 1024))<0){
+	  if(errno == ECONNRESET){
+	    close(client[0].fd);
+	    client[0].fd = -1;
+	  }
+	  else{
+	    WriteErrLog("read client err!\n");
+	  }
+	}
+	/*
+	else if(n == 0){
+	  close(client[0].fd);
+	  client[0].fd = -1;
+	}
+	*/
+	else if(n >0){
+	  //send to client
+	  WriteErrLog("send to client\n");
+	  write(client[1].fd, cDataBuf, n);
+	}
+      }  
+    }
+    
+    //recive client info
+    if(client[1].fd > 0){
+      if(client[1].revents & (POLLIN|POLLERR)){
+	if((n = read(client[1].fd, cDataBuf, 1024))<0){
+	  if(errno == ECONNRESET){
+	    close(client[1].fd);
+	    client[1].fd = -1;
+	  }
+	  else{
+	    WriteErrLog("read client err!\n");
+	  }
+	}
+	/*
+	else if(n == 0){
+	  close(client[1].fd);
+	  client[1].fd = -1;
+	}
+	*/
+	else if(n >0){
+	  //send to server
+	  WriteErrLog("send to server\n");
+	  write(client[0].fd, cDataBuf, n);
+	}
+      }  
+    }  
+    
+  }
+
+  /*
   while(1){
     FD_ZERO(&rset);
     FD_SET(proxyClientSocketId,&rset);
@@ -287,4 +358,5 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
       printf("send to client!\nx");
     } 
   }
+  */
 }
