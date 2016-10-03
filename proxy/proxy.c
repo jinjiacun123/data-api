@@ -1,28 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdarg.h>
-//#include <sys/termio.h>
-#include <sys/socket.h>
-#include <sys/times.h>
-#include <sys/select.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include <poll.h>
-
-#ifndef _SCO_DS
-#include <fcntl.h>
-#endif
-#include <signal.h>
-#define LISTENMAX   1024
-#define PROXY_SERVER "127.0.0.1"
-#define PROXY_PORT   8001
-#define SERVER       "127.0.0.1"
-#define SERVER_PORT  8000
+#include "config.h"
 
 int g_iCltNum=0;
 extern int errno;
@@ -31,6 +7,14 @@ int PassiveSock();
 //char *cftime(char *s, const char *format, time_t *time);
 int ConnectSock();
 void deal_proxy(int proxyClientSocketId, int clientSocketId);
+//init login
+int init_login(int proxy_client_fd);
+//send heart to server
+int send_heart_to_server(int proxy_client_fd, int * heart_times);
+//from client to server
+int deal_from_client_to_server(int proxy_client_fd, const char * buf, unsigned long buf_len);
+//from server to client
+int deal_from_server_to_client(int client_fd, const char * buf, unsigned long buf_len);
 
 void catchcld(int sig)
 {
@@ -100,8 +84,6 @@ main(int argc,char *argv[])
     }
     WriteErrLog("accept client connection!\n");
 
-    //WriteTest("Accepted connection(%d) From host(%s) port(%d)/n",isSockId,inet_ntoa(sAddrIn.sin_addr),ntohs(sAddrIn.sin_port));
-
     //进程数量大于iPNum时 1秒后继续服务
     if(g_iCltNum > iPNum - 1){
       WriteErrLog("g_iCltNum is too much\n");
@@ -109,6 +91,8 @@ main(int argc,char *argv[])
       sleep(1); 
       continue;
     }
+    
+    WriteErrLog("create child process!\n");
     //创建进程
     if((iChildPid=fork()) < 0){
       WriteErrLog("Fork error :%s!!/n",strerror(errno));
@@ -137,7 +121,8 @@ main(int argc,char *argv[])
     }
     WriteErrLog("connection to server!\n");
     
-    /*WriteTest(" %d to  %d/n",isSockId,icSockId);*/
+    //init login
+    assert(init_login(proxyClientSocketId) != 0);
 
     deal_proxy(proxyClientSocketId, clientSocketId);
   }
@@ -206,17 +191,10 @@ PassiveSock()
   return s;
 }
 
-/*
-char *cftime(char *s, const char *format, time_t *time)
-{
-  strftime(s, 256, format, localtime(time));
-  return s;
-}
-*/
-
 //proxy client connect to server
 int
-ConnectSock(){
+ConnectSock()
+{
   int proxy_client_fd;
   struct sockaddr_in proxy_client_addr;
 
@@ -225,19 +203,20 @@ ConnectSock(){
   proxy_client_addr.sin_port = htons(SERVER_PORT);
 
   if((proxy_client_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
-    perror("error proxy_client_addr!\n");
+    WriteErrLog("error proxy_client_addr!\n");
     exit(1);
   }
 
   if(connect(proxy_client_fd, (void *)&proxy_client_addr ,sizeof(proxy_client_addr)) == -1){
-    perror("error proxy connection to server!\n");
+    WriteErrLog("error proxy connection to server!\n");
     exit(1);
   }
 
   return proxy_client_fd;
 }
 
-void deal_proxy(int proxyClientSocketId, int clientSocketId){
+void deal_proxy(int proxyClientSocketId, int clientSocketId)
+{
   struct pollfd client[2];
   unsigned char cDataBuf[1024];
   int n;
@@ -246,15 +225,24 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
   int maxi=0;
   int nready;
   int i;
-  
-  
+  int heart_times = 0;
+    
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
   client[1].fd = clientSocketId;
   client[1].events = POLLIN;
   
+
+  //init server's login
+  assert(init_login(proxyClientSocketId) != 0);
+
   while(1){
-    nready = poll(client, 2, -1);    
+    nready = poll(client, 2, 5000);    
+    
+    if(nready == 0){//timeout
+      //send heart to server
+      assert(send_heart_to_server(proxyClientSocketId, &heart_times) != 0);
+    }
 
     //recive server info
     if(client[0].fd > 0){
@@ -268,12 +256,10 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
 	    WriteErrLog("read client err!\n");
 	  }
 	}
-	/*
 	else if(n == 0){
-	  close(client[0].fd);
-	  client[0].fd = -1;
+	  WriteErrLog("server connection close\n");
+	  exit(-1);
 	}
-	*/
 	else if(n >0){
 	  //send to client
 	  WriteErrLog("send to client\n");
@@ -294,12 +280,10 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
 	    WriteErrLog("read client err!\n");
 	  }
 	}
-	/*
 	else if(n == 0){
-	  close(client[1].fd);
-	  client[1].fd = -1;
+	  WriteErrLog("client connection close\n");
+	  exit(-1);
 	}
-	*/
 	else if(n >0){
 	  //send to server
 	  WriteErrLog("send to server\n");
@@ -309,54 +293,124 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
     }  
     
   }
+}
 
-  /*
-  while(1){
-    FD_ZERO(&rset);
-    FD_SET(proxyClientSocketId,&rset);
-    FD_SET(clientSocketId,&rset);
-    iRet=select(clientSocketId+1,&rset,NULL,NULL,NULL);
+//send heart to server
+int 
+send_heart_to_server(int proxy_client_fd, int * heart_times)
+{
+  //send heart to server
+  char * package;
+  int request_len  = sizeof(request_s_t);
+  int package_len = request_len +sizeof(REQUEST_T(heart));
+  package = (char *)malloc(package_len + 1);
+  memset(package, 0x00, package_len);
+
+  request_s_t * data;
+  data = (request_s_t *)package;
+  memcpy(data->header_name, HEADER, 4);
+  data->body_len = package_len -8;
+  data->type = TYPE_HEART;
+  
+  REQUEST_T(heart) * data_ex;
+  data_ex = (REQUEST_T(heart) *)(package + request_len);
+  data_ex->index = 1;
+  
+  write(proxy_client_fd, package, package_len);
+
+  free(package);
+  return 0;
+}
+
+//init login
+int 
+init_login(int proxy_client_fd)
+{
+  char * package;
+  int request_len = sizeof(request_s_t);
+  int package_len = request_len + sizeof(REQUEST_T(login));
+  package = (char *)malloc(package_len+1);  
+  memset(package, 0x00, package_len);
+
+  //request login
+  request_s_t * data;
+  data = (request_s_t *)package;
+  memcpy(data->header_name, HEADER, 4);
+  data->body_len = package_len - 8;
+  data->type = TYPE_LOGIN;
+  
+  REQUEST_T(login) * data_ex;
+  data_ex = (REQUEST_T(login) *)(package + request_len);
+  data_ex->key = 3;
+  data_ex->index = 0;
+  strncpy(data_ex->username, USERNAME, 64);
+  strncpy(data_ex->password, PASSWORD, 64);
+
+  write(proxy_client_fd, package, package_len);
+  free(package);
+  WriteErrLog("send login info!\n");
+
+  //response login
+  p_response_s_t  p_response_s;
+  char * buff;
+  int buff_len = 8;
+  unsigned short type = 0x00;
+  assert(buff = (char *)malloc(buff_len+1));
+  memset(buff, 0x00, buff_len);
+  int n = read(proxy_client_fd, buff, buff_len);
+  WriteErrLog("recive login info!\n");
+  if(n == 8){
+    p_response_s = (p_response_s_t)buff;
+    //parse head
+    if(strcmp(p_response_s->header_name, HEADER)){
+      WriteErrLog("recive login head of info err!\n");
+      exit(-1);
+    }
+    buff_len = p_response_s->body_len;
+    free(buff);
+    assert(buff = (char *)malloc(buff_len+1));
     
-    //如果连接在客户机的套接字可读
-    if(FD_ISSET(clientSocketId,&rset)){
-      //读取客户请求
-      iRet=recv(clientSocketId,cDataBuf,1024,0);
-      if(iRet == 0 ){
-	close(proxyClientSocketId);
-	close(clientSocketId);
-	exit(0);
-      }
-      WriteErrLog("recive client request!\n");
-      WriteErrLog("proxyClientSocketId:%d\n", proxyClientSocketId);
-      //WriteTest("U recv(%d)=%s/n",iRet,cDataBuf);
-      //转发到服务器
-      if(send(proxyClientSocketId,cDataBuf,iRet,0)<0){
-	close(proxyClientSocketId);
-	close(clientSocketId);
-	exit(0);
-      }
-      WriteErrLog("send to server!\n");
+    memset(buff, 0x00, buff_len+1);
+    n = read(proxy_client_fd, buff, buff_len);
+    if(n != buff_len){
+      WriteErrLog("recive login body's length of info err!\n");
+      exit(-1);
+    }
+    
+    type = (unsigned short *)buff;
+    if(type != TYPE_LOGIN){
+      WriteErrLog("recive login body's type of info err!\n");
+      exit(-1);
     }
 
-    //如果连接在服务器的套接字可读
-    if(FD_ISSET(proxyClientSocketId,&rset)){
-      //读服务器的应答
-      iRet = recv(proxyClientSocketId,cDataBuf,1024,0);
-      if(iRet == 0 ){
-	close(proxyClientSocketId);
-	close(clientSocketId);
-	exit(0);
-      }
-      printf("recive server!\n");
-      //WriteTest("D recv(%d)=%s/n",iRet,cDataBuf);
-      //转发到客户
-      if(send(clientSocketId,cDataBuf,iRet,0)<0){
-	close(proxyClientSocketId);
-	close(proxyClientSocketId);
-	exit(0);
-      }
-      printf("send to client!\nx");
-    } 
+    return 0;
   }
-  */
+  else{
+    WriteErrLog("recive login info err!\n");
+    exit(-1);
+  }
+  return -1;
+}
+
+//from client to server
+int
+deal_from_client_to_server(proxy_client_fd, buf, buf_len)
+     int proxy_client_fd;
+     const char * buf;
+     unsigned long buf_len;
+{
+  //parse client's request
+  //deal request of client to request of server
+  //send request of server
+  return 0;
+}
+
+//from server to client
+int
+deal_from_server_to_client(client_fd, buf, buf_len)
+     int client_fd;
+     const char * buf;
+     unsigned long buf_len;
+{
+  return 0;
 }

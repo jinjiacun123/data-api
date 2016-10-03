@@ -206,14 +206,6 @@ PassiveSock()
   return s;
 }
 
-/*
-char *cftime(char *s, const char *format, time_t *time)
-{
-  strftime(s, 256, format, localtime(time));
-  return s;
-}
-*/
-
 //proxy client connect to server
 int
 ConnectSock(){
@@ -268,12 +260,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
 	    WriteErrLog("read client err!\n");
 	  }
 	}
-	/*
 	else if(n == 0){
-	  close(client[0].fd);
-	  client[0].fd = -1;
+	  WriteErrLog("server connection close\n");
+	  exit(0);
+	  //close(client[0].fd);
+	  //client[0].fd = -1;
 	}
-	*/
 	else if(n >0){
 	  //send to client
 	  WriteErrLog("send to client\n");
@@ -294,12 +286,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId){
 	    WriteErrLog("read client err!\n");
 	  }
 	}
-	/*
 	else if(n == 0){
-	  close(client[1].fd);
-	  client[1].fd = -1;
+	  WriteErrLog("client connection close\n");
+	  exit(-1);
+	  // close(client[1].fd);
+	  //client[1].fd = -1;
 	}
-	*/
 	else if(n >0){
 	  //send to server
 	  WriteErrLog("send to server\n");

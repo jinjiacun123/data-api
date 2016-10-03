@@ -85,3 +85,68 @@
 [ 28533] : send to client
 [ 28533] : send to server
 [ 28533] : send to client
+[ 29353] : SockRecvServer:Listening on port 8001.......
+[ 29353] : accept client connection!
+[ 29358] : connection to server!
+[ 29358] : send to server
+[ 29358] : send to client
+[ 29358] : send to server
+[ 29358] : send to client
+[ 29358] : send to server
+[ 29358] : send to client
+[ 29353]ÚÎ]∑†?	Ù?u∑–Ju∑ : accept client connection!
+[ 29362] : connection to server!
+[ 29362] : send to server
+[ 29362] : send to client
+[ 29362] : send to server
+[ 29362] : send to client
+[ 29362] : send to server
+[ 29362] : send to client
+[ 29394] : SockRecvServer:Listening on port 8001.......
+[ 29394] : accept client connection!
+[ 29396] : connection to server!
+[ 29396] : send to server
+[ 29396] : send to client
+[ 29396] : send to server
+[ 29396] : send to client
+[ 29396] : client connection close
+[ 29394]ÚÎ[∑ HÙ?s∑–Js∑ : accept client connection!
+[ 29428] : connection to server!
+[ 29428] : send to server
+[ 29428] : send to client
+[ 29428] : send to server
+[ 29428] : send to client
+[ 29428] : send to server
+[ 29428] : send to client
+[ 29428] : send to server
+[ 29428] : send to client
+[ 29428] : server connection close
+[  5291] : SockRecvServer:Listening on port 8001.......
+[  5291] : accept client connection!
+[  5497] : SockRecvServer:Listening on port 8001.......
+[  5497] : accept client connection!
+[  5497] : create child process!
+[  5576] : SockRecvServer:Listening on port 8001.......
+[  5576] : accept client connection!
+[  5576] : create child process!
+[  5576]Ú€]∑∞BÙ/u∑–:u∑ : accept client connection!
+[  5576]Ú€]∑∞BÙ/u∑–:u∑ : create child process!
+[  5576]Ú€]∑∞BB : accept client connection!
+[  5576]Ú€]∑∞BB : create child process!
+[  5576]Ú€]∑∞BB : accept client connection!
+[  5576]Ú€]∑∞BB : create child process!
+[  5576]Ú€]∑∞BB : accept client connection!
+[  5576]Ú€]∑∞BB : create child process!
+[  5576]Ú€]∑∞BB : accept client connection!
+[  5576]Ú€]∑∞BB : create child process!
+[  6355] : SockRecvServer:Listening on port 8001.......
+[  6355] : accept client connection!
+[  6355] : create child process!
+[  6357] : connection to server!
+[  6357] : send login info!
+[  6357] : recive login info!
+[  6357] : recive login head of info err!
+[  7515] : SockRecvServer:Listening on port 8001.......
+[  7515] : accept client connection!
+[  7515] : create child process!
+[  7576] : error proxy connection to server!
