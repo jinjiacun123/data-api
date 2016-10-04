@@ -17,26 +17,30 @@ int deal_from_client_to_server(int proxy_client_fd, const char * buf, unsigned l
 int deal_from_server_to_client(int client_fd, const char * buf, unsigned long buf_len);
 
 //request of realtime
-int deal_request_of_realtime();
+static int deal_request_of_realtime();
 //request of auto_push
-int deal_request_of_auto_push();
+static int deal_request_of_auto_push();
 //request of time_share
-int deal_request_of_time_share();
+static int deal_request_of_time_share();
 //request of history
-int deal_request_of_history();
+static int deal_request_of_history();
 //request of zib
-int deal_request_of_zlib();
+static int deal_request_of_zlib();
 
 //response of realtime
-int deal_response_of_realtime();
+static int deal_response_of_realtime();
+static void do_foreign_exchange(char * code, buff_t * my_buff,int i);
+static void do_no_foreign_exchange(char * code, buff_t * my_buff, int i);
+static void do_exponent(char * code, buff_t * my_buff, int i);
+static void do_stock(char * code, buff_t * my_buff, int i);      
 //response of auto_push
-int deal_response_of_auto_push();
+static int deal_response_of_auto_push();
 //response of time_share
-int deal_response_of_time_share();
+static int deal_response_of_time_share();
 //response of history
-int deal_response_of_history();
+static int deal_response_of_history();
 //response of zlib
-int deal_response_of_zlib();
+static int deal_response_of_zlib();
 
 void catchcld(int sig)
 {
@@ -318,8 +322,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 }
 
 //send heart to server
-int 
-send_heart_to_server(int proxy_client_fd, int * heart_times)
+int send_heart_to_server(int proxy_client_fd, int * heart_times)
 {
   //send heart to server
   char * package;
@@ -345,8 +348,7 @@ send_heart_to_server(int proxy_client_fd, int * heart_times)
 }
 
 //init login
-int 
-init_login(int proxy_client_fd)
+int init_login(int proxy_client_fd)
 {
   char * package;
   int request_len = sizeof(request_s_t);
@@ -415,8 +417,7 @@ init_login(int proxy_client_fd)
 }
 
 //from client to server
-int
-deal_from_client_to_server(proxy_client_fd, buf, buf_len)
+int deal_from_client_to_server(proxy_client_fd, buf, buf_len)
      int proxy_client_fd;
      const char * buf;
      unsigned long buf_len;
@@ -448,8 +449,7 @@ deal_from_client_to_server(proxy_client_fd, buf, buf_len)
 }
 
 //from server to client
-int
-deal_from_server_to_client(client_fd, buf, buf_len)
+int deal_from_server_to_client(client_fd, buf, buf_len)
      int client_fd;
      const char * buf;
      unsigned long buf_len;
@@ -483,39 +483,226 @@ deal_from_server_to_client(client_fd, buf, buf_len)
 }
 
 //request of realtime
-int deal_request_of_realtime()
+static int deal_request_of_realtime(int proxy_client_socket_fd)
 {
+  char request[1024];
+
+  int size = 1;
+  request_s_t data ;
+  memset(&data, 0x00, sizeof(request_s_t));
+  memcpy(data.header_name, HEADER, 4);
+  data.body_len =  sizeof(request_s_t) 
+    + sizeof(request_realtime_t)
+    - 8
+    + sizeof(entity_t)*size;
+  data.type = TYPE_REALTIME;
+  request_realtime_t data_ex;
+  data_ex.size = size;
+  data_ex.option= 0x0080;  
+  entity_t l_entity[size];
+  memset(l_entity, 0x00, sizeof(entity_t)*size);
+  memcpy(l_entity[0].code, "XAU", 6);
+  l_entity[0].code_type = 0x5b00;
+  
+  memset(request, 0, sizeof(data) 
+                     + sizeof(data_ex) 
+                     + sizeof(entity_t)*size);
+  memcpy(request, &data, sizeof(data));
+  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
+  memcpy(request+sizeof(data)+sizeof(data_ex), &l_entity, sizeof(entity_t)*size);
+  write(proxy_client_socket_fd, 
+	request, 
+	sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size, 0); 
+ 
   return 0;
 }
 
 //request of auto_push
-int deal_request_of_auto_push()
+static int deal_request_of_auto_push(int proxy_client_socket_fd)
 {
+  char request[1024];
+
+  int size = 1;
+  request_s_t data ;
+  memset(&data,0x00,sizeof(request_s_t));
+  memcpy(data.header_name, HEADER, 4);
+  data.body_len =  sizeof(request_s_t) 
+    + sizeof(request_realtime_t)
+    - 8
+    + sizeof(entity_t)*size;
+  data.type = TYPE_REALTIME;
+
+  request_realtime_t data_ex;
+  memset(&data_ex, 0x00, sizeof(request_realtime_t));
+  data_ex.size = size;
+  data_ex.option= 0x0080;
+  
+  entity_t l_entity[size];
+  memset(l_entity, 0x00, sizeof(entity_t)*size);
+  memcpy(l_entity[0].code, "XAU", 6);
+  l_entity[0].code_type = 0x5b00;
+  memset(request, 0, sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size);
+  memcpy(request, &data, sizeof(data));
+  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
+  memcpy(request+sizeof(data)+sizeof(data_ex), &l_entity, sizeof(entity_t)*size);
+  write(proxy_client_socket_fd, 
+	request, 
+	sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size, 0); 
+
   return 0;
 }
 
 //request of time_share
-int deal_request_of_time_share()
+static int deal_request_of_time_share(int proxy_client_socket_fd)
 {
+  char request[1024];
+
+  request_s_t data ;
+  memset(&data,0x00,sizeof(request_s_t));
+  memcpy(data.header_name ,HEADER, 4);
+  data.body_len =  sizeof(request_s_t)+sizeof(request_time_share_t) - 8;
+  data.type = TYPE_TIME_SHARE;
+  request_time_share_t data_ex;
+  data_ex.size = 0;
+  data_ex.option = 0x0080;
+  memcpy(data_ex.code,"XAG",6);
+  data_ex.code_type = 0x5b00;
+  memcpy(data_ex.code2,"XAG",6);
+  data_ex.code_type2 = 0x5b00;
+
+  memset(request, 0, sizeof(data)+sizeof(data_ex));
+  memcpy(request, &data, sizeof(data));
+  memcpy(request+sizeof(data_ex), &data_ex, sizeof(data_ex)); 
+  write(proxy_client_socket_fd, request, sizeof(data)+sizeof(data_ex), 0);
   return 0;
 }
 
 //request of history
-int deal_request_of_history()
+static int deal_request_of_history(int proxy_client_socket_fd)
 {
+  char request[1024];
+
+  request_s_t data;
+  memset(&data,0x00,sizeof(request_s_t));
+  memcpy(data.header_name, HEADER,4);
+  data.body_len =  sizeof(request_s_t)+sizeof(request_history_t) - 8;
+  data.type = TYPE_HISTORY;
+  
+  request_history_t data_ex;
+  memset(&data_ex, 0x00, sizeof(request_history_t));
+  data_ex.size = 1;
+  data_ex.index = 0;
+  data_ex.option = 0x0080;
+  strncpy(data_ex.code, "XAG", 6);
+  data_ex.code_type = 0x5b00;
+
+  //日线请求
+  data_ex.period = PERIOD_TYPE_DAY;      //请求周期类型
+  data_ex.begin_position = 0; //请求开始位置
+  data_ex.period_num = 1;
+  data_ex.day = 400*data_ex.period_num;//请求个数(400个)
+  data_ex.size = 0;
+  strncpy(data_ex.code2, "xag", 6);
+  data_ex.code_type2 = 0x5b00;
+
+  //周线
+
+  //月线
+
+  //5分钟
+
+  //15分钟
+
+  //30分钟
+
+  //60分钟
+
+  //120分钟
+
+  memset(request, 0, sizeof(data)+sizeof(data_ex));
+  memcpy(request, &data, sizeof(data));
+  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
+  write(proxy_client_socket_fd, request, sizeof(data)+sizeof(data_ex));  
   return 0;
 }
 
 //request of zib
-int deal_request_of_zlib()
+static int deal_request_of_zlib()
 {
   return 0;
 }
 
 //response of realtime
-int deal_response_of_realtime()
+static int deal_response_of_realtime(int client_socket_fd, buff_t * my_buff)
 {
+  response_realtime_t * realtime = (response_realtime_t *)(my_buff->buff+sizeof(response_s_t));
+  char code[7]={0};
+  int i=0;
+
+  for(i=0; i< realtime->size; i++){
+    response_realtime_price_t * data_type = (response_realtime_price_t *)(my_buff->buff
+							+ sizeof(response_s_t)
+							+ sizeof(response_realtime_t)
+							+ i*(sizeof(response_realtime_price_t)+sizeof(response_realtime_price_no_foreign_exchange_t)));
+    memcpy(code, data_type->code, 6);
+    if(data_type->code_type == 0x5b00){//非外汇
+      do_no_foreign_exchange(code, my_buff, i);
+    }
+    else if(data_type->code_type == 0xffff8100){//外汇
+      do_foreign_exchange(code, my_buff, i);
+    }
+    //指数（成交量单位（个，万，亿），万和亿只保留两位小数后面加单位(万或亿)
+    else if(data_type->code_type == 0x1200){
+      do_exponent(code, my_buff, i);
+    }
+    else if(data_type->code_type == 0x1101){//股票
+      do_stock(code, my_buff, i);
+    }
+  }
   return 0;
+}
+
+//处理外汇
+static void do_foreign_exchange(char * code, buff_t * my_buff, int i)
+{
+  WriteErrLog("do_foreign_exchange...\n");
+  response_realtime_price_foreign_exchange_t * entity = (response_realtime_price_foreign_exchange_t*)(my_buff->buff
+					    + 28
+					  + sizeof(response_realtime_price_t)
+					  + i*(sizeof(response_realtime_price_t)+sizeof(response_realtime_price_foreign_exchange_t)));
+}
+
+//处理非外汇
+static void do_no_foreign_exchange(char * code, buff_t * my_buff, int i)
+{
+  WriteErrLog("do_no_foreign_exchange...\n");
+  
+  response_realtime_price_no_foreign_exchange_t * entity = (response_realtime_price_no_foreign_exchange_t*)(my_buff->buff
+					    +28
+					    +sizeof(response_realtime_price_ex_t)
+					    +i*(sizeof(response_realtime_price_ex_t)+sizeof(response_realtime_price_no_foreign_exchange_t)));
+  // WriteErrLog("品种:%s, 最新价:%d\n", code, entity->new_price);
+  
+}
+
+//处理指数
+static void do_exponent(char * code, buff_t * my_buff, int i)
+{
+  WriteErrLog("处理指标...\n");
+  response_realtime_price_exponent_t * tmp = (response_realtime_price_exponent_t*)(my_buff->buff
+					          +28
+					     +sizeof(response_realtime_price_t)
+					     + i*(sizeof(response_realtime_price_t)+sizeof(response_realtime_price_exponent_t)));
+}
+
+//处理股票
+static void do_stock(char * code, buff_t * my_buff, int i)
+{
+  WriteErrLog("处理股票...\n");
+  response_realtime_price_stock_t * tmp = (response_realtime_price_stock_t *)(my_buff->buff
+					            +28
+					      +sizeof(response_realtime_price_t)
+					      +i*(sizeof(response_realtime_price_t)+sizeof(response_realtime_price_stock_t)));
 }
 
 //response of auto_push
@@ -525,14 +712,65 @@ int deal_response_of_auto_push()
 }
 
 //response of time_share
-int deal_response_of_time_share()
+int deal_response_of_time_share(int client_socket_fd, buff_t * my_buff)
 {
+  WriteErrLog("解析分时数据\n");
+  char code[7];
+  memset(code, 0, 7);
+  response_s_t * response_s = (response_s_t *)my_buff->p_res_media_h;
+  response_time_share_t * time_share = (response_time_share_t *)my_buff->p_res_media_h+3;
+  memcpy(code, time_share->code, 6);
+  int code_len = strlen(code);
+  int index = 0;
+  for(index = 0; index < code_len; index++){
+    code[index] = tolower(code[index]);
+  }
+  if(response_s->type == TYPE_TIME_SHARE){
+    response_time_share_price_t * price = (response_time_share_price_t *)time_share->his_data;
+    int i = 0;
+    for(i=0; i<time_share->his_len; i++){
+      WriteErrLog("第%d条数据 收到code_type:%d\tcode:%s\tnew_price:%d\ttotal:%d\n",
+		  i+1,
+		  time_share->code_type,
+		  time_share->code,
+		  price->new_price,
+		  price->total);
+      price ++;
+    }
+  }
   return 0;
 }
 
 //response of history
-int deal_response_of_history()
+int deal_response_of_history(int client_socket_fd, buff_t * my_buff)
 {
+  unsigned short code_type;
+  char my_code[7];
+  memset(my_code, 0, 7);
+  WriteErrLog("client_parse_history\n");
+  response_s_t * response_s = (response_s_t*)my_buff->p_res_media_h;
+  if(response_s->type == TYPE_HISTORY){
+    response_history_t * history = (response_history_t * )(response_s+3);
+    response_history_price_t * price = history->data;
+    int code_len = strlen(history->code);
+    if(code_len>6) code_len = 6;
+    memcpy(my_code, history->code, code_len);
+    code_type = history->code_type;
+    int i = 0;
+    for (i =0; i<history->size; i++){
+	    WriteErrLog("index:%d\t code:%.6s\t date:%ld\t open:%ld\t max:%ld\t  min:%ld\t close:%d\t money:%d\t total:%ld\n",
+		   i+1,
+		   my_code,
+		   price->date,
+		   price->open_price,
+		   price->max_price,
+		   price->min_price,
+		   price->close_price,
+		   price->money,
+		   price->total);
+      price ++;
+    }
+  }
   return 0;
 }
 
