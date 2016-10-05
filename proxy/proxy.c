@@ -17,15 +17,15 @@ int deal_from_client_to_server(int proxy_client_fd, const char * buf, unsigned l
 int deal_from_server_to_client(int client_fd, const char * buf, unsigned long buf_len);
 
 //request of realtime
-static int deal_request_of_realtime();
+static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of auto_push
-static int deal_request_of_auto_push();
+static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of time_share
-static int deal_request_of_time_share();
+static int deal_request_of_time_share(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of history
-static int deal_request_of_history();
+static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of zib
-static int deal_request_of_zlib();
+static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 
 //response of realtime
 static int deal_response_of_realtime();
@@ -367,7 +367,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  //WriteErrLog("send to server\n");
 	  //write(client[0].fd, cDataBuf, n);
 	 //send to client
-	  WriteErrLog("send to client\n");
+	  WriteErrLog("read client info!\n");
 	  //write(client[1].fd, cDataBuf, n);
 	  //recive head from server
 	  p_header = (p_response_header)buff;
@@ -514,29 +514,31 @@ int init_login(int proxy_client_fd)
 }
 
 //from client to server
-int deal_from_client_to_server(proxy_client_fd, buf, buf_len)
+int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
      int proxy_client_fd;
-     const char * buf;
-     unsigned long buf_len;
+     const char * buff;
+     unsigned long buff_len;
 {
+  WriteErrLog("send message from client to server!\n");
   //parse client's request
   unsigned short type = 0;
+  type = TYPE_REALTIME;
   //deal request of client to request of server
   if(type == TYPE_ZIB){
-    REQUEST_DEAL(zlib)();
+    REQUEST_DEAL(zlib)(proxy_client_fd,buff, buff_len);
   }
   switch(type){    
   case TYPE_REALTIME:
-    REQUEST_DEAL(realtime);
+    REQUEST_DEAL(realtime)(proxy_client_fd,buff, buff_len);
     break;
   case TYPE_AUTO_PUSH:
-    REQUEST_DEAL(auto_push);
+    REQUEST_DEAL(auto_push)(proxy_client_fd,buff, buff_len);
     break;
   case TYPE_TIME_SHARE:
-    REQUEST_DEAL(time_share);
+    REQUEST_DEAL(time_share)(proxy_client_fd,buff, buff_len);
     break;
   case TYPE_HISTORY:
-    REQUEST_DEAL(history);
+    REQUEST_DEAL(history)(proxy_client_fd,buff, buff_len);
     break;
   }
   
@@ -552,7 +554,9 @@ int deal_from_server_to_client(client_fd, buf, buf_len)
      unsigned long buf_len;
 {
   //recive from server
+  WriteErrLog("send message from server to client!\n");
   unsigned short type = 0;
+  type = TYPE_REALTIME;
   //parse and second deal
   if(type == TYPE_ZIB){
 
@@ -583,7 +587,7 @@ int deal_from_server_to_client(client_fd, buf, buf_len)
 }
 
 //request of realtime
-static int deal_request_of_realtime(int proxy_client_socket_fd)
+static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
   char request[1024];
 
@@ -618,7 +622,7 @@ static int deal_request_of_realtime(int proxy_client_socket_fd)
 }
 
 //request of auto_push
-static int deal_request_of_auto_push(int proxy_client_socket_fd)
+static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
   char request[1024];
 
@@ -653,7 +657,7 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd)
 }
 
 //request of time_share
-static int deal_request_of_time_share(int proxy_client_socket_fd)
+static int deal_request_of_time_share(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
   char request[1024];
 
@@ -678,7 +682,7 @@ static int deal_request_of_time_share(int proxy_client_socket_fd)
 }
 
 //request of history
-static int deal_request_of_history(int proxy_client_socket_fd)
+static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
   char request[1024];
 
@@ -727,7 +731,7 @@ static int deal_request_of_history(int proxy_client_socket_fd)
 }
 
 //request of zib
-static int deal_request_of_zlib()
+static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
   return 0;
 }

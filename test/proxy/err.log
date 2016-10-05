@@ -76,3 +76,21 @@
 [ 23489] : recive login info!
 [ 23489] : recive login info check ok!
 [ 23489] : send to server
+[ 28436] : SockRecvServer:Listening on port 8001.......
+[ 28436] : accept client connection!
+[ 28436] : create child process!
+[ 28438] : connection to server!
+[ 28438] : send login info!
+[ 28438] : recive login info!
+[ 28438] : recive login info check ok!
+[ 28438] : send to client
+[ 28438] : compare header err!
+[ 28466] : SockRecvServer:Listening on port 8001.......
+[ 28466] : accept client connection!
+[ 28466] : create child process!
+[ 28469] : connection to server!
+[ 28469] : send login info!
+[ 28469] : recive login info!
+[ 28469] : recive login info check ok!
+[ 28469] : send to client
+[ 28469] : compare header err!
