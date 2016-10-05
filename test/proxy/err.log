@@ -1,152 +1,78 @@
-[ 25568] : SockRecvServer:Listening on port 8001.......
-[ 25568] : accept client connection!
-[ 25599] : SockRecvServer:Listening on port 8001.......
-[ 25599] : accept client connection!
-[ 25696] : SockRecvServer:Listening on port 8001.......
-[ 25696] : accept client connection!
-[ 25696] : g_iCltNum is too much
-[ 25745] : SockRecvServer:Listening on port 8001.......
-[ 25745] : accept client connection!
-[ 25749] : connection to server!
-[ 25749] : recive client request!
-[ 25749] : proxyClientSocketId:3
-[ 25749] : send to server!
-[ 25745]Ú[Y∑ : accept client connection!
-[ 25752] : connection to server!
-[ 25752] : recive client request!
-[ 25752] : proxyClientSocketId:3
-[ 25752] : send to server!
-[ 25745]Ú[Y∑ : accept client connection!
-[ 25754] : connection to server!
-[ 25754] : recive client request!
-[ 25754] : proxyClientSocketId:3
-[ 25754] : send to server!
-[ 27808] : SockRecvServer:Listening on port 8001.......
-[ 27808] : accept client connection!
-[ 27887] : connection to server!
-[ 28126] : SockRecvServer:Listening on port 8001.......
-[ 28126] : accept client connection!
-[ 28129] : connection to server!
-[ 28126]ÚÎ\∑ÄfÙ?t∑–Jt∑ : accept client connection!
-[ 28179] : connection to server!
-[ 28296] : SockRecvServer:Listening on port 8001.......
-[ 28296] : accept client connection!
-[ 28298] : connection to server!
-[ 28298] : send to server
-[ 28298] : send to client
-[ 28298] : send to server
-[ 28329] : SockRecvServer:Listening on port 8001.......
-[ 28435] : SockRecvServer:Listening on port 8001.......
-[ 28435] : accept client connection!
-[ 28444] : connection to server!
-[ 28444] : send to server
-[ 28444] : send to client
-[ 28444] : send to server
-[ 28531] : SockRecvServer:Listening on port 8001.......
-[ 28531] : accept client connection!
-[ 28533] : connection to server!
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 28533] : send to server
-[ 28533] : send to client
-[ 29353] : SockRecvServer:Listening on port 8001.......
-[ 29353] : accept client connection!
-[ 29358] : connection to server!
-[ 29358] : send to server
-[ 29358] : send to client
-[ 29358] : send to server
-[ 29358] : send to client
-[ 29358] : send to server
-[ 29358] : send to client
-[ 29353]ÚÎ]∑†?	Ù?u∑–Ju∑ : accept client connection!
-[ 29362] : connection to server!
-[ 29362] : send to server
-[ 29362] : send to client
-[ 29362] : send to server
-[ 29362] : send to client
-[ 29362] : send to server
-[ 29362] : send to client
-[ 29394] : SockRecvServer:Listening on port 8001.......
-[ 29394] : accept client connection!
-[ 29396] : connection to server!
-[ 29396] : send to server
-[ 29396] : send to client
-[ 29396] : send to server
-[ 29396] : send to client
-[ 29396] : client connection close
-[ 29394]ÚÎ[∑ HÙ?s∑–Js∑ : accept client connection!
-[ 29428] : connection to server!
-[ 29428] : send to server
-[ 29428] : send to client
-[ 29428] : send to server
-[ 29428] : send to client
-[ 29428] : send to server
-[ 29428] : send to client
-[ 29428] : send to server
-[ 29428] : send to client
-[ 29428] : server connection close
-[  5291] : SockRecvServer:Listening on port 8001.......
-[  5291] : accept client connection!
-[  5497] : SockRecvServer:Listening on port 8001.......
-[  5497] : accept client connection!
-[  5497] : create child process!
-[  5576] : SockRecvServer:Listening on port 8001.......
-[  5576] : accept client connection!
-[  5576] : create child process!
-[  5576]Ú€]∑∞BÙ/u∑–:u∑ : accept client connection!
-[  5576]Ú€]∑∞BÙ/u∑–:u∑ : create child process!
-[  5576]Ú€]∑∞BB : accept client connection!
-[  5576]Ú€]∑∞BB : create child process!
-[  5576]Ú€]∑∞BB : accept client connection!
-[  5576]Ú€]∑∞BB : create child process!
-[  5576]Ú€]∑∞BB : accept client connection!
-[  5576]Ú€]∑∞BB : create child process!
-[  5576]Ú€]∑∞BB : accept client connection!
-[  5576]Ú€]∑∞BB : create child process!
-[  6355] : SockRecvServer:Listening on port 8001.......
-[  6355] : accept client connection!
-[  6355] : create child process!
-[  6357] : connection to server!
-[  6357] : send login info!
-[  6357] : recive login info!
-[  6357] : recive login head of info err!
-[  7515] : SockRecvServer:Listening on port 8001.......
-[  7515] : accept client connection!
-[  7515] : create child process!
-[  7576] : error proxy connection to server!
+[ 22058] : SockRecvServer:Listening on port 8001.......
+[ 22058] : accept client connection!
+[ 22058] : create child process!
+[ 22139] : connection to server!
+[ 22139] : send login info!
+[ 22139] : recive login info!
+[ 22139] : recive login head of info err!
+[ 22274] : SockRecvServer:Listening on port 8001.......
+[ 22274] : accept client connection!
+[ 22274] : create child process!
+[ 22278] : connection to server!
+[ 22278] : send login info!
+[ 22278] : recive login info!
+[ 22278] : recive login head of info err!
+[ 22310] : SockRecvServer:Listening on port 8001.......
+[ 22310] : accept client connection!
+[ 22310] : create child process!
+[ 22332] : connection to server!
+[ 22332] : send login info!
+[ 22332] : recive login info!
+[ 22332] : recive login head of info err!
+[ 22460] : SockRecvServer:Listening on port 8001.......
+[ 22460] : accept client connection!
+[ 22460] : create child process!
+[ 22478] : connection to server!
+[ 22478] : send login info!
+[ 22478] : recive login info!
+[ 22478] : recive login head of info err!
+[ 22596] : SockRecvServer:Listening on port 8001.......
+[ 22596] : accept client connection!
+[ 22596] : create child process!
+[ 22621] : connection to server!
+[ 22621] : send login info!
+[ 22621] : recive login info!
+[ 22621] : recive login body's type of info err!
+[ 23087] : SockRecvServer:Listening on port 8001.......
+[ 23087] : accept client connection!
+[ 23087] : create child process!
+[ 23105] : connection to server!
+[ 23105] : send login info!
+[ 23105] : recive login info!
+[ 23105] : recive login body's type of info err!
+[ 23267] : SockRecvServer:Listening on port 8001.......
+[ 23267] : accept client connection!
+[ 23267] : create child process!
+[ 23282] : connection to server!
+[ 23282] : send login info!
+[ 23282] : recive login info!
+[ 23282] : recive login body's type of info err!
+[ 23377] : SockRecvServer:Listening on port 8001.......
+[ 23377] : accept client connection!
+[ 23377] : create child process!
+[ 23380] : connection to server!
+[ 23380] : send login info!
+[ 23380] : recive login info!
+[ 23433] : SockRecvServer:Listening on port 8001.......
+[ 23433] : accept client connection!
+[ 23433] : create child process!
+[ 23437] : connection to server!
+[ 23437] : send login info!
+[ 23437] : recive login info!
+[ 23437] : recive login info check ok!
+[ 23452] : SockRecvServer:Listening on port 8001.......
+[ 23452] : accept client connection!
+[ 23452] : create child process!
+[ 23455] : connection to server!
+[ 23455] : send login info!
+[ 23455] : recive login info!
+[ 23455] : recive login info check ok!
+[ 23455] : send login info!
+[ 23487] : SockRecvServer:Listening on port 8001.......
+[ 23487] : accept client connection!
+[ 23487] : create child process!
+[ 23489] : connection to server!
+[ 23489] : send login info!
+[ 23489] : recive login info!
+[ 23489] : recive login info check ok!
+[ 23489] : send to server

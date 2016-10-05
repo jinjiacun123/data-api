@@ -41,6 +41,8 @@ static int deal_response_of_time_share();
 static int deal_response_of_history();
 //response of zlib
 static int deal_response_of_zlib();
+//response of heart
+static int deal_response_of_heart();
 
 void catchcld(int sig)
 {
@@ -60,7 +62,7 @@ void catchcld(int sig)
         服务器端口号
         允许最大连接数
 */
-main(int argc,char *argv[])
+void main(int argc,char *argv[])
 {
   int proxyClientSocketId;
   int proxyServerSocketId;
@@ -146,9 +148,6 @@ main(int argc,char *argv[])
       exit(0);
     }
     WriteErrLog("connection to server!\n");
-    
-    //init login
-    assert(init_login(proxyClientSocketId) != 0);
 
     deal_proxy(proxyClientSocketId, clientSocketId);
   }
@@ -260,14 +259,14 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   
 
   //init server's login
-  assert(init_login(proxyClientSocketId) != 0);
+  assert(init_login(proxyClientSocketId) == 0);
 
   while(1){
     nready = poll(client, 2, 5000);    
     
     if(nready == 0){//timeout
       //send heart to server
-      assert(send_heart_to_server(proxyClientSocketId, &heart_times) != 0);
+      assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
 
     //recive server info
@@ -378,7 +377,7 @@ int init_login(int proxy_client_fd)
   p_response_s_t  p_response_s;
   char * buff;
   int buff_len = 8;
-  unsigned short type = 0x00;
+  unsigned short type;
   assert(buff = (char *)malloc(buff_len+1));
   memset(buff, 0x00, buff_len);
   int n = read(proxy_client_fd, buff, buff_len);
@@ -386,7 +385,7 @@ int init_login(int proxy_client_fd)
   if(n == 8){
     p_response_s = (p_response_s_t)buff;
     //parse head
-    if(strcmp(p_response_s->header_name, HEADER)){
+    if(strncmp(p_response_s->header_name, HEADER, 4)){
       WriteErrLog("recive login head of info err!\n");
       exit(-1);
     }
@@ -401,12 +400,13 @@ int init_login(int proxy_client_fd)
       exit(-1);
     }
     
-    type = (unsigned short *)buff;
+    type = *((unsigned short *)buff);
     if(type != TYPE_LOGIN){
       WriteErrLog("recive login body's type of info err!\n");
       exit(-1);
     }
-
+    
+    WriteErrLog("recive login info check ok!\n");
     return 0;
   }
   else{
@@ -462,6 +462,9 @@ int deal_from_server_to_client(client_fd, buf, buf_len)
   }
   
   switch(type){
+  case TYPE_HEART:
+    RESPONSE_DEAL(heart);
+    break;
   case TYPE_REALTIME:
     RESPONSE_DEAL(realtime)();
     break;
@@ -775,7 +778,13 @@ int deal_response_of_history(int client_socket_fd, buff_t * my_buff)
 }
 
 //response of zlib
-int deal_response_of_zlib()
+static int deal_response_of_zlib()
+{
+  return 0;
+}
+
+//response of heart
+static int deal_response_of_heart()
 {
   return 0;
 }
