@@ -243,7 +243,7 @@ ConnectSock()
 void deal_proxy(int proxyClientSocketId, int clientSocketId)
 {
   struct pollfd client[2];
-  unsigned char cDataBuf[1024];
+  char * buff;
   int n;
   fd_set rset;
   int iRet=0;
@@ -251,6 +251,8 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   int nready;
   int i;
   int heart_times = 0;
+  int length = 8;
+  p_response_header p_header;
     
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
@@ -272,7 +274,14 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive server info
     if(client[0].fd > 0){
       if(client[0].revents & (POLLIN|POLLERR)){
-	if((n = read(client[0].fd, cDataBuf, 1024))<0){
+	length = 8;
+	buff = (char *)malloc(length);
+	if(buff == NULL){
+	  WriteErrLog("malloc memory err!\n");
+	  exit(-1);
+	}
+	memset(buff, 0x00, length);
+	if((n = read(client[0].fd, buff, length))<0){
 	  if(errno == ECONNRESET){
 	    close(client[0].fd);
 	    client[0].fd = -1;
@@ -285,18 +294,62 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  WriteErrLog("server connection close\n");
 	  exit(-1);
 	}
-	else if(n >0){
+	else if(n == length){
 	  //send to client
 	  WriteErrLog("send to client\n");
-	  write(client[1].fd, cDataBuf, n);
+	  //write(client[1].fd, cDataBuf, n);
+	  //recive head from server
+	  p_header = (p_response_header)buff;
+	  if(strncmp(p_header->str, HEADER, 4)){
+	    WriteErrLog("compare header err!\n");
+	    exit(-1);
+	  }
+	  length = p_header->length;
+	  free(buff);
+	  buff = (char *)malloc(length+1);
+	  if(buff == NULL){
+	    WriteErrLog("malloc momory err!\n");
+	    exit(-1);
+	  }
+	  memset(buff, 0x00, length);
+	  int off = 0;
+	  int last_length = length;
+	  while(n = read(client[0].fd, buff+off, last_length)){
+	    if(n<0){
+	      if(errno == ECONNRESET){
+		close(client[0].fd);
+		client[0].fd = -1;
+	      }
+	      else{
+		WriteErrLog("read client err!\n");
+		exit(-1);
+	      }
+	    }
+	    else if(n == 0){
+	      WriteErrLog("server connection close\n");
+	      exit(-1);
+	    }
+	    else if(n == last_length){
+	      break;	      
+	    }	  
+	    else if(n < last_length){
+	      off += n;
+	      last_length -= n;
+	    }
+	  }
 	}
+	//deal_from_server_to_client
+	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
       }  
     }
     
     //recive client info
     if(client[1].fd > 0){
       if(client[1].revents & (POLLIN|POLLERR)){
-	if((n = read(client[1].fd, cDataBuf, 1024))<0){
+	//head of package
+	length = 8;
+	buff = (char *)malloc(length);
+	if((n = read(client[1].fd, buff, length))<0){
 	  if(errno == ECONNRESET){
 	    close(client[1].fd);
 	    client[1].fd = -1;
@@ -309,11 +362,55 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  WriteErrLog("client connection close\n");
 	  exit(-1);
 	}
-	else if(n >0){
+	else if(n == length){
 	  //send to server
-	  WriteErrLog("send to server\n");
-	  write(client[0].fd, cDataBuf, n);
+	  //WriteErrLog("send to server\n");
+	  //write(client[0].fd, cDataBuf, n);
+	 //send to client
+	  WriteErrLog("send to client\n");
+	  //write(client[1].fd, cDataBuf, n);
+	  //recive head from server
+	  p_header = (p_response_header)buff;
+	  if(strncmp(p_header->str, HEADER, 4)){
+	    WriteErrLog("compare header err!\n");
+	    exit(-1);
+	  }
+	  length = p_header->length;
+	  free(buff);
+	  buff = (char *)malloc(length+1);
+	  if(buff == NULL){
+	    WriteErrLog("malloc momory err!\n");
+	    exit(-1);
+	  }
+	  memset(buff, 0x00, length);
+	  int off = 0;
+	  int last_length = length;
+	  while(n = read(client[0].fd, buff+off, last_length)){
+	    if(n<0){
+	      if(errno == ECONNRESET){
+		close(client[0].fd);
+		client[0].fd = -1;
+	      }
+	      else{
+		WriteErrLog("read client err!\n");
+		exit(-1);
+	      }
+	    }
+	    else if(n == 0){
+	      WriteErrLog("server connection close\n");
+	      exit(-1);
+	    }
+	    else if(n == last_length){
+	      break;	      
+	    }	  
+	    else if(n < last_length){
+	      off += n;
+	      last_length -= n;
+	    }
+	  } 
 	}
+	//body of package
+	assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
       }  
     }  
     
