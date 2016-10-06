@@ -1,4 +1,4 @@
-#include "config.h"
+#include  "config.h"
 
 int g_iCltNum=0;
 extern int errno;
@@ -608,11 +608,29 @@ int deal_from_server_to_client(client_fd, buff, buff_len)
 }
 
 //request of realtime
-static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
+static int deal_request_of_realtime(int proxy_client_socket_fd, 
+				    const char * buff, 
+				    unsigned int buff_len)
 {
   char request[1024];
-
   int size = 1;
+
+  //get entity_list from client
+  request_c_realtime_t * request_c_realtime = (request_c_realtime_t *)buff;
+  if(request_c_realtime->type != TYPE_REALTIME){
+    WriteErrLog("Type err in request");
+    exit(-1);
+  }
+  size = request_c_realtime->size;
+  entity_t l_entity[size];
+  memset(l_entity, 0x00, sizeof(entity_t)*size);
+  entity_t * entity;
+  int i=0;
+  for(i=0; i< size; i++){
+    entity = (entity_t*)(buff+sizeof(request_c_realtime_t));
+    memcpy(l_entity[i].code, entity->code, 6);
+    l_entity[i].code_type = entity->code_type;
+  }
 
   request_realtime_t data ;
   memset(&data, 0x00, sizeof(request_s_t));
@@ -624,10 +642,12 @@ static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buf
   data.type = TYPE_REALTIME;
   data.size = size;
   data.option= 0x0080;  
+  /*
   entity_t l_entity[size];
   memset(l_entity, 0x00, sizeof(entity_t)*size);
-  memcpy(l_entity[0].code, "XAU", 6);
+  memncpy(l_entity[0].code, "XAU", 6);
   l_entity[0].code_type = 0x5b00;
+  */
   
   memset(request, 0, sizeof(data)
                      + sizeof(entity_t)*size);

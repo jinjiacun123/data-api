@@ -57,6 +57,8 @@
 #define EXPONENT            0x02
 #define STOCK               0X03
 
+#pragma pack (4)
+
 //map category and market
 typedef struct{
   short market;
@@ -370,6 +372,10 @@ typedef struct{
   short size;
   unsigned short option; 
 }request_realtime_t;
+typedef struct{
+  unsigned short type;
+  int size;
+}request_c_realtime_t;
 
 typedef struct{
   //  request_s_t pre;
