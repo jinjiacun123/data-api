@@ -6,3 +6,5 @@ proxy:proxy.c
 	cc -g -w -o proxy proxy.c
 poll_server:test_poll.c
 	cc -g -w -o poll_server test_poll.c
+test_proxy:test_proxy.c
+	cc -g -w -o test_proxy test_proxy.c

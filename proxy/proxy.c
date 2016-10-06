@@ -266,14 +266,17 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   while(1){
     nready = poll(client, 2, 5000);    
     
+    /*
     if(nready == 0){//timeout
       //send heart to server
       assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
+    */
 
     //recive server info
     if(client[0].fd > 0){
       if(client[0].revents & (POLLIN|POLLERR)){
+	WriteErrLog("recive info from server!\n");
 	length = 8;
 	buff = (char *)malloc(length);
 	if(buff == NULL){
@@ -346,9 +349,24 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive client info
     if(client[1].fd > 0){
       if(client[1].revents & (POLLIN|POLLERR)){
-	//head of package
+	//head of package	
 	length = 8;
 	buff = (char *)malloc(length);
+	if(!buff){
+	  WriteErrLog("alloc memory error!\n");
+	  exit(-1);
+	}
+	memset(buff, 0x00, length);
+        /*
+	length = 1024;
+	buff = (char *)malloc(length+1);
+	if(buff){
+	  memset(buff, 0x00, length);
+	  n = read(client[1].fd, buff, 1024);
+	  write(client[0].fd, buff, n);
+	  continue;
+	}
+	*/
 	if((n = read(client[1].fd, buff, length))<0){
 	  if(errno == ECONNRESET){
 	    close(client[1].fd);
@@ -385,11 +403,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  memset(buff, 0x00, length);
 	  int off = 0;
 	  int last_length = length;
-	  while(n = read(client[0].fd, buff+off, last_length)){
+	  while(n = read(client[1].fd, buff+off, last_length)){
 	    if(n<0){
 	      if(errno == ECONNRESET){
-		close(client[0].fd);
-		client[0].fd = -1;
+		close(client[1].fd);
+		client[1].fd = -1;
+		WriteErrLog("connreset error!\n");
 	      }
 	      else{
 		WriteErrLog("read client err!\n");
@@ -409,6 +428,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	    }
 	  } 
 	}
+	WriteErrLog("recive client info complete!\n");
 	//body of package
 	assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
       }  
@@ -522,7 +542,8 @@ int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
   WriteErrLog("send message from client to server!\n");
   //parse client's request
   unsigned short type = 0;
-  type = TYPE_REALTIME;
+  //get type
+  type = *((unsigned short*)buff);
   //deal request of client to request of server
   if(type == TYPE_ZIB){
     REQUEST_DEAL(zlib)(proxy_client_fd,buff, buff_len);
@@ -544,19 +565,20 @@ int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
   
   //send request of server
   
-  return -1;
+  return 0;
 }
 
 //from server to client
-int deal_from_server_to_client(client_fd, buf, buf_len)
+int deal_from_server_to_client(client_fd, buff, buff_len)
      int client_fd;
-     const char * buf;
-     unsigned long buf_len;
+     const char * buff;
+     unsigned long buff_len;
 {
   //recive from server
   WriteErrLog("send message from server to client!\n");
   unsigned short type = 0;
-  type = TYPE_REALTIME;
+  //get type
+  type = *((unsigned short*)buff);
   //parse and second deal
   if(type == TYPE_ZIB){
 
@@ -564,26 +586,25 @@ int deal_from_server_to_client(client_fd, buf, buf_len)
   
   switch(type){
   case TYPE_HEART:
-    RESPONSE_DEAL(heart);
+    RESPONSE_DEAL(heart)(client_fd, buff, buff_len);
     break;
   case TYPE_REALTIME:
-    RESPONSE_DEAL(realtime)();
+    RESPONSE_DEAL(realtime)(client_fd, buff, buff_len);
     break;
   case TYPE_AUTO_PUSH:
-    RESPONSE_DEAL(auto_push)();
+    RESPONSE_DEAL(auto_push)(client_fd, buff, buff_len);
     break;
   case TYPE_TIME_SHARE:
-    RESPONSE_DEAL(time_share)();
+    RESPONSE_DEAL(time_share)(client_fd, buff, buff_len);
     break;
   case TYPE_HISTORY:
-    RESPONSE_DEAL(history)();
+    RESPONSE_DEAL(history)(client_fd, buff, buff_len);
     break;
   }
-
   //send to client
 
 
-  return -1;
+  return 0;
 }
 
 //request of realtime
@@ -592,32 +613,29 @@ static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buf
   char request[1024];
 
   int size = 1;
-  request_s_t data ;
+
+  request_realtime_t data ;
   memset(&data, 0x00, sizeof(request_s_t));
   memcpy(data.header_name, HEADER, 4);
-  data.body_len =  sizeof(request_s_t) 
-    + sizeof(request_realtime_t)
+  data.body_len =  sizeof(request_realtime_t)
     - 8
     + sizeof(entity_t)*size;
+  
   data.type = TYPE_REALTIME;
-  request_realtime_t data_ex;
-  data_ex.size = size;
-  data_ex.option= 0x0080;  
+  data.size = size;
+  data.option= 0x0080;  
   entity_t l_entity[size];
   memset(l_entity, 0x00, sizeof(entity_t)*size);
   memcpy(l_entity[0].code, "XAU", 6);
   l_entity[0].code_type = 0x5b00;
   
-  memset(request, 0, sizeof(data) 
-                     + sizeof(data_ex) 
+  memset(request, 0, sizeof(data)
                      + sizeof(entity_t)*size);
   memcpy(request, &data, sizeof(data));
-  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
-  memcpy(request+sizeof(data)+sizeof(data_ex), &l_entity, sizeof(entity_t)*size);
+  memcpy(request+sizeof(data), &l_entity, sizeof(entity_t)*size);
   write(proxy_client_socket_fd, 
 	request, 
-	sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size, 0); 
- 
+	sizeof(data)+sizeof(entity_t)*size, 0);
   return 0;
 }
 
@@ -627,8 +645,8 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * bu
   char request[1024];
 
   int size = 1;
-  request_s_t data ;
-  memset(&data,0x00,sizeof(request_s_t));
+  request_realtime_t data ;
+  memset(&data,0x00,sizeof(request_realtime_t));
   memcpy(data.header_name, HEADER, 4);
   data.body_len =  sizeof(request_s_t) 
     + sizeof(request_realtime_t)
@@ -636,22 +654,19 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * bu
     + sizeof(entity_t)*size;
   data.type = TYPE_REALTIME;
 
-  request_realtime_t data_ex;
-  memset(&data_ex, 0x00, sizeof(request_realtime_t));
-  data_ex.size = size;
-  data_ex.option= 0x0080;
+  data.size = size;
+  data.option= 0x0080;
   
   entity_t l_entity[size];
   memset(l_entity, 0x00, sizeof(entity_t)*size);
   memcpy(l_entity[0].code, "XAU", 6);
   l_entity[0].code_type = 0x5b00;
-  memset(request, 0, sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size);
+  memset(request, 0, sizeof(data)+sizeof(entity_t)*size);
   memcpy(request, &data, sizeof(data));
-  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
-  memcpy(request+sizeof(data)+sizeof(data_ex), &l_entity, sizeof(entity_t)*size);
+  memcpy(request+sizeof(data), &l_entity, sizeof(entity_t)*size);
   write(proxy_client_socket_fd, 
 	request, 
-	sizeof(data)+sizeof(data_ex)+sizeof(entity_t)*size, 0); 
+	sizeof(data)+sizeof(entity_t)*size, 0); 
 
   return 0;
 }
@@ -661,23 +676,21 @@ static int deal_request_of_time_share(int proxy_client_socket_fd, const char * b
 {
   char request[1024];
 
-  request_s_t data ;
+  request_time_share_t data ;
   memset(&data,0x00,sizeof(request_s_t));
   memcpy(data.header_name ,HEADER, 4);
-  data.body_len =  sizeof(request_s_t)+sizeof(request_time_share_t) - 8;
-  data.type = TYPE_TIME_SHARE;
-  request_time_share_t data_ex;
-  data_ex.size = 0;
-  data_ex.option = 0x0080;
-  memcpy(data_ex.code,"XAG",6);
-  data_ex.code_type = 0x5b00;
-  memcpy(data_ex.code2,"XAG",6);
-  data_ex.code_type2 = 0x5b00;
+  data.body_len = sizeof(request_time_share_t) - 8;
+  data.type = TYPE_TIME_SHARE;  
+  data.size = 0;
+  data.option = 0x0080;
+  memcpy(data.code,"XAG",6);
+  data.code_type = 0x5b00;
+  memcpy(data.code2,"XAG",6);
+  data.code_type2 = 0x5b00;
 
-  memset(request, 0, sizeof(data)+sizeof(data_ex));
+  memset(request, 0, sizeof(data));
   memcpy(request, &data, sizeof(data));
-  memcpy(request+sizeof(data_ex), &data_ex, sizeof(data_ex)); 
-  write(proxy_client_socket_fd, request, sizeof(data)+sizeof(data_ex), 0);
+  write(proxy_client_socket_fd, request, sizeof(data), 0);
   return 0;
 }
 
@@ -686,28 +699,25 @@ static int deal_request_of_history(int proxy_client_socket_fd, const char * buff
 {
   char request[1024];
 
-  request_s_t data;
+  request_history_t data;
   memset(&data,0x00,sizeof(request_s_t));
   memcpy(data.header_name, HEADER,4);
-  data.body_len =  sizeof(request_s_t)+sizeof(request_history_t) - 8;
-  data.type = TYPE_HISTORY;
-  
-  request_history_t data_ex;
-  memset(&data_ex, 0x00, sizeof(request_history_t));
-  data_ex.size = 1;
-  data_ex.index = 0;
-  data_ex.option = 0x0080;
-  strncpy(data_ex.code, "XAG", 6);
-  data_ex.code_type = 0x5b00;
+  data.body_len = sizeof(request_history_t) - 8;
+  data.type = TYPE_HISTORY;  
+  data.size = 1;
+  data.index = 0;
+  data.option = 0x0080;
+  strncpy(data.code, "XAG", 6);
+  data.code_type = 0x5b00;
 
   //日线请求
-  data_ex.period = PERIOD_TYPE_DAY;      //请求周期类型
-  data_ex.begin_position = 0; //请求开始位置
-  data_ex.period_num = 1;
-  data_ex.day = 400*data_ex.period_num;//请求个数(400个)
-  data_ex.size = 0;
-  strncpy(data_ex.code2, "xag", 6);
-  data_ex.code_type2 = 0x5b00;
+  data.period = PERIOD_TYPE_DAY;      //请求周期类型
+  data.begin_position = 0; //请求开始位置
+  data.period_num = 1;
+  data.day = 400*data.period_num;//请求个数(400个)
+  data.size = 0;
+  strncpy(data.code2, "xag", 6);
+  data.code_type2 = 0x5b00;
 
   //周线
 
@@ -723,10 +733,9 @@ static int deal_request_of_history(int proxy_client_socket_fd, const char * buff
 
   //120分钟
 
-  memset(request, 0, sizeof(data)+sizeof(data_ex));
+  memset(request, 0, sizeof(data));
   memcpy(request, &data, sizeof(data));
-  memcpy(request+sizeof(data), &data_ex, sizeof(data_ex));
-  write(proxy_client_socket_fd, request, sizeof(data)+sizeof(data_ex));  
+  write(proxy_client_socket_fd, request, sizeof(data));  
   return 0;
 }
 
@@ -737,15 +746,14 @@ static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, u
 }
 
 //response of realtime
-static int deal_response_of_realtime(int client_socket_fd, buff_t * my_buff)
+static int deal_response_of_realtime(int client_socket_fd, char * my_buff,int buff_len)
 {
-  response_realtime_t * realtime = (response_realtime_t *)(my_buff->buff+sizeof(response_s_t));
+  response_realtime_t * realtime = (response_realtime_t *)(my_buff);
   char code[7]={0};
   int i=0;
 
   for(i=0; i< realtime->size; i++){
-    response_realtime_price_t * data_type = (response_realtime_price_t *)(my_buff->buff
-							+ sizeof(response_s_t)
+    response_realtime_price_t * data_type = (response_realtime_price_t *)(my_buff
 							+ sizeof(response_realtime_t)
 							+ i*(sizeof(response_realtime_price_t)+sizeof(response_realtime_price_no_foreign_exchange_t)));
     memcpy(code, data_type->code, 6);
@@ -816,20 +824,19 @@ int deal_response_of_auto_push()
 }
 
 //response of time_share
-int deal_response_of_time_share(int client_socket_fd, buff_t * my_buff)
+int deal_response_of_time_share(int client_socket_fd, char * my_buff, int buff_len)
 {
   WriteErrLog("解析分时数据\n");
   char code[7];
   memset(code, 0, 7);
-  response_s_t * response_s = (response_s_t *)my_buff->p_res_media_h;
-  response_time_share_t * time_share = (response_time_share_t *)my_buff->p_res_media_h+3;
+  response_time_share_t * time_share = (response_time_share_t *)my_buff;
   memcpy(code, time_share->code, 6);
   int code_len = strlen(code);
   int index = 0;
   for(index = 0; index < code_len; index++){
     code[index] = tolower(code[index]);
   }
-  if(response_s->type == TYPE_TIME_SHARE){
+  if(time_share->type == TYPE_TIME_SHARE){
     response_time_share_price_t * price = (response_time_share_price_t *)time_share->his_data;
     int i = 0;
     for(i=0; i<time_share->his_len; i++){
@@ -846,15 +853,17 @@ int deal_response_of_time_share(int client_socket_fd, buff_t * my_buff)
 }
 
 //response of history
-int deal_response_of_history(int client_socket_fd, buff_t * my_buff)
+int deal_response_of_history(int client_socket_fd, char * my_buff, int buff_lenx)
 {
+  unsigned short type;
   unsigned short code_type;
   char my_code[7];
   memset(my_code, 0, 7);
   WriteErrLog("client_parse_history\n");
-  response_s_t * response_s = (response_s_t*)my_buff->p_res_media_h;
-  if(response_s->type == TYPE_HISTORY){
-    response_history_t * history = (response_history_t * )(response_s+3);
+  type = ((unsigned short*)my_buff);
+  response_s_t * response_s = (response_s_t*)my_buff;
+  if(type == TYPE_HISTORY){
+    response_history_t * history = (response_history_t * )my_buff;
     response_history_price_t * price = history->data;
     int code_len = strlen(history->code);
     if(code_len>6) code_len = 6;

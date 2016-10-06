@@ -244,6 +244,10 @@ typedef struct{
 }response_realtime_price_ex_t;
 
 typedef struct{
+  //body
+  unsigned short type;//data type
+  char index;
+  
   char not;
   long key;
   short code_type;
@@ -253,6 +257,10 @@ typedef struct{
 }response_realtime_t;
 
 typedef struct{
+  //body
+  unsigned short type;//data type
+  char index;
+
   char srv;
   long key;
   short code_type;
@@ -297,10 +305,6 @@ typedef struct{
   //header
   char header_name[4];
   int  body_len;
-  
-  //body
-  unsigned short type;//data type
-  char index;
 }response_s_t;
 typedef response_s_t * p_response_s_t;
 //response--------------------------------------------------------
@@ -309,6 +313,22 @@ typedef response_s_t * p_response_s_t;
 #define REQUEST_T(param) request_##param##_t
 #define REQUEST_DEAL(param) deal_request_of_##param
 typedef struct{
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+}request_s_t;
+typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+
   char index;
   char no;
   long key;
@@ -321,11 +341,27 @@ typedef struct{
 }request_login_t;
 
 typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+
   char index;
   char operator;
 }request_heart_t;
 
 typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+
   char  index;   
   char  no;   
   long  key;
@@ -336,6 +372,14 @@ typedef struct{
 }request_realtime_t;
 
 typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+
   char index;
   char no;
   long key;
@@ -348,6 +392,14 @@ typedef struct{
 }request_time_share_t;
 
 typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+  
+  //body
+  unsigned short type;
+
   char index;
   char no;
   long key;
@@ -363,15 +415,6 @@ typedef struct{
   unsigned short code_type2;   
   char code2[6];
 }request_history_t;
-  
-typedef struct{
-  //header
-  char header_name[4];
-  int body_len;
-  
-  //body
-  unsigned short type;
-}request_s_t;
 
 request_s_t request_data[] = {
   {HEADER, sizeof(REQUEST_T(login))+4, TYPE_LOGIN},//login
