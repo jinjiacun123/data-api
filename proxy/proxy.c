@@ -333,6 +333,18 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      exit(-1);
 	    }
 	    else if(n == last_length){
+	      //reccive complete and send to server
+	      char * send_buff;
+	      send_buff = (char *)malloc(8+length+1);
+	      if(!send_buff){
+		WriteErrLog("send_buff malloc err!\n");
+		exit(-1);
+	      }
+	      memset(send_buff, 0x00, 8+length);
+	      memcpy(send_buff, HEADER, 4);
+	      memcpy(send_buff+4, &length, 4);
+	      memcpy(send_buff+8, buff, length);
+	      write(client[1].fd, send_buff, length+8);
 	      break;	      
 	    }	  
 	    else if(n < last_length){
@@ -342,7 +354,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  }
 	}
 	//deal_from_server_to_client
-	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
+	//	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
       }  
     }
     
@@ -420,6 +432,18 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      exit(-1);
 	    }
 	    else if(n == last_length){
+	      //reccive complete and send to server
+	      char * send_buff;
+	      send_buff = (char *)malloc(8+length+1);
+	      if(!send_buff){
+		WriteErrLog("send_buff malloc err!\n");
+		exit(-1);
+	      }
+	      memset(send_buff, 0x00, 8+length);
+	      memcpy(send_buff, HEADER, 4);
+	      memcpy(send_buff+4, &length, 4);
+	      memcpy(send_buff+8, buff, length);
+	      write(client[0].fd, send_buff, length+8);
 	      break;	      
 	    }	  
 	    else if(n < last_length){
@@ -430,7 +454,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	}
 	WriteErrLog("recive client info complete!\n");
 	//body of package
-	assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
+	//assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
       }  
     }  
     

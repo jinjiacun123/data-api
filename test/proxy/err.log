@@ -109,3 +109,32 @@
 [ 14846]°ë¿ôŸm·€v@¤m·¥ : send message from server to client!
 [ 14846]š¨ôŸm·Èv : å¤„ç†è‚¡ç¥¨...
 [ 14846]¤ : client connection close
+[  4843] : SockRecvServer:Listening on port 8001.......
+[  4843] : accept client connection!
+[  4843] : create child process!
+[  5048] : connection to server!
+[  5048] : send login info!
+[  5048] : recive login info!
+[  5048] : recive login info check ok!
+[  5048] : read client info!
+[  5080] : SockRecvServer:Listening on port 8001.......
+[  5080] : accept client connection!
+[  5080] : create child process!
+[  5103] : connection to server!
+[  5103] : send login info!
+[  5103] : recive login info!
+[  5103] : recive login info check ok!
+[  5103] : read client info!
+[  5103]ù	«˜Ú²¿`f|· : recive client info complete!
+[  5103]ù	ÎÖl·˜Ú²¿`f|· : client connection close
+[  5080] : accept client connection!
+[  5080] : create child process!
+[  5360] : connection to server!
+[  5360] : send login info!
+[  5360] : recive login info!
+[  5360] : recive login info check ok!
+[  5360] : read client info!
+[  5360]ù	«˜Ú²¿`f|· : recive client info complete!
+[  5360]ù	ÎÖl·˜Ú²¿`f|· : recive info from server!
+[  5360]ù	ÎÖl·˜Ú²¿`f|· : send to client
+[  5360]ù	ÎÖl·˜Ú²¿`f|· : client connection close
