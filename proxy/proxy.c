@@ -1,4 +1,25 @@
 #include  "config.h"
+typedef struct
+{
+  char m_head[4];
+  int  m_length; 
+  unsigned short m_nType;
+  char m_nIndex;
+  char m_No;
+  int m_lKey;
+  unsigned short m_cCodeType;
+  char m_cCode[6];
+  short  m_nSize;   
+  unsigned short m_nOption;        
+  short m_nPeriodNum;
+  unsigned short m_nSize2;
+  int m_lBeginPosition;
+  unsigned short m_nDay;
+  short m_cPeriod;
+  unsigned short m_cCodeType2;   
+  char m_cCode2[6];
+}TeachPack;
+
 
 int g_iCltNum=0;
 extern int errno;
@@ -264,7 +285,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   assert(init_login(proxyClientSocketId) == 0);
 
   while(1){
-    nready = poll(client, 2, 5000);    
+    nready = poll(client, 2, -1);    
     
     /*
     if(nready == 0){//timeout
@@ -361,6 +382,36 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive client info
     if(client[1].fd > 0){
       if(client[1].revents & (POLLIN|POLLERR)){
+	/*
+	char tmp_buff[1024];
+	int rrr = read(client[1].fd, tmp_buff, 1024);
+	char request[1024];
+	TeachPack data;
+	memset(&data,0x00,sizeof(TeachPack));
+	memcpy(data.m_head, HEADER,4);
+	data.m_length =  sizeof(TeachPack) - 8;
+	data.m_nType = TYPE_HISTORY;
+	data.m_nSize =1;
+	data.m_nIndex= 0;
+	data.m_nOption= 0x0080;
+	memcpy(data.m_cCode, "600000", 6);
+	data.m_cCodeType = 0x1101;
+
+	//日线请求
+	data.m_cPeriod = PERIOD_TYPE_DAY;      //请求周期类型
+	data.m_lBeginPosition = 0; //请求开始位置
+	data.m_nPeriodNum = 7;
+	data.m_nDay = 100*data.m_nPeriodNum;//请求个数(500个)
+	data.m_nSize2 =0;
+	memcpy(data.m_cCode2,"600000", 6);
+	data.m_cCodeType2 = 0x1101;
+   
+
+	memset(request, 0, sizeof(data));
+	memcpy(request, &data, sizeof(data));
+	int rr = send(client[0].fd, request, sizeof(data), 0);
+	continue;
+	*/
 	//head of package	
 	length = 8;
 	buff = (char *)malloc(length);
@@ -443,7 +494,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff, HEADER, 4);
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
-	      write(client[0].fd, send_buff, length+8);
+	      write(client[0].fd, send_buff, length+8);	      
 	      break;	      
 	    }	  
 	    else if(n < last_length){
@@ -491,24 +542,22 @@ int send_heart_to_server(int proxy_client_fd, int * heart_times)
 int init_login(int proxy_client_fd)
 {
   char * package;
-  int request_len = sizeof(request_s_t);
-  int package_len = request_len + sizeof(REQUEST_T(login));
-  package = (char *)malloc(package_len+1);  
+  int request_len = sizeof(request_login_t);
+  int package_len = request_len ;
+  package = (char *)malloc(package_len);  
   memset(package, 0x00, package_len);
 
   //request login
-  request_s_t * data;
-  data = (request_s_t *)package;
+  request_login_t * data;
+  data = (request_login_t *)package;
   memcpy(data->header_name, HEADER, 4);
   data->body_len = package_len - 8;
   data->type = TYPE_LOGIN;
-  
-  REQUEST_T(login) * data_ex;
-  data_ex = (REQUEST_T(login) *)(package + request_len);
-  data_ex->key = 3;
-  data_ex->index = 0;
-  strncpy(data_ex->username, USERNAME, 64);
-  strncpy(data_ex->password, PASSWORD, 64);
+ 
+  data->key = 3;
+  data->index = 0;
+  strncpy(data->username, USERNAME, 64);
+  strncpy(data->password, PASSWORD, 64);
 
   write(proxy_client_fd, package, package_len);
   free(package);

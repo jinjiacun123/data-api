@@ -408,14 +408,14 @@ typedef struct{
 
   char index;
   char no;
-  long key;
+  int key;
   unsigned short code_type;
   char code[6];
   short  size;   
   unsigned short option;        
   short period_num;
   unsigned short size2;
-  long begin_position;
+  int begin_position;
   unsigned short day;
   short period;
   unsigned short code_type2;   
