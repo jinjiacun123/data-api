@@ -12560,3 +12560,55 @@
 [ 17376]Î&g·h|ó¿`¶v·‘ : recive info from server!
 [ 17376]Î&g·h|ó¿`¶v·‘ : send to client
 [ 17376]Î&g·h|ó¿`¶v·‘ : recive client info complete!
+[ 18512] : SockRecvServer:Listening on port 8001.......
+[ 18512] : accept client connection!
+[ 18512] : create child process!
+[ 18562] : connection to server!
+[ 18562] : send login info!
+[ 18562] : recive login info!
+[ 18562] : recive login info check ok!
+[ 18562] : client connection close
+[ 18512]ò«]·Ëôÿt·Ğ
+u· : accept client connection!
+[ 18512]ò«]·Ëôÿt·Ğ
+u· : create child process!
+[ 18584] : connection to server!
+[ 18584] : send login info!
+[ 18584] : recive login info!
+[ 18584] : recive login info check ok!
+[ 18584] : client connection close
+[ 18512]ò«]·ËB : accept client connection!
+[ 18512]ò«]·ËB : create child process!
+[ 18597] : connection to server!
+[ 18597] : send login info!
+[ 18597] : recive login info!
+[ 18597] : recive login info check ok!
+[ 18597] : read client info!
+[ 18597]Ë«ø6ò¿`6t·‘Ë : recive client info complete!
+[ 18597]ËÎ¦d·ø6ò¿`6t·‘Ë : recive info from server!
+[ 18597]ËÎ¦d·ø6ò¿`6t·‘Ë : send to client
+[ 18597]ËÎ¦d·ø6ò¿`6t·‘Ë : recive info from server!
+[ 18597]ËÎ¦d·ø6ò¿`6t·‘Ë : send to client
+[ 18597]ËÎ¦d·ø6ò¿`6t·‘Ë : recive client info complete!
+[ 19204] : SockRecvServer:Listening on port 8001.......
+[ 19204] : accept client connection!
+[ 19204] : create child process!
+[ 19237] : connection to server!
+[ 19237] : send login info!
+[ 19237] : recive login info!
+[ 19237] : recive login info check ok!
+[ 19237] : client connection close
+[ 19204]ò[h·0Âô¯·Ğº· : accept client connection!
+[ 19204]ò[h·0Âô¯·Ğº· : create child process!
+[ 19248] : connection to server!
+[ 19248] : send login info!
+[ 19248] : recive login info!
+[ 19248] : recive login info check ok!
+[ 19248] : read client info!
+[ 19248]0Â@«hJ”¿`æ~·1Â : recive client info complete!
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : recive info from server!
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : send to client
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : recive info from server!
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : send to client
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : recive client info complete!
+[ 19248]0ÂÎVo·hJ”¿`æ~·1Â : è¿›ç¨‹è¶…æ—¶

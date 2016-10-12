@@ -68,10 +68,15 @@ static int deal_response_of_heart();
 void catchcld(int sig)
 {
   int  iStat;
-  /*等待进程结束*/
+  while(waitpid(-1, NULL, WNOHANG) >0){
+    g_iCltNum--;
+  }
+  /*
+  //等待进程结束
   wait(&iStat);
-  /*子进程结束后进程数量减一*/
+  //子进程结束后进程数量减一
   g_iCltNum--;
+  */
 }
 
 /*
@@ -100,7 +105,7 @@ void main(int argc,char *argv[])
   char cHost[20];
   char cPort[20];
   char cNum[20];
-  int  iPNum=10;
+  int  iPNum=1024;
 
   //捕捉子进程结束的信号
   signal(SIGCHLD,catchcld);
@@ -285,14 +290,15 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   assert(init_login(proxyClientSocketId) == 0);
 
   while(1){
-    nready = poll(client, 2, -1);    
+    nready = poll(client, 2, 30000);
     
-    /*
     if(nready == 0){//timeout
+      WriteErrLog("进程超时\n");
+      exit(-1);
       //send heart to server
-      assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
+      //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
-    */
+    
 
     //recive server info
     if(client[0].fd > 0){
@@ -366,6 +372,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
 	      write(client[1].fd, send_buff, length+8);
+	      free(send_buff);
 	      break;	      
 	    }	  
 	    else if(n < last_length){
@@ -495,6 +502,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
 	      write(client[0].fd, send_buff, length+8);	      
+	      free(send_buff);
 	      break;	      
 	    }	  
 	    else if(n < last_length){

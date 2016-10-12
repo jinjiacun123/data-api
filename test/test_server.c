@@ -6,9 +6,9 @@
 #include "./../include/cJSON.h"
 //#include "./../include/do_json.h"
 
-//#define SERVER_HOST "192.168.1.131"
-#define SERVER_HOST "127.0.0.1"
-#define SERVER_PORT 8888
+#define SERVER_HOST "192.168.1.131"
+//#define SERVER_HOST "127.0.0.1"
+//#define SERVER_PORT 8888
 //#define SERVER_PORT 9999
 #define MAX_HEAD_LEN 80
 int client;
