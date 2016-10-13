@@ -27,6 +27,7 @@ void WriteErrLog(const char * i_sFormat,...);
 int PassiveSock();
 //char *cftime(char *s, const char *format, time_t *time);
 int ConnectSock();
+int get_client_ip(int client_fd, char * ip);
 void deal_proxy(int proxyClientSocketId, int clientSocketId);
 //init login
 int init_login(int proxy_client_fd);
@@ -288,12 +289,16 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 
   //init server's login
   assert(init_login(proxyClientSocketId) == 0);
+  
+  char client_ip[15];
+  memset(&client_ip, 0x00, 15);
+  assert(get_client_ip(client[1].fd, &client_ip) == 0);
 
   while(1){
-    nready = poll(client, 2, 30000);
+    nready = poll(client, 2, 50000);
     
     if(nready == 0){//timeout
-      WriteErrLog("进程超时\n");
+      WriteErrLog("%s\tprocess timeout\n", client_ip);
       exit(-1);
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
@@ -303,11 +308,11 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive server info
     if(client[0].fd > 0){
       if(client[0].revents & (POLLIN|POLLERR)){
-	WriteErrLog("recive info from server!\n");
+	WriteErrLog("%s\trecive info from server!\n", client_ip);
 	length = 8;
 	buff = (char *)malloc(length);
 	if(buff == NULL){
-	  WriteErrLog("malloc memory err!\n");
+	  WriteErrLog("%s\tmalloc memory err!\n", client_ip);
 	  exit(-1);
 	}
 	memset(buff, 0x00, length);
@@ -317,28 +322,28 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	    client[0].fd = -1;
 	  }
 	  else{
-	    WriteErrLog("read client err!\n");
+	    WriteErrLog("%s\tread client err!\n", client_ip);
 	  }
 	}
 	else if(n == 0){
-	  WriteErrLog("server connection close\n");
+	  WriteErrLog("%s\tserver connection close\n", client_ip);
 	  exit(-1);
 	}
 	else if(n == length){
 	  //send to client
-	  WriteErrLog("send to client\n");
+	  WriteErrLog("%s\tsend to client\n", client_ip);
 	  //write(client[1].fd, cDataBuf, n);
 	  //recive head from server
 	  p_header = (p_response_header)buff;
 	  if(strncmp(p_header->str, HEADER, 4)){
-	    WriteErrLog("compare header err!\n");
+	    WriteErrLog("%s\tcompare header err!\n", client_ip);
 	    exit(-1);
 	  }
 	  length = p_header->length;
 	  free(buff);
 	  buff = (char *)malloc(length+1);
 	  if(buff == NULL){
-	    WriteErrLog("malloc momory err!\n");
+	    WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	    exit(-1);
 	  }
 	  memset(buff, 0x00, length);
@@ -351,12 +356,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		client[0].fd = -1;
 	      }
 	      else{
-		WriteErrLog("read client err!\n");
+		WriteErrLog("%s\tread client err!\n", client_ip);
 		exit(-1);
 	      }
 	    }
 	    else if(n == 0){
-	      WriteErrLog("server connection close\n");
+	      WriteErrLog("%s\tserver connection close\n", client_ip);
 	      exit(-1);
 	    }
 	    else if(n == last_length){
@@ -364,7 +369,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      char * send_buff;
 	      send_buff = (char *)malloc(8+length+1);
 	      if(!send_buff){
-		WriteErrLog("send_buff malloc err!\n");
+		WriteErrLog("%s\tsend_buff malloc err!\n", client_ip);
 		exit(-1);
 	      }
 	      memset(send_buff, 0x00, 8+length);
@@ -423,7 +428,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	length = 8;
 	buff = (char *)malloc(length);
 	if(!buff){
-	  WriteErrLog("alloc memory error!\n");
+	  WriteErrLog("%s\talloc memory error!\n", client_ip);
 	  exit(-1);
 	}
 	memset(buff, 0x00, length);
@@ -443,11 +448,11 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	    client[1].fd = -1;
 	  }
 	  else{
-	    WriteErrLog("read client err!\n");
+	    WriteErrLog("%s\tread client err!\n", client_ip);
 	  }
 	}
 	else if(n == 0){
-	  WriteErrLog("client connection close\n");
+	  WriteErrLog("%s\tclient connection close\n", client_ip);
 	  exit(-1);
 	}
 	else if(n == length){
@@ -455,19 +460,19 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  //WriteErrLog("send to server\n");
 	  //write(client[0].fd, cDataBuf, n);
 	 //send to client
-	  WriteErrLog("read client info!\n");
+	  WriteErrLog("%s\tread client info!\n", client_ip);
 	  //write(client[1].fd, cDataBuf, n);
 	  //recive head from server
 	  p_header = (p_response_header)buff;
 	  if(strncmp(p_header->str, HEADER, 4)){
-	    WriteErrLog("compare header err!\n");
+	    WriteErrLog("%s\tcompare header err!\n", client_ip);
 	    exit(-1);
 	  }
 	  length = p_header->length;
 	  free(buff);
 	  buff = (char *)malloc(length+1);
 	  if(buff == NULL){
-	    WriteErrLog("malloc momory err!\n");
+	    WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	    exit(-1);
 	  }
 	  memset(buff, 0x00, length);
@@ -478,15 +483,15 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      if(errno == ECONNRESET){
 		close(client[1].fd);
 		client[1].fd = -1;
-		WriteErrLog("connreset error!\n");
+		WriteErrLog("%s\tconnreset error!\n", client_ip);
 	      }
 	      else{
-		WriteErrLog("read client err!\n");
+		WriteErrLog("%s\tread client err!\n", client_ip);
 		exit(-1);
 	      }
 	    }
 	    else if(n == 0){
-	      WriteErrLog("server connection close\n");
+	      WriteErrLog("%s\tserver connection close\n", client_ip);
 	      exit(-1);
 	    }
 	    else if(n == last_length){
@@ -494,7 +499,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      char * send_buff;
 	      send_buff = (char *)malloc(8+length+1);
 	      if(!send_buff){
-		WriteErrLog("send_buff malloc err!\n");
+		WriteErrLog("%s\tsend_buff malloc err!\n", client_ip);
 		exit(-1);
 	      }
 	      memset(send_buff, 0x00, 8+length);
@@ -511,7 +516,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	    }
 	  } 
 	}
-	WriteErrLog("recive client info complete!\n");
+	WriteErrLog("%s\trecive client info complete!\n", client_ip);
 	//body of package
 	//assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
       }  
@@ -998,4 +1003,24 @@ static int deal_response_of_zlib()
 static int deal_response_of_heart()
 {
   return 0;
+}
+
+
+int get_client_ip(int client_fd, char * ip)
+{
+  struct sockaddr_in sa;
+  int len;
+
+  len = sizeof(sa);
+  if(!getpeername(client_fd, (struct sockaddr *)&sa, &len)){
+    strcpy(ip, inet_ntoa(sa.sin_addr));
+    return 0;
+    /*
+    memset(sql,0,1024);
+    snprintf(sql,1024,"client login. ip: %s, port :%d",inet_ntoa(sa.sin_addr),ntohs(sa.sin_port));
+    snprintf(machine_ip,17,"%s",inet_ntoa(sa.sin_addr));
+    mylog(sql);
+    */
+  }
+  return -1;
 }

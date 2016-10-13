@@ -2,24 +2,67 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<assert.h>
 #include "cJSON.h"
 
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
-#define SERVER_MARKET 127.0.0.1
-#define SERVER_MARKET_PORT 8001
+#define SERVER_MARKET "221.6.167.245"
+#define SERVER_MARKET_PORT 8881
+
+#define USERNAME "jrjvip_android"
+#define PASSWORD "zjw_android"
+#define HEADER   "ZJHR"
+
+/*number of type as hexadicimal*/
+#define TYPE_EMPTY      0x0D03 //empty
+#define TYPE_INIT       0x0101 //init
+#define TYPE_LOGIN      0X0102 //login
+#define TYPE_HEART      0x0905 //heart tick
+#define TYPE_ZIB        0x8001 //
+#define TYPE_REALTIME   0x0201 //
+#define TYPE_HISTORY    0x0402 //
+#define TYPE_TIME_SHARE 0x0301 //
+#define TYPE_AUTO_PUSH  0x0A01 //
+#define TYPE_SERVERINFO 0x0103 //
+#define TYPE_DAY_CURPOS 0x020c //
 
 char buff[100*1024];
 
-typedef struct{
+typedef struct
+{
+  char m_head[4]; 
+  int  m_length;  
+  unsigned short m_nType;
+  char  m_nIndex;   
+  char  m_Not;   
+  long  m_lKey;
+  short m_cCodeType;
+  char  m_cCode[6];
+  short m_nSize;
+  unsigned short m_nOption; 
+}RealPack;
+
+typedef struct
+{
+  unsigned short code_type;
+  char code[6];
+}CodeInfo;
+
+typedef struct
+{
   char code[6];
   char name[20];
-  int  pre_close;  
+  int  pre_close;  //close price of yestoday
+  int price;       //now price
 }entity_t;
 
-typedef struct{
+typedef struct
+{
   char file_name[10];
   char date[8];//year-month-day
   short code_type;
@@ -40,15 +83,24 @@ entity_t * entity_list;
 int init_market();
 int last_time_market;//effective time
 int cur_time;        //current time
+int init_socket(int * sock_fd);
+void init_receive(void * socket_fd);
 int get_content(char * filename, char * buff, int length);
 int get_market(cJSON * root_json, int index);
+void get_realtime_data();
 
 int main()
 {
+  pthread_t p_id = 0;
+  int socket_fd = 0;
   //--receive both shanghhai and shenzhen market stock
   init_market();
+  init_socket(&socket_fd);
+  init_receive(&socket_fd);
+  
   //---init data and sort
   //get realtime data
+  get_realtime_data();
   //sort by price
 
   //---auto push data---
@@ -94,7 +146,7 @@ int init_market()
   //parse 1101
   get_market(root_json, index);
   free(root_json);
-  //parse 1201r
+  //parse 1201
   index = 1;
   memset(buff, 0x00, 1024*100);
   memset(&cmd, 0x00, 50);
@@ -211,4 +263,115 @@ int get_market(cJSON * root_json, int index)
 	 market_list[index].entity_list_size);
   
   return 0;
+}
+
+int init_socket(int * socket_fd)
+{
+  int c_len = 0;
+  struct sockaddr_in cli;
+  
+  cli.sin_family = AF_INET;
+  cli.sin_port = htons(SERVER_MARKET_PORT);
+  cli.sin_addr.s_addr = inet_addr(SERVER_MARKET);
+
+  socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if(socket_fd < 0){
+    printf("socket() failrue!\n");
+    return -1;
+  }
+
+  if(connect(socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
+    printf("connect() failure!\n");
+    return -1;
+  } 
+  printf("connect() success\n");
+  return 0;
+}
+
+void get_realtime_data(int socket_fd)
+{
+  char * request;
+  int entity_count = market_list[0].entity_list_size;
+  int off = sizeof(RealPack);
+  int codeinfo_length = sizeof(CodeInfo);
+  CodeInfo * codeinfo;
+  entity_t * entity;
+  int entity_length = sizeof(entity_t);
+  
+  request = (char *)malloc(sizeof(RealPack) + codeinfo_length*entity_count);
+  int request_length = sizeof(RealPack)+ codeinfo_length * entity_count;
+ 
+  if(request == NULL){
+    printf("malloc err!\n");
+    exit(-1);
+  }
+  memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*entity_count);
+
+  RealPack * data = (RealPack*)&request;  
+  memcpy(data->m_head, HEADER, 4);
+  data->m_length =  request_length - 8;
+  data->m_nType = TYPE_REALTIME;
+  data->m_nSize = entity_count;
+  data->m_nOption= 0x0080;
+
+  //股票:pass
+  int i=0;
+  for(; i< entity_count; i++){
+    entity = (entity_t *)(market_list[0].list+i*entity_length);
+    codeinfo = (CodeInfo *)(&request+off+i*codeinfo_length);
+    codeinfo->code_type = market_list[0].code_type;
+    strncpy(codeinfo->code, entity->code, 6);
+  }
+ 
+  if(send(socket_fd, request, request_length, 0)){
+    printf("send success!\n");
+  }
+  
+}
+
+void init_receive(void * socket_fd)
+{
+  char head[6];
+  char * buff = NULL;
+  int package_body_length = 0;
+  int * fd = (int *)socket_fd;
+  int ret_count = 0;
+  int length = 8;
+  int head_length = sizeof(struct response_header);
+  int off = 0;
+
+  while(1){
+    memset(&head, 0x00, 6);
+    buff = (char *)malloc(length);
+    if(buff == NULL){
+      printf("malloc err!\n");
+      exit(-1);
+    }
+    memset(buff, 0x00, length);
+    //接受头部
+    ret_count = read(socket_fd, buff,8);
+    if(ret_count == 0){
+      printf("connect close!\n");
+      pthread_exit();
+    } 
+    
+    if(ret_cont == length){
+      //receive body of package
+      strncpy(head, buff, 6);
+      length = *((int *)(buff+6));
+      free(buff);
+      buff = (char *)malloc(length);
+      if(buff == NULL){
+	printf("malloc err!\n");
+	exit(-1);
+      }
+      memset(buff, 0x00, length);
+      while(length != (ret_count = read(socket_fd, buff+off, length))){
+	off += ret_count;
+	length -= ret_count;	
+      }    
+      printf("recive complete!\n");
+      
+    }
+  }
 }

@@ -12612,3 +12612,21 @@ u· : create child process!
 [ 19248]0ÂÎVo·hJ”¿`æ~·1Â : send to client
 [ 19248]0ÂÎVo·hJ”¿`æ~·1Â : recive client info complete!
 [ 19248]0ÂÎVo·hJ”¿`æ~·1Â : è¿›ç¨‹è¶…æ—¶
+[  6855] : SockRecvServer:Listening on port 8001.......
+[  6855] : accept client connection!
+[  6855] : create child process!
+[  6971] : connection to server!
+[  6971] : send login info!
+[  6971] : recive login info!
+[  6971] : recive login info check ok!
+[  6971] : 221.6.167.245	read client info!
+[  6971]€
+µ­(T¿`s·
+ : 221.6.167.245	recive client info complete!
+[  6971]€
+Îvc·(T¿`s·
+ : 221.6.167.245	recive info from server!
+[  6971]€
+Îvc·(T¿`s·
+ : 221.6.167.245	send to client
+[  6971] : 221.6.167.245	client connection close
