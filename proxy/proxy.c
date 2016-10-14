@@ -20,6 +20,12 @@ typedef struct
   char m_cCode2[6];
 }TeachPack;
 
+typedef struct
+{
+  int is_used;
+  int process_id;
+  char ip[15];
+}process_ip_t;
 
 int g_iCltNum=0;
 extern int errno;
@@ -28,6 +34,9 @@ int PassiveSock();
 //char *cftime(char *s, const char *format, time_t *time);
 int ConnectSock();
 int get_client_ip(int client_fd, char * ip);
+int is_connected(int socket_fd, process_ip_t process_ip_list[]);
+int add_connected(int socket_fd, process_ip_t process_ip_list[]);
+int remove_connected(int process_id);
 void deal_proxy(int proxyClientSocketId, int clientSocketId);
 //init login
 int init_login(int proxy_client_fd);
@@ -69,7 +78,9 @@ static int deal_response_of_heart();
 void catchcld(int sig)
 {
   int  iStat;
-  while(waitpid(-1, NULL, WNOHANG) >0){
+  int p_id;
+  while((p_id = waitpid(-1, NULL, WNOHANG)) >0){
+    remove_connected(p_id);
     g_iCltNum--;
   }
   /*
@@ -80,6 +91,7 @@ void catchcld(int sig)
   */
 }
 
+#define MAX_CONNECTS 10
 /*
 函数：tcp代理服务
 功能：创建一个Socket服务，等待客户端连接，在客户段和服务器端建立代理连接
@@ -89,6 +101,7 @@ void catchcld(int sig)
         服务器端口号
         允许最大连接数
 */
+process_ip_t process_ip_list[MAX_CONNECTS]={};
 void main(int argc,char *argv[])
 {
   int proxyClientSocketId;
@@ -106,7 +119,7 @@ void main(int argc,char *argv[])
   char cHost[20];
   char cPort[20];
   char cNum[20];
-  int  iPNum=1024;
+  int  iPNum = MAX_CONNECTS;
 
   //捕捉子进程结束的信号
   signal(SIGCHLD,catchcld);
@@ -124,6 +137,8 @@ void main(int argc,char *argv[])
     WriteErrLog("创建sock在服务%s失败/n",cService);
     exit(-1);
   }
+  
+  int i = 0;
   while(1){        
     signal(SIGCHLD,catchcld);
     signal(SIGPIPE,SIG_IGN);
@@ -147,6 +162,15 @@ void main(int argc,char *argv[])
       continue;
     }
     
+    //check ip is connected
+    if((i=is_connected(clientSocketId, process_ip_list)) < 0){
+      WriteErrLog("this client is connected!\n");
+      close(clientSocketId);
+      continue;
+    }
+    i = add_connected(clientSocketId, process_ip_list);
+    
+    
     WriteErrLog("create child process!\n");
     //创建进程
     if((iChildPid=fork()) < 0){
@@ -157,7 +181,8 @@ void main(int argc,char *argv[])
       continue;
     }
     //父进程继续等待客户端的连接 进程数量加一
-    if(iChildPid>0){ 
+    if(iChildPid > 0){
+      process_ip_list[i].process_id = iChildPid;
       close(clientSocketId);
       g_iCltNum++;continue; 
     }
@@ -1023,4 +1048,64 @@ int get_client_ip(int client_fd, char * ip)
     */
   }
   return -1;
+}
+
+//exists 0,not -1
+int is_connected(int socket_fd, process_ip_t process_ip_list[])
+{
+  char cur_ip[18];
+  int i = 0;
+  memset(&cur_ip, 0x00, 18);
+
+  get_client_ip(socket_fd, cur_ip);
+  for(; i< MAX_CONNECTS; i++){
+    if(!strcmp(cur_ip, process_ip_list[i].ip)){
+      return -1;
+    }
+  }
+
+  i = 0;
+  for(i=0; i< MAX_CONNECTS; i++){
+    if(process_ip_list[i].ip == NULL){
+      strcpy(process_ip_list[i].ip, cur_ip);
+    }
+  }
+  return i;
+}
+
+int add_connected(int socket_fd, process_ip_t process_ip_list[])
+{
+  char cur_ip[18];
+  int i = 0;
+  memset(&cur_ip, 0x00, 18);
+
+  get_client_ip(socket_fd, cur_ip);
+  //add client ip and process_id to process_ip_list
+  for(i=0; i< MAX_CONNECTS; i++){
+    if(process_ip_list[i].is_used == 0){
+      strcpy(process_ip_list[i].ip, cur_ip);
+      process_ip_list[i].is_used = 1;
+      break;
+    }
+  }
+
+  return i;
+}
+
+int remove_connected(int process_id)
+{
+  int i = 0;
+
+  //remove client ip from process_ip_list
+  i = 0;
+  for(i; i< MAX_CONNECTS; i++){
+    if(process_ip_list[i].process_id  == process_id){
+      memset(process_ip_list[i].ip, 0x00, 18);
+      process_ip_list[i].process_id = 0;
+      process_ip_list[i].is_used = 0;
+      break;
+    }
+  }
+  
+  return 0;
 }
