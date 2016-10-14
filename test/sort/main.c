@@ -11,8 +11,10 @@
 #include "cJSON.h"
 
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
-#define SERVER_MARKET "221.6.167.245"
-#define SERVER_MARKET_PORT 8881
+//#define SERVER_MARKET "221.6.167.245"
+//#define SERVER_MARKET_PORT 8881
+#define SERVER_MARKET "192.168.1.131"
+#define SERVER_MARKET_PORT 8001
 
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"
@@ -87,24 +89,56 @@ int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
 int get_content(char * filename, char * buff, int length);
 int get_market(cJSON * root_json, int index);
-void get_realtime_data();
+void send_realtime(int socket_fd, int index, int size);
+int send_auto_push(int socket_fd);
 
 int main()
 {
   pthread_t p_id = 0;
   int socket_fd = 0;
+  int ret = 0;
   //--receive both shanghhai and shenzhen market stock
-  init_market();
+  // init_market();
   init_socket(&socket_fd);
-  init_receive(&socket_fd);
-  
-  //---init data and sort
-  //get realtime data
-  get_realtime_data();
-  //sort by price
+  //init_receive(&socket_fd);
+  //ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
+ 
+  int menu = 1;
+  while(1){
+    /*
+    printf("1-realtime\n \
+            2-auto_push\n");
+    menu = getchar();
+    */
+    switch(menu){
+    case 1:{//realtime
+      //---init data and sort
+      //get realtime data
+      send_realtime(socket_fd, 0, 10);
+      char *buff;
+      int length = 8;
+      buff = (char *)malloc(length);
+      if(buff == NULL){
+	printf("memory malloc err!\n");
+	exit(-1);
+      }
+      memset(buff, 0x00, length);
+      buff = read(socket_fd, buff, length);
+      menu = 2;
+    }
+    case 2:{//autopush
 
-  //---auto push data---
-  //get auto push data and resort data
+    }
+    default:{
+      
+    }
+    }
+    
+    //sort by price
+  
+    //---auto push data---
+    //get auto push data and resort data
+  }
   
   
 }
@@ -288,8 +322,9 @@ int init_socket(int * socket_fd)
   return 0;
 }
 
-void get_realtime_data(int socket_fd)
+void send_realtime(int socket_fd, int index, int size)
 {
+  size = 1;
   char * request;
   int entity_count = market_list[0].entity_list_size;
   int off = sizeof(RealPack);
@@ -298,30 +333,40 @@ void get_realtime_data(int socket_fd)
   entity_t * entity;
   int entity_length = sizeof(entity_t);
   
-  request = (char *)malloc(sizeof(RealPack) + codeinfo_length*entity_count);
-  int request_length = sizeof(RealPack)+ codeinfo_length * entity_count;
+  request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
+  if(request == NULL){
+    printf("malloc err!\n");
+    exit(-1);
+  }
+  int request_length = sizeof(RealPack)+ codeinfo_length * size;
  
   if(request == NULL){
     printf("malloc err!\n");
     exit(-1);
   }
-  memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*entity_count);
+  memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
 
-  RealPack * data = (RealPack*)&request;  
+  RealPack * data = (RealPack*)request;  
   memcpy(data->m_head, HEADER, 4);
   data->m_length =  request_length - 8;
   data->m_nType = TYPE_REALTIME;
   data->m_nSize = entity_count;
   data->m_nOption= 0x0080;
 
+  codeinfo = (CodeInfo *)(request+off);
+  codeinfo->code_type = 0x1101;
+  strncpy(codeinfo->code, "600000", 6);
   //股票:pass
+  /*
   int i=0;
-  for(; i< entity_count; i++){
-    entity = (entity_t *)(market_list[0].list+i*entity_length);
+  entity = (entity_t *)(market_list[0].list+i*entity_length);
+  for(i=index; (i< entity_count)&&(i<(index+1)*size); i++){ 
     codeinfo = (CodeInfo *)(&request+off+i*codeinfo_length);
     codeinfo->code_type = market_list[0].code_type;
     strncpy(codeinfo->code, entity->code, 6);
+    entity ++;
   }
+  */
  
   if(send(socket_fd, request, request_length, 0)){
     printf("send success!\n");
@@ -331,13 +376,13 @@ void get_realtime_data(int socket_fd)
 
 void init_receive(void * socket_fd)
 {
-  char head[6];
+  char head[4];
   char * buff = NULL;
   int package_body_length = 0;
   int * fd = (int *)socket_fd;
   int ret_count = 0;
-  int length = 8;
-  int head_length = sizeof(struct response_header);
+  int head_length = 8;
+  int length = head_length;  
   int off = 0;
 
   while(1){
@@ -352,10 +397,18 @@ void init_receive(void * socket_fd)
     ret_count = read(socket_fd, buff,8);
     if(ret_count == 0){
       printf("connect close!\n");
-      pthread_exit();
+      sleep(3);
+      continue;
+      //pthread_exit();
     } 
+    if(ret_count <0){
+      printf("recive server err!\n");
+      sleep(3);
+      continue;
+      //pthread_exit(-1);
+    }
     
-    if(ret_cont == length){
+    if(ret_count == length){
       //receive body of package
       strncpy(head, buff, 6);
       length = *((int *)(buff+6));
@@ -369,9 +422,33 @@ void init_receive(void * socket_fd)
       while(length != (ret_count = read(socket_fd, buff+off, length))){
 	off += ret_count;
 	length -= ret_count;	
-      }    
+      }
+      //parse
+      printf("%s\n", buff);
       printf("recive complete!\n");
       
     }
   }
+}
+
+int send_auto_push(int socket_fd)
+{
+  char request[1024];
+
+  RealPack data;
+  memset(&data,0x00,sizeof(RealPack));
+  memcpy(data.m_head,HEADER,4);
+  data.m_length =  sizeof(RealPack) - 8;
+  data.m_nType = TYPE_AUTO_PUSH;
+  data.m_nSize =1;
+  data.m_nOption= 0x0080;
+  //memcpy(data.m_cCode2,"EURUSD",6);
+  //data.m_cCodeType2 = 0x8100;
+
+  memset(request, 0, sizeof(data));
+  memcpy(request, &data, sizeof(data));
+  int r = send(socket_fd, request, sizeof(data), 0);  
+  printf("r:%d\n", r);
+  printf("主推请求\n");
+  return 0;
 }
