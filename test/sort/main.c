@@ -9,90 +9,9 @@
 #include<sys/stat.h>
 #include<assert.h>
 #include "cJSON.h"
+#include "config.h"
 
-#define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
-//#define SERVER_MARKET "221.6.167.245"
-//#define SERVER_MARKET_PORT 8881
-//#define SERVER_MARKET "192.168.1.131"
-#define SERVER_MARKET "127.0.0.1"
-#define SERVER_MARKET_PORT 8001
-
-#define USERNAME "jrjvip_android"
-#define PASSWORD "zjw_android"
-#define HEADER   "ZJHR"
-
-/*number of type as hexadicimal*/
-#define TYPE_EMPTY      0x0D03 //empty
-#define TYPE_INIT       0x0101 //init
-#define TYPE_LOGIN      0X0102 //login
-#define TYPE_HEART      0x0905 //heart tick
-#define TYPE_ZIB        0x8001 //
-#define TYPE_REALTIME   0x0201 //
-#define TYPE_HISTORY    0x0402 //
-#define TYPE_TIME_SHARE 0x0301 //
-#define TYPE_AUTO_PUSH  0x0A01 //
-#define TYPE_SERVERINFO 0x0103 //
-#define TYPE_DAY_CURPOS 0x020c //
-
-char buff[100*1024];
-
-typedef struct
-{
-  char m_head[4]; 
-  int  m_length;  
-  unsigned short m_nType;
-  char  m_nIndex;   
-  char  m_Not;   
-  long  m_lKey;
-  short m_cCodeType;
-  char  m_cCode[6];
-  short m_nSize;
-  unsigned short m_nOption; 
-}RealPack;
-
-typedef struct
-{
-  unsigned short code_type;
-  char code[6];
-}CodeInfo;
-
-typedef struct
-{
-  char code[6];
-  char name[20];
-  int  pre_close;  //close price of yestoday
-  int price;       //now price
-}entity_t;
-
-typedef struct
-{
-  char file_name[10];
-  char date[8];//year-month-day
-  short code_type;
-  char name[20];
-  short unit;
-  char open_close_time[50];
-  entity_t * list;
-  int entity_list_size;
-}market_t;
-
-market_t market_list[] = {
-  //上证a股
-  {"1101.txt","20161012",0x1101,"上证A股",1000,"[570-690][780-900][-1--1][-1--1]"},
-  //深证a股
-  {"1201.txt","20161012",0x1201,"深证A股",1000,"[570-690][780-900][-1--1][-1--1]"}
-};
-entity_t * entity_list;
-int init_market();
-int last_time_market;//effective time
-int cur_time;        //current time
-int init_socket(int * sock_fd);
-void init_receive(void * socket_fd);
-int get_content(char * filename, char * buff, int length);
-int get_market(cJSON * root_json, int index);
-void send_realtime(int socket_fd, int index, int size);
-int send_auto_push(int socket_fd);
-int parse(char * buff, int buf_len);
+static void do_stock(char *, char *, int);
 
 int main()
 {
@@ -102,50 +21,23 @@ int main()
   //--receive both shanghhai and shenzhen market stock
   init_market();
   init_socket(&socket_fd);
-  //ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
- 
+  ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
+  printf("ret:%d\n", ret);
+  //init_receive(&socket_fd);
+  //---init data and sort
+  //get realtime data
+  send_realtime(socket_fd, 0, 1);
+  //sort by price
+
+  //---auto push data---
+  //get auto push data and resort data
   int menu = 1;
   while(1){
-    /*
-    printf("1-realtime\n \
-            2-auto_push\n");
-    menu = getchar();
-    */
-    switch(menu){
-    case 1:{//realtime
-      //---init data and sort
-      //get realtime data
-      send_realtime(socket_fd, 0, 1);
-      /*
-      char *buff;
-      int length = 8;
-      buff = (char *)malloc(length);
-      if(buff == NULL){
-	printf("memory malloc err!\n");
-	exit(-1);
-      }
-      memset(buff, 0x00, length);
-      int r = read(socket_fd, buff, length);
-      */
-      menu = 2;
-    }
-    case 2:{//autopush
-
-    }
-    default:{
-      
-    }
-    }
-    
-    init_receive(&socket_fd);
-
-    //sort by price
-  
-    //---auto push data---
-    //get auto push data and resort data
+    sleep(3);
+    send_heart(socket_fd);
+    heart_times++;
   }
-  
-  
+
 }
 
 //get code for both market
@@ -327,7 +219,7 @@ int init_socket(int * socket_fd)
   return 0;
 }
 
-void send_realtime(int socket_fd, int index, int size)
+int send_realtime(int socket_fd, int index, int size)
 {
   char * request;
   int entity_count = market_list[0].entity_list_size;
@@ -369,7 +261,10 @@ void send_realtime(int socket_fd, int index, int size)
  
   if(send(socket_fd, request, request_length, 0)){
     printf("send success!\n");
+    return 0;
   }
+  
+  return -1;
 }
 
 void init_receive(void * socket_fd)
@@ -432,7 +327,7 @@ void init_receive(void * socket_fd)
    }
 }
 
-int send_auto_push(int socket_fd)
+int send_auto_push(int socket_fd, int index, int size)
 {
   char request[1024];
 
@@ -454,12 +349,88 @@ int send_auto_push(int socket_fd)
   return 0;
 }
 
-int parse(char * buff, int buf_len)
+int send_heart(int socket_fd)
 {
-  int type;
+  char request[1024];
+  TestSrvData2 data ;
+  memset(&data,0x00,sizeof(TestSrvData2));
+  memcpy(data.head, HEADER,4);
+  data.length      = sizeof(TestSrvData2) -8;    
+  data.m_nType     = TYPE_HEART;
+  data.m_nIndex= 1;
+
+  memset(request, 0, 1024);
+  memcpy(request, &data, sizeof(data));
+  send(socket_fd, request, sizeof(data), 0);
+  printf("心跳请求发送完毕\n");
+  return 0;
+}
+
+int parse(char * buff, int buff_len)
+{
+  unsigned short type;
   
-  type = (*(int *)buff);
+  type = (*(unsigned short *)buff);
   printf("type:%x\n", type);
-  
+  switch(type){
+  case TYPE_REALTIME:{
+    printf("realtime...\n");
+    parse_realtime(buff, buff_len);
+  }
+    break;
+  case TYPE_AUTO_PUSH:{
+    printf("auto_push...\n");
+    parse_auto_push(buff, buff_len);
+  }
+    break;
+  case TYPE_HEART:{
+    printf("heart...\n");
+    heart_times--;
+  }
+    break;
+  default:{
+    printf("unknown type...\n");
+  }
+    break;
+  }
+  return 0;
+}
+
+int parse_realtime(char * buff, int buff_len)
+{
+  AskData2 * data_head = (AskData2 *)(buff);
+  char code[7]={0};
+  int i=0;
+
+  for(i=0; i< data_head->m_nSize; i++){
+    CommRealTimeData * data_type = (CommRealTimeData *)(buff
+							+ 20
+							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+    memcpy(code, data_type->m_cCode, 6);
+    if(data_type->m_cCodeType == 0x1101){//股票
+	do_stock(code, buff, i);
+    }
+  }
+  return 0;
+}
+
+//处理股票
+static void
+do_stock(code, buff, i)
+     char * code;
+     char * buff;
+     int i;
+{
+  printf("处理股票...\n");
+  HSStockRealTime * tmp = (HSStockRealTime *)(buff
+					            +20
+					      +sizeof(CommRealTimeData)
+					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+  printf("品种:%s, 最新价:%d\n", code, tmp->m_lNewPrice);
+}
+
+
+int parse_auto_push(char * buff, int buff_len)
+{
   return 0;
 }

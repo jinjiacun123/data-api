@@ -13458,3 +13458,21 @@ t· : accept client connection!
 [  3858]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
 [  3858]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
 [  3858] : 127.0.0.1	client connection close
+[  3186]ò+a·Ð+B : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  8931] : connection to server!
+[  8931] : send login info!
+[  8931] : recive login info!
+[  8931] : recive login info check ok!
+[  8931] : 127.0.0.1	client connection close
+[  3186]ò+a·Ð+B : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  9029] : connection to server!
+[  9029] : send login info!
+[  9029] : recive login info!
+[  9029] : recive login info check ok!
+[  9029] : 127.0.0.1	read client info!
+[  9029]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  9029]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  9029]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  9029] : 127.0.0.1	process timeout
