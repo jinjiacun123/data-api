@@ -13243,3 +13243,218 @@ t· : accept client connection!
 [ 12493] : 127.0.0.1	recive client info complete!
 [ 12439]òKc·psB : accept client connection!
 [ 12439]òK127.0.0.1 : this client is connected!
+[  4093] : SockRecvServer:Listening on port 8001.......
+[  4093] : accept client connection!
+[  4093] : create child process!
+[  4429] : connection to server!
+[  4429] : send login info!
+[  4429] : recive login info!
+[  4429] : recive login info check ok!
+[  4429] : 127.0.0.1	client connection close
+[  4093]òëb·ÀÀ	ô?z·ÐJz· : accept client connection!
+[  4093]òë127.0.0.1 : create child process!
+[  4458] : connection to server!
+[  4458] : send login info!
+[  4458] : recive login info!
+[  4458] : recive login info check ok!
+[  4458] : 127.0.0.1	process timeout
+[  4093]òëb·ÀÀ	B : accept client connection!
+[  4093]òë127.0.0.1 : create child process!
+[  4468] : connection to server!
+[  4468] : send login info!
+[  4468] : recive login info!
+[  4468] : recive login info check ok!
+[  4468] : 127.0.0.1	client connection close
+[  4093]òëb·ÀÀ	B : accept client connection!
+[  4093]òë127.0.0.1 : create child process!
+[  4576] : connection to server!
+[  4576] : send login info!
+[  4576] : recive login info!
+[  4576] : recive login info check ok!
+[  4576] : 127.0.0.1	read client info!
+[  4576]ÀÀ	í°(Y²¿`vy·ÁÀ	 : 127.0.0.1	recive client info complete!
+[  4576]ÀÀ	Îæi·(Y²¿`vy·ÁÀ	 : 127.0.0.1	process timeout
+[  4093]òëb·ÀÀ	B : accept client connection!
+[  4093]òë127.0.0.1 : create child process!
+[  4677] : connection to server!
+[  4677] : send login info!
+[  4677] : recive login info!
+[  4677] : recive login info check ok!
+[  4677] : 127.0.0.1	read client info!
+[  4677]ÀÀ	í°(Y²¿`vy·ÁÀ	 : 127.0.0.1	recive client info complete!
+[  4677]ÀÀ	Îæi·(Y²¿`vy·ÁÀ	 : 127.0.0.1	process timeout
+[  4817] : SockRecvServer:Listening on port 8001.......
+[  4817] : accept client connection!
+[  4817] : create child process!
+[  4949] : connection to server!
+[  4949] : send login info!
+[  4949] : recive login info!
+[  4949] : recive login info check ok!
+[  4949] : 127.0.0.1	read client info!
+[  4949]àj	í°âƒ¿`Fw·áj	 : 127.0.0.1	recive client info complete!
+[  4949]àj	Î¶g·âƒ¿`Fw·áj	 : 127.0.0.1	client connection close
+[  4817]ò»`·àj	ôx·Ðx· : accept client connection!
+[  4817]ò»127.0.0.1 : create child process!
+[  5939] : connection to server!
+[  5939] : send login info!
+[  5939] : recive login info!
+[  5939] : recive login info check ok!
+[  5939] : 127.0.0.1	read client info!
+[  5939]àj	í°âƒ¿`Fw·áj	 : 127.0.0.1	recive client info complete!
+[  5939]àj	Î¶g·âƒ¿`Fw·áj	 : 127.0.0.1	recive info from server!
+[  5939]àj	Î¶g·âƒ¿`Fw·áj	 : 127.0.0.1	send to client
+[  5939] : 127.0.0.1	recive client info complete!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  4817]ò»`·àj	B : accept client connection!
+[  4817]ò»127.0.0.1 : this client is connected!
+[  7170] : SockRecvServer:Listening on port 8001.......
+[  7170] : accept client connection!
+[  7170] : create child process!
+[  7175] : connection to server!
+[  7175] : send login info!
+[  7175] : recive login info!
+[  7175] : recive login info check ok!
+[  7175] : 127.0.0.1	read client info!
+[  7175]_	í°Mê¿`¶x·_	 : 127.0.0.1	recive client info complete!
+[  7175]_	Î&i·Mê¿`¶x·_	 : 127.0.0.1	recive info from server!
+[  7175]_	Î&i·Mê¿`¶x·_	 : 127.0.0.1	send to client
+[  7175] : 127.0.0.1	recive client info complete!
+[  7264] : SockRecvServer:Listening on port 8001.......
+[  7264] : accept client connection!
+[  7264] : create child process!
+[  7289] : connection to server!
+[  7289] : send login info!
+[  7289] : recive login info!
+[  7289] : recive login info check ok!
+[  7289] : 127.0.0.1	client connection close
+[  7264]òkZ· Rô¿q·ÐÊq· : accept client connection!
+[  7264]òk127.0.0.1 : create child process!
+[  7319] : connection to server!
+[  7319] : send login info!
+[  7319] : recive login info!
+[  7319] : recive login info check ok!
+[  7319] : 127.0.0.1	read client info!
+[  7319] Rí°Ãù¿`öp·!R : 127.0.0.1	recive client info complete!
+[  7319] RÎfa·Ãù¿`öp·!R : 127.0.0.1	recive info from server!
+[  7319] RÎfa·Ãù¿`öp·!R : 127.0.0.1	send to client
+[  7319] : 127.0.0.1	recive client info complete!
+[  7319] : 127.0.0.1	process timeout
+[  7264]òkZ· RB : accept client connection!
+[  7264]òk127.0.0.1 : create child process!
+[  7362] : connection to server!
+[  7362] : send login info!
+[  7362] : recive login info!
+[  7362] : recive login info check ok!
+[  7362] : 127.0.0.1	read client info!
+[  7362] Rí°Ãù¿`öp·!R : 127.0.0.1	recive client info complete!
+[  7362] RÎfa·Ãù¿`öp·!R : 127.0.0.1	recive info from server!
+[  7362] RÎfa·Ãù¿`öp·!R : 127.0.0.1	send to client
+[  7362] : 127.0.0.1	process timeout
+[  7264]òkZ· RB : accept client connection!
+[  7264]òk127.0.0.1 : create child process!
+[  7604] : connection to server!
+[  7604] : send login info!
+[  7604] : recive login info!
+[  7604] : recive login info check ok!
+[  7604] : 127.0.0.1	read client info!
+[  7604] Rí°Ãù¿`öp·!R : 127.0.0.1	recive client info complete!
+[  7604] RÎfa·Ãù¿`öp·!R : 127.0.0.1	recive info from server!
+[  7604] RÎfa·Ãù¿`öp·!R : 127.0.0.1	send to client
+[  7604] : 127.0.0.1	recive client info complete!
+[  7604] : 127.0.0.1	process timeout
+[  7264]òkZ· RB : accept client connection!
+[  7264]òk127.0.0.1 : create child process!
+[  7757] : connection to server!
+[  7757] : send login info!
+[  7757] : recive login info!
+[  7757] : recive login info check ok!
+[  7757] : 127.0.0.1	read client info!
+[  7757] Rí°Ãù¿`öp·!R : 127.0.0.1	recive client info complete!
+[  7757] RÎfa·Ãù¿`öp·!R : 127.0.0.1	recive info from server!
+[  7757] RÎfa·Ãù¿`öp·!R : 127.0.0.1	send to client
+[  7757] : 127.0.0.1	process timeout
+[  7264]òkZ· RB : accept client connection!
+[  7264]òk127.0.0.1 : create child process!
+[  8024] : connection to server!
+[  8024] : send login info!
+[  8024] : recive login info!
+[  8024] : recive login info check ok!
+[  8024] : 127.0.0.1	read client info!
+[  8024] Rí°Ãù¿`öp·!R : 127.0.0.1	recive client info complete!
+[  8024] RÎfa·Ãù¿`öp·!R : 127.0.0.1	recive info from server!
+[  8024] RÎfa·Ãù¿`öp·!R : 127.0.0.1	send to client
+[  8024] : 127.0.0.1	process timeout
+[  3186] : SockRecvServer:Listening on port 8001.......
+[  3186] : accept client connection!
+[  3186] : create child process!
+[  3368] : connection to server!
+[  3368] : send login info!
+[  3368] : recive login info!
+[  3368] : recive login info check ok!
+[  3368] : 127.0.0.1	read client info!
+[  3368]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  3368]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  3368]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  3368] : 127.0.0.1	process timeout
+[  3186]ò+a·Ð+ôx·ÐŠx· : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  3612] : connection to server!
+[  3612] : send login info!
+[  3612] : recive login info!
+[  3612] : recive login info check ok!
+[  3612] : 127.0.0.1	read client info!
+[  3612]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  3612]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  3612]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  3612] : 127.0.0.1	process timeout
+[  3186]ò+a·Ð+B : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  3670] : connection to server!
+[  3670] : send login info!
+[  3670] : recive login info!
+[  3670] : recive login info check ok!
+[  3670] : 127.0.0.1	read client info!
+[  3670]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  3670]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  3670]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  3670] : 127.0.0.1	client connection close
+[  3186]ò+a·Ð+B : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  3798] : connection to server!
+[  3798] : send login info!
+[  3798] : recive login info!
+[  3798] : recive login info check ok!
+[  3798] : 127.0.0.1	read client info!
+[  3798]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  3798]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  3798]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  3798] : 127.0.0.1	recive client info complete!
+[  3798] : 127.0.0.1	process timeout
+[  3186]ò+a·Ð+B : accept client connection!
+[  3186]ò+127.0.0.1 : create child process!
+[  3858] : connection to server!
+[  3858] : send login info!
+[  3858] : recive login info!
+[  3858] : recive login info check ok!
+[  3858] : 127.0.0.1	read client info!
+[  3858]Ð+í°ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive client info complete!
+[  3858]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	recive info from server!
+[  3858]Ð+Î&h·ˆ¦¿`¶w·Ñ+ : 127.0.0.1	send to client
+[  3858] : 127.0.0.1	client connection close

@@ -13,7 +13,8 @@
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 //#define SERVER_MARKET "221.6.167.245"
 //#define SERVER_MARKET_PORT 8881
-#define SERVER_MARKET "192.168.1.131"
+//#define SERVER_MARKET "192.168.1.131"
+#define SERVER_MARKET "127.0.0.1"
 #define SERVER_MARKET_PORT 8001
 
 #define USERNAME "jrjvip_android"
@@ -91,6 +92,7 @@ int get_content(char * filename, char * buff, int length);
 int get_market(cJSON * root_json, int index);
 void send_realtime(int socket_fd, int index, int size);
 int send_auto_push(int socket_fd);
+int parse(char * buff, int buf_len);
 
 int main()
 {
@@ -98,9 +100,8 @@ int main()
   int socket_fd = 0;
   int ret = 0;
   //--receive both shanghhai and shenzhen market stock
-  // init_market();
+  init_market();
   init_socket(&socket_fd);
-  //init_receive(&socket_fd);
   //ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
  
   int menu = 1;
@@ -114,7 +115,8 @@ int main()
     case 1:{//realtime
       //---init data and sort
       //get realtime data
-      send_realtime(socket_fd, 0, 10);
+      send_realtime(socket_fd, 0, 1);
+      /*
       char *buff;
       int length = 8;
       buff = (char *)malloc(length);
@@ -123,7 +125,8 @@ int main()
 	exit(-1);
       }
       memset(buff, 0x00, length);
-      buff = read(socket_fd, buff, length);
+      int r = read(socket_fd, buff, length);
+      */
       menu = 2;
     }
     case 2:{//autopush
@@ -134,6 +137,8 @@ int main()
     }
     }
     
+    init_receive(&socket_fd);
+
     //sort by price
   
     //---auto push data---
@@ -308,13 +313,13 @@ int init_socket(int * socket_fd)
   cli.sin_port = htons(SERVER_MARKET_PORT);
   cli.sin_addr.s_addr = inet_addr(SERVER_MARKET);
 
-  socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if(socket_fd < 0){
+  *socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+  if(*socket_fd < 0){
     printf("socket() failrue!\n");
     return -1;
   }
 
-  if(connect(socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
+  if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
     printf("connect() failure!\n");
     return -1;
   } 
@@ -324,7 +329,6 @@ int init_socket(int * socket_fd)
 
 void send_realtime(int socket_fd, int index, int size)
 {
-  size = 1;
   char * request;
   int entity_count = market_list[0].entity_list_size;
   int off = sizeof(RealPack);
@@ -350,28 +354,22 @@ void send_realtime(int socket_fd, int index, int size)
   memcpy(data->m_head, HEADER, 4);
   data->m_length =  request_length - 8;
   data->m_nType = TYPE_REALTIME;
-  data->m_nSize = entity_count;
+  data->m_nSize = size;
   data->m_nOption= 0x0080;
-
-  codeinfo = (CodeInfo *)(request+off);
-  codeinfo->code_type = 0x1101;
-  strncpy(codeinfo->code, "600000", 6);
-  //股票:pass
-  /*
+  
+  //股票:pass  
   int i=0;
   entity = (entity_t *)(market_list[0].list+i*entity_length);
-  for(i=index; (i< entity_count)&&(i<(index+1)*size); i++){ 
-    codeinfo = (CodeInfo *)(&request+off+i*codeinfo_length);
+  for(i=index; i<(index+1)*size; i++){ 
+    codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
     codeinfo->code_type = market_list[0].code_type;
     strncpy(codeinfo->code, entity->code, 6);
     entity ++;
   }
-  */
  
   if(send(socket_fd, request, request_length, 0)){
     printf("send success!\n");
   }
-  
 }
 
 void init_receive(void * socket_fd)
@@ -379,14 +377,14 @@ void init_receive(void * socket_fd)
   char head[4];
   char * buff = NULL;
   int package_body_length = 0;
-  int * fd = (int *)socket_fd;
   int ret_count = 0;
   int head_length = 8;
   int length = head_length;  
   int off = 0;
+  int fd = *((int *)socket_fd);
 
-  while(1){
-    memset(&head, 0x00, 6);
+   while(1){
+    memset(&head, 0x00, 4);
     buff = (char *)malloc(length);
     if(buff == NULL){
       printf("malloc err!\n");
@@ -394,24 +392,27 @@ void init_receive(void * socket_fd)
     }
     memset(buff, 0x00, length);
     //接受头部
-    ret_count = read(socket_fd, buff,8);
+    ret_count = read(fd, buff,length);
+    printf("fd:%d\n", fd);
     if(ret_count == 0){
       printf("connect close!\n");
       sleep(3);
-      continue;
+      return 0;
+      //      continue;
       //pthread_exit();
     } 
     if(ret_count <0){
       printf("recive server err!\n");
       sleep(3);
-      continue;
+            return 0;
+      // continue;
       //pthread_exit(-1);
     }
     
     if(ret_count == length){
       //receive body of package
-      strncpy(head, buff, 6);
-      length = *((int *)(buff+6));
+      strncpy(head, buff, 4);
+      length = *((int *)(buff+4));
       free(buff);
       buff = (char *)malloc(length);
       if(buff == NULL){
@@ -419,16 +420,16 @@ void init_receive(void * socket_fd)
 	exit(-1);
       }
       memset(buff, 0x00, length);
-      while(length != (ret_count = read(socket_fd, buff+off, length))){
+      while(length != (ret_count = read(fd, buff+off, length))){
 	off += ret_count;
 	length -= ret_count;	
       }
       //parse
       printf("%s\n", buff);
       printf("recive complete!\n");
-      
+      parse(buff, length);
     }
-  }
+   }
 }
 
 int send_auto_push(int socket_fd)
@@ -450,5 +451,15 @@ int send_auto_push(int socket_fd)
   int r = send(socket_fd, request, sizeof(data), 0);  
   printf("r:%d\n", r);
   printf("主推请求\n");
+  return 0;
+}
+
+int parse(char * buff, int buf_len)
+{
+  int type;
+  
+  type = (*(int *)buff);
+  printf("type:%x\n", type);
+  
   return 0;
 }
