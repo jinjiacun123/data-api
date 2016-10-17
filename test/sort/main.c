@@ -8,6 +8,7 @@
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<assert.h>
+//#include <zlib.h>
 #include "cJSON.h"
 #include "config.h"
 
@@ -26,7 +27,7 @@ int main()
   //init_receive(&socket_fd);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, 1);
+  send_realtime(socket_fd, 0, 5);
   //sort by price
 
   //---auto push data---
@@ -366,21 +367,25 @@ int send_heart(int socket_fd)
   return 0;
 }
 
-int parse(char * buff, int buff_len)
+int parse(char * buff, uLongf  buff_len)
 {
   unsigned short type;
   
+  if(buff == NULL)
+    return -2;
   type = (*(unsigned short *)buff);
-  printf("type:%x\n", type);
+  printf("type:%02x\n", type);
   switch(type){
   case TYPE_REALTIME:{
     printf("realtime...\n");
     parse_realtime(buff, buff_len);
+    free(buff);
   }
     break;
   case TYPE_AUTO_PUSH:{
     printf("auto_push...\n");
     parse_auto_push(buff, buff_len);
+    free(buff);
   }
     break;
   case TYPE_HEART:{
@@ -388,15 +393,24 @@ int parse(char * buff, int buff_len)
     heart_times--;
   }
     break;
-  default:{
-    printf("unknown type...\n");
+  case TYPE_ZIB:{
+    printf("bzib...\n");
+    char * src_buff = NULL;
+    uLongf src_buff_len = 0;
+    assert(unpack(buff, buff_len, &src_buff, &src_buff_len) == 0);
+    free(buff);
+    parse(src_buff, src_buff_len);
+  }
+    break;
+  default:{ 
+    printf("unknown type:%d...\n", type);
   }
     break;
   }
   return 0;
 }
 
-int parse_realtime(char * buff, int buff_len)
+int parse_realtime(char * buff, uLongf buff_len)
 {
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
@@ -421,7 +435,6 @@ do_stock(code, buff, i)
      char * buff;
      int i;
 {
-  printf("处理股票...\n");
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					            +20
 					      +sizeof(CommRealTimeData)
@@ -430,7 +443,48 @@ do_stock(code, buff, i)
 }
 
 
-int parse_auto_push(char * buff, int buff_len)
+int parse_auto_push(char * buff, uLong   buff_len)
 {
   return 0;
+}
+
+int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len)
+{
+  TransZipData2   * zheader;
+  zheader = (TransZipData2 *)des_buff;
+  if(zheader->m_nType != TYPE_ZIB){
+    printf("parse zlib package type error!\n");
+    return -100;
+  }
+
+  *src_buff_len = (uLongf)zheader->m_lOrigLen;
+  *src_buff = (char *)malloc(*src_buff_len);
+  if(*src_buff == NULL){
+    printf("malloc err!\n");
+    return -1;
+  }
+  memset(*src_buff, 0 , *src_buff_len);
+  
+  int unzip =  uncompress((Bytef *)(*src_buff), src_buff_len,
+			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
+  if(unzip == Z_MEM_ERROR){
+    printf("memory not enough\n");
+    return -2;
+  }
+  if(unzip == Z_BUF_ERROR){
+    printf("buff not enough!\n");
+    return -3;
+  }
+  if(unzip == Z_DATA_ERROR){
+    printf("unpack data err!\n");
+    return -4;
+   }
+  if(unzip == Z_OK
+     && *((long*)src_buff_len) == zheader->m_lOrigLen){
+    // my_buff->p_res_media_h = (p_response_meta_header)my_buff->unpack_buff;
+    return 0;
+    //parse(my_buff);
+    //return;
+  }
+  return -1;
 }
