@@ -153,6 +153,30 @@ void main(int argc,char *argv[])
       continue;
     }
     WriteErrLog("accept client connection!\n");
+#define SOCKET_ERROR (-1)
+    int keepAlive = 1;   //设定keepalive
+    int keepIDie = 5;    //首次探测开始前的tcp无数手法空闲实际
+    int keepInterval = 3;//每次侦探的间隔实际
+    int keepCount = 2;   //侦探次数
+    
+    
+    if(setsockopt(clientSocketId, SOL_SOCKET, SO_KEEPALIVE,(void*)&keepAlive, sizeof(keepAlive)) == SOCKET_ERROR){
+      WriteErrLog("Call setsockopt error,error is %d\n", errno);
+      exit(-1);
+    }
+    if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPIDLE, (void*)keepInterval, sizeof(keepInterval)) == SOCKET_ERROR){
+      WriteErrLog("call setsockopt error,error is %d\n", errno);
+      exit(-1);
+    }
+    if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval)) == SOCKET_ERROR){
+      WriteErrLog("call setsocket error, error is%d\n", errno);
+      exit(-1);
+    }
+    if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPCNT,(void *)&keepCount, sizeof(keepCount)) == SOCKET_ERROR){
+      WriteErrLog("call setsocketopt error, error is %d\n", errno);
+      exit(-1);
+    }
+
 
     //进程数量大于iPNum时 1秒后继续服务
     if(g_iCltNum > iPNum - 1){
@@ -305,6 +329,8 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   int heart_times = 0;
   int length = 8;
   p_response_header p_header;
+  
+  int alive_times = 0;
     
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
@@ -328,11 +354,17 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
-    
+
+    if(alive_times>20){
+      WriteErrLog("%s\tclient is die\n", client_ip);
+      exit(-1);
+    }
+
 
     //recive server info
     if(client[0].fd > 0){
       if(client[0].revents & (POLLIN|POLLERR)){
+	alive_times++;
 	WriteErrLog("%s\trecive info from server!\n", client_ip);
 	length = 8;
 	buff = (char *)malloc(length);
@@ -419,6 +451,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive client info
     if(client[1].fd > 0){
       if(client[1].revents & (POLLIN|POLLERR)){
+	alive_times--;
 	/*
 	char tmp_buff[1024];
 	int rrr = read(client[1].fd, tmp_buff, 1024);

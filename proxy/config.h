@@ -16,6 +16,7 @@
 #include <poll.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <netinet/tcp.h>
 
 #ifndef _SCO_DS
 #include <fcntl.h>

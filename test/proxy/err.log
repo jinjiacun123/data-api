@@ -14143,3 +14143,70 @@ t· : accept client connection!
 [  6569] : 127.0.0.1	recive info from server!
 [  6569] : 127.0.0.1	send to client
 [  6569] : 127.0.0.1	client connection close
+[  6099]òk`· : accept client connection!
+[  6099]òk127.0.0.1 : create child process!
+[  6726] : connection to server!
+[  6726] : send login info!
+[  6726] : recive login info!
+[  6726] : recive login info check ok!
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	read client info!
+[  6726] : 127.0.0.1	recive client info complete!
+[  6726] : 127.0.0.1	recive info from server!
+[  6726] : 127.0.0.1	send to client
+[  6726] : 127.0.0.1	client connection close
+[  6888] : SockRecvServer:Listening on port 8001.......
+[  6888] : accept client connection!
+[  6888] : create child process!
+[  6893] : connection to server!
+[  6893] : send login info!
+[  6893] : recive login info!
+[  6893] : recive login info check ok!
+[  6893] : 127.0.0.1	read client info!
+[  6893] : 127.0.0.1	recive client info complete!
+[  6893] : 127.0.0.1	recive info from server!
+[  6893] : 127.0.0.1	send to client
+[  6893] : 127.0.0.1	read client info!
+[  6893] : 127.0.0.1	recive client info complete!
+[  6893] : 127.0.0.1	recive info from server!
+[  6893] : 127.0.0.1	send to client
+[  6893] : 127.0.0.1	client connection close
