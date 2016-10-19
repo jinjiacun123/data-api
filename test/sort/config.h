@@ -25,6 +25,14 @@
 #define TYPE_SERVERINFO 0x0103 //
 #define TYPE_DAY_CURPOS 0x020c //
 
+//column of sort
+typedef enum
+{
+  NEW_PRICE,
+  ADD_RANGE,
+  DOWN_RANGE
+}column_n;
+
 char buff[100*1024];
 
 typedef struct
@@ -161,7 +169,6 @@ my_key_t key_root = {0};
 
 typedef struct
 {
-  unsigned int index;//sort subscript
   unsigned int address;//point to entity_t
 }sort_t;
 
@@ -178,7 +185,7 @@ typedef struct
   char open_close_time[50];
   entity_t * list;
   int entity_list_size;
-  // sort_t * s_price_list; //sort by price
+  sort_t * sort_price_list; //sort by price
 }market_t;
 
 market_t market_list[] = {
@@ -203,7 +210,7 @@ int parse(char * buff, uLongf buff_len);
 int parse_realtime(char * buff, uLongf buff_len);
 int parse_auto_push(char * buff, uLongf buff_len);
 int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len);
-int my_sort(int index);
+int my_sort(int code_type_index, int column_index);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);

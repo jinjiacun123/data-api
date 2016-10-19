@@ -544,7 +544,8 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
   return -1;
 }
 
-int my_sort(int index)
+//from samll to big
+int my_sort(int code_type_index, int column_index)
 {
   
   return 0;
