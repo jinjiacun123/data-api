@@ -26,10 +26,10 @@ int main()
   printf("ret:%d\n", ret);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
+  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);  
   //---auto push data---
   //get auto push data and resort data
-  //  send_auto_push(socket_fd, 0, market_list[0].entity_list_size);
+  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   int menu = 1;
   while(1){
     sleep(3);
@@ -233,7 +233,7 @@ int init_socket(int * socket_fd)
   return 0;
 }
 
-int send_realtime(int socket_fd, int index, int size)
+int send_realtime(int socket_fd, int index, int size, int code_type_index)
 {
   char * request;
   int entity_count = market_list[0].entity_list_size;
@@ -341,26 +341,45 @@ void init_receive(void * socket_fd)
    }
 }
 
-int send_auto_push(int socket_fd, int index, int size)
+int send_auto_push(int socket_fd, int index, int size, int code_type_index)
 {
-  char request[1024];
+  char * request;
+  int off = sizeof(RealPack);
+  int codeinfo_length = sizeof(CodeInfo);
+  CodeInfo * codeinfo;
+  entity_t * entity;
+  int entity_length = sizeof(entity_t);
+  int i = 0;
+  int request_length = sizeof(RealPack)+codeinfo_length*size;
 
-  RealPack data;
-  memset(&data,0x00,sizeof(RealPack));
-  memcpy(data.m_head,HEADER,4);
-  data.m_length =  sizeof(RealPack) - 8;
-  data.m_nType = TYPE_AUTO_PUSH;
-  data.m_nSize =1;
-  data.m_nOption= 0x0080;
-  //memcpy(data.m_cCode2,"EURUSD",6);
-  //data.m_cCodeType2 = 0x8100;
+  request = (char *)malloc(request_length);
+  if(request == NULL){
+    printf("malloc err!\n");
+    exit(-1);
+  }
+  memset(request, 0x00, request_length);
+  
+  RealPack * data = (RealPack *)request;  
+  memcpy(data->m_head,HEADER,4);
+  data->m_length =  request - 8;
+  data->m_nType = TYPE_AUTO_PUSH;
+  data->m_nSize = size;
+  data->m_nOption= 0x0080;
+  
+  entity = (entity_t *)(market_list[code_type_index].list+i*entity_length);
+  for(i = index; i<(index+1)*size; i++){
+    codeinfo = (CodeInfo *)(request + off + i * codeinfo_length);
+    codeinfo->code_type = market_list[code_type_index].code_type;
+    strncpy(codeinfo->code, entity->code, 6);
+    entity ++;
+  }
 
-  memset(request, 0, sizeof(data));
-  memcpy(request, &data, sizeof(data));
-  int r = send(socket_fd, request, sizeof(data), 0);
-  printf("r:%d\n", r);
-  printf("主推请求\n");
-  return 0;
+  if(send(socket_fd, request, request_length, 0)){
+    printf("send auto_push success!\n");
+    return 0;
+  }
+  
+  return -1;
 }
 
 int send_heart(int socket_fd)
@@ -451,20 +470,32 @@ do_stock(code_type, code, buff, i)
 {
   int address = 0;
   unsigned int code_type_index = 0;
+  entity_t * entity;
   if(code_type == 0x1201){
     code_type_index = 1;
   }
   assert((address = find_entity_by_key(code, 6, code_type_index)) > 0);
-  
+  entity = (entity_t *)address;
+
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
+  */
+  entity->price = tmp->m_lNewPrice;
+  /*
+  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
+	 i,
+	 code_type,
+	 code,
+	 entity->price);
+  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)

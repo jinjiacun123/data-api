@@ -6,5 +6,5 @@ b main
 #b unpack
 #b get_market
 #b save_key
-b find_entity_by_key
+#b find_entity_by_key
 r

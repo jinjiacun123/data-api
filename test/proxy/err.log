@@ -15421,3 +15421,18 @@ z· : accept client connection!
 [ 24215] : 127.0.0.1	recive info from server!
 [ 24215] : 127.0.0.1	send to client
 [ 24215] : 127.0.0.1	client connection close
+[ 23995]ò«b· *B : accept client connection!
+[ 23995]ò«127.0.0.1 : create child process!
+[ 24276] : connection to server!
+[ 24276] : send login info!
+[ 24276] : recive login info!
+[ 24276] : recive login info check ok!
+[ 24276] : 127.0.0.1	read client info!
+[ 24276] : 127.0.0.1	recive client info complete!
+[ 24276] : 127.0.0.1	recive info from server!
+[ 24276] : 127.0.0.1	send to client
+[ 24276] : 127.0.0.1	read client info!
+[ 24276] : 127.0.0.1	recive client info complete!
+[ 24276] : 127.0.0.1	recive info from server!
+[ 24276] : 127.0.0.1	send to client
+[ 24276] : 127.0.0.1	client connection close
