@@ -434,7 +434,10 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff, HEADER, 4);
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
-	      write(client[1].fd, send_buff, length+8);
+	      if(write(client[1].fd, send_buff, length+8) == -1){
+		WriteErrLog("%s\tWrite to client error!\n", client_ip);
+		exit(-1);
+	      }
 	      free(send_buff);
 	      break;	      
 	    }	  
@@ -565,7 +568,10 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff, HEADER, 4);
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
-	      write(client[0].fd, send_buff, length+8);	      
+	      if(write(client[0].fd, send_buff, length+8) == -1){
+		WriteErrLog("%s\twrite to server error!\n", client_ip);
+		exit(-1);
+	      }
 	      free(send_buff);
 	      break;	      
 	    }	  

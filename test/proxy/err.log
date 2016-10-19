@@ -15278,3 +15278,146 @@ t· : accept client connection!
 [ 22939] : recive login info!
 [ 22939] : recive login info check ok!
 [ 22939] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 23047] : connection to server!
+[ 23047] : send login info!
+[ 23047] : recive login info!
+[ 23047] : recive login info check ok!
+[ 23047] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 23060] : connection to server!
+[ 23060] : send login info!
+[ 23060] : recive login info!
+[ 23060] : recive login info check ok!
+[ 23060] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 23122] : connection to server!
+[ 23122] : send login info!
+[ 23122] : recive login info!
+[ 23122] : recive login info check ok!
+[ 23122] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 23158] : connection to server!
+[ 23158] : send login info!
+[ 23158] : recive login info!
+[ 23158] : recive login info check ok!
+[ 23158] : 127.0.0.1	client connection close
+[ 23995] : SockRecvServer:Listening on port 8001.......
+[ 23995] : accept client connection!
+[ 23995] : create child process!
+[ 24021] : connection to server!
+[ 24021] : send login info!
+[ 24021] : recive login info!
+[ 24021] : recive login info check ok!
+[ 24021] : 127.0.0.1	read client info!
+[ 24021] : 127.0.0.1	recive client info complete!
+[ 24021] : 127.0.0.1	recive info from server!
+[ 24021] : 127.0.0.1	send to client
+[ 24021] : 127.0.0.1	client connection close
+[ 23995]ò«b· *ôÿy·Ð
+z· : accept client connection!
+[ 23995]ò«127.0.0.1 : create child process!
+[ 24167] : connection to server!
+[ 24167] : send login info!
+[ 24167] : recive login info!
+[ 24167] : recive login info check ok!
+[ 24167] : 127.0.0.1	read client info!
+[ 24167] : 127.0.0.1	recive client info complete!
+[ 24167] : 127.0.0.1	recive info from server!
+[ 24167] : 127.0.0.1	send to client
+[ 24167] : 127.0.0.1	read client info!
+[ 24167] : 127.0.0.1	recive client info complete!
+[ 24167] : 127.0.0.1	recive info from server!
+[ 24167] : 127.0.0.1	send to client
+[ 24167] : 127.0.0.1	process timeout
+[ 23995]ò«b· *B : accept client connection!
+[ 23995]ò«127.0.0.1 : create child process!
+[ 24183] : connection to server!
+[ 24183] : send login info!
+[ 24183] : recive login info!
+[ 24183] : recive login info check ok!
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	read client info!
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	recive info from server!
+[ 24183] : 127.0.0.1	send to client
+[ 24183] : 127.0.0.1	recive client info complete!
+[ 24183] : 127.0.0.1	process timeout
+[ 23995]ò«b· *B : accept client connection!
+[ 23995]ò«127.0.0.1 : create child process!
+[ 24215] : connection to server!
+[ 24215] : send login info!
+[ 24215] : recive login info!
+[ 24215] : recive login info check ok!
+[ 24215] : 127.0.0.1	read client info!
+[ 24215] : 127.0.0.1	recive client info complete!
+[ 24215] : 127.0.0.1	recive info from server!
+[ 24215] : 127.0.0.1	send to client
+[ 24215] : 127.0.0.1	read client info!
+[ 24215] : 127.0.0.1	recive client info complete!
+[ 24215] : 127.0.0.1	recive info from server!
+[ 24215] : 127.0.0.1	send to client
+[ 24215] : 127.0.0.1	read client info!
+[ 24215] : 127.0.0.1	recive client info complete!
+[ 24215] : 127.0.0.1	recive info from server!
+[ 24215] : 127.0.0.1	send to client
+[ 24215] : 127.0.0.1	client connection close

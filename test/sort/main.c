@@ -24,13 +24,12 @@ int main()
   init_socket(&socket_fd);
   ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
   printf("ret:%d\n", ret);
-  return 0;
   //---init data and sort
   //get realtime data
-  //send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
+  send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
   //---auto push data---
   //get auto push data and resort data
-  //  send_realtime(socket_fd, 0, market_list[0].entity_list_size);
+  //  send_auto_push(socket_fd, 0, market_list[0].entity_list_size);
   int menu = 1;
   while(1){
     sleep(3);
@@ -455,7 +454,7 @@ do_stock(code_type, code, buff, i)
   if(code_type == 0x1201){
     code_type_index = 1;
   }
-  assert((address = find_entity_by_key(code, 6, code_type_index)) == 0);
+  assert((address = find_entity_by_key(code, 6, code_type_index)) > 0);
   
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
