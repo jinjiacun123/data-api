@@ -538,7 +538,7 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
     location = get_index_by_code_ascii(ascii); 
     //check location is malloc
     if(cur_key->childs[location] == NULL){
-      tmp_key = (key_t *)malloc(sizeof(my_key_t));
+      tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
       if(tmp_key == NULL){
 	printf("malloc error!\n");
 	exit(-1);
