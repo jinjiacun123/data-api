@@ -510,49 +510,12 @@ int my_sort(int index)
   return 0;
 }
 
-/*
-  both code and code_type general 8 sequence map to point of entity_t
-  
-  code[0] hight to first byte
-  code[1] low to first byte
-  code[2] hight to second byte
-  code[3] low to second byte
-  code[4] hight to third byte
-  code[5] low to third byte
-  code_type_index[0] hight to forth byte
-  code_type_index[1] low to forth byte
+/**
+   
 */
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
 {
-  int location = 0;
-  unsigned int unit;
-  char ascii;
-  int i = 0;
-  int mask_code = 0x0000000f;
-  int off_bit = 0;
-
-  //first hight 4 byte of byte
-  //second low  4 byte of byte
-  //and so on
-  for(i=0; i<6; i++){
-    off_bit = (7-i)*4;
-    ascii = *(code+i); 
-    location = get_index_by_code_ascii(ascii);
-    memset(&unit, 0x00, 4);
-    unit = (mask_code<<off_bit) & ((unsigned int)entity);
-    //unit |= ~mask_code;    
-    key_map[location] = key_map[location] | unit;
-  }
   
-  //forth byte
-  off_bit = (7-i)*4;
-  memset(&unit, 0x00, 4);
-  unit = (mask_code<<off_bit) & ((unsigned int)entity);
-  //  unit |= ~mask_code;
-  location = code_type_index;
-  key_map[location] = key_map[location] | unit; 
-  
-  return 0;
 }
 
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index, unsigned int * i_address)
