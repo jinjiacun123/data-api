@@ -12,7 +12,7 @@
 #include "cJSON.h"
 #include "config.h"
 
-static void do_stock(char *, char *, int);
+static void do_stock(unsigned short, char *, char *, int);
 
 int main()
 {
@@ -24,14 +24,12 @@ int main()
   init_socket(&socket_fd);
   ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
   printf("ret:%d\n", ret);
-  //init_receive(&socket_fd);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, 5);
-  //sort by price
-
+  send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
   //---auto push data---
   //get auto push data and resort data
+  //  send_realtime(socket_fd, 0, market_list[0].entity_list_size);
   int menu = 1;
   while(1){
     sleep(3);
@@ -58,7 +56,7 @@ int init_market()
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[0].file_name);
   system(cmd);
-  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");
+  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");  
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[1].file_name);
   system(cmd);
@@ -179,14 +177,19 @@ int get_market(cJSON * root_json, int index)
     strncpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring,6);
     strcpy(entity->name, cJSON_GetObjectItem(item, "name")->valuestring);
     entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-    printf("code:%s,name:%s,preclose:%d\n", 
+    //save to key
+    assert(save_key(entity->code, 6, index, entity) == 0); 
+    /*
+    printf("index:%d,code:%s,name:%s,preclose:%d\n", 
+	   i,
 	   entity->code,
 	   entity->name,
 	   entity->pre_close);
+    */
     entity++;
   }
 
-  printf("date:%s,code_type:%x\n", 
+  printf("date:%s,code_type:%x,name:%s,unit:%d,open_close_time:%s,code_size:%d\n", 
 	 market_list[index].date, 
 	 market_list[index].code_type,
 	 market_list[index].name,
@@ -344,7 +347,7 @@ int send_auto_push(int socket_fd, int index, int size)
 
   memset(request, 0, sizeof(data));
   memcpy(request, &data, sizeof(data));
-  int r = send(socket_fd, request, sizeof(data), 0);  
+  int r = send(socket_fd, request, sizeof(data), 0);
   printf("r:%d\n", r);
   printf("主推请求\n");
   return 0;
@@ -422,7 +425,7 @@ int parse_realtime(char * buff, uLongf buff_len)
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
-	do_stock(code, buff, i);
+      do_stock(data_type->m_cCodeType, code, buff, i);
     }
   }
   return 0;
@@ -430,16 +433,28 @@ int parse_realtime(char * buff, uLongf buff_len)
 
 //处理股票
 static void
-do_stock(code, buff, i)
+do_stock(code_type, code, buff, i)
+     unsigned short code_type;
      char * code;
      char * buff;
      int i;
 {
+  unsigned int address = 0;
+  unsigned int code_type_index = 0;
+  if(code_type == 0x1201){
+    code_type_index = 1;
+  }
+  assert(find_entity_by_key(code, 6, code_type_index, &address) == 0);
+  
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
-					            +20
+					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-  printf("品种:%s, 最新价:%d\n", code, tmp->m_lNewPrice);
+  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
+	 i,
+	 code_type,
+	 code,
+	 tmp->m_lNewPrice);
 }
 
 
@@ -486,5 +501,99 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
     //parse(my_buff);
     //return;
   }
+  return -1;
+}
+
+int my_sort(int index)
+{
+  
+  return 0;
+}
+
+/*
+  both code and code_type general 8 sequence map to point of entity_t
+  
+  code[0] hight to first byte
+  code[1] low to first byte
+  code[2] hight to second byte
+  code[3] low to second byte
+  code[4] hight to third byte
+  code[5] low to third byte
+  code_type_index[0] hight to forth byte
+  code_type_index[1] low to forth byte
+*/
+int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
+{
+  int location = 0;
+  unsigned int unit;
+  char ascii;
+  int i = 0;
+  int mask_code = 0x0000000f;
+  int off_bit = 0;
+
+  //first hight 4 byte of byte
+  //second low  4 byte of byte
+  //and so on
+  for(i=0; i<6; i++){
+    off_bit = (7-i)*4;
+    ascii = *(code+i); 
+    location = get_index_by_code_ascii(ascii);
+    memset(&unit, 0x00, 4);
+    unit = (mask_code<<off_bit) & ((unsigned int)entity);
+    //unit |= ~mask_code;    
+    key_map[location] = key_map[location] | unit;
+  }
+  
+  //forth byte
+  off_bit = (7-i)*4;
+  memset(&unit, 0x00, 4);
+  unit = (mask_code<<off_bit) & ((unsigned int)entity);
+  //  unit |= ~mask_code;
+  location = code_type_index;
+  key_map[location] = key_map[location] | unit; 
+  
+  return 0;
+}
+
+int find_entity_by_key(char * code, unsigned int code_len, int code_type_index, unsigned int * i_address)
+{
+  int location = 0;
+  unsigned int unit;
+  char ascii;
+  int i = 0;
+  int mask_code = 0x0000000f;
+  int off_bit = 0;
+  int address = 0;
+
+  //from first to sixth bit
+  for(i=0; i<6; i++){
+    ascii = *(code+i);
+    off_bit = mask_code<<((7-i)*4);
+    location = get_index_by_code_ascii(ascii);
+    address |= key_map[location] & off_bit; 
+  }
+
+  //7th bit
+  off_bit = mask_code<<((7-i)*4);
+  location = code_type_index;
+  address |= key_map[location] & off_bit;
+
+  return 0;
+}
+
+int get_index_by_code_ascii(char ascii)
+{
+  int base_digit = 0;
+  int base_alphabet = 10;
+  //digit
+  if(ascii>=48 || ascii <=57){
+    return base_digit+ascii-48;
+  }
+
+  //alphabet
+  if(ascii>=65 || ascii <= 80){
+    return base_alphabet+ascii-65;
+  } 
+
   return -1;
 }

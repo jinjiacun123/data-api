@@ -31,3 +31,6 @@ test_proxy:test_proxy.c
 
 test_poll:test_poll.c
 	$(CC) -g -o test_poll test_poll.c
+
+test_byte:byte.c
+	$(CC) -g -o test_byte byte.c

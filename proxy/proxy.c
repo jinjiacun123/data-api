@@ -153,6 +153,7 @@ void main(int argc,char *argv[])
       continue;
     }
     WriteErrLog("accept client connection!\n");
+    /*
 #define SOCKET_ERROR (-1)
     int keepAlive = 1;   //设定keepalive
     int keepIDie = 5;    //首次探测开始前的tcp无数手法空闲实际
@@ -176,7 +177,7 @@ void main(int argc,char *argv[])
       WriteErrLog("call setsocketopt error, error is %d\n", errno);
       exit(-1);
     }
-
+    */
 
     //进程数量大于iPNum时 1秒后继续服务
     if(g_iCltNum > iPNum - 1){
@@ -451,7 +452,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
     //recive client info
     if(client[1].fd > 0){
       if(client[1].revents & (POLLIN|POLLERR)){
-	alive_times--;
+	alive_times = 0;
 	/*
 	char tmp_buff[1024];
 	int rrr = read(client[1].fd, tmp_buff, 1024);
