@@ -143,7 +143,6 @@ typedef struct
 typedef struct
 {
   char code[6];
-  char name[20];
   int  pre_close;  //close price of yestoday
   int price;       //now price
 }entity_t;
@@ -153,16 +152,12 @@ typedef struct
 #define MAX_CHILDS 36 //0-9 A-Z
 typedef struct
 {
-  void * next;
-}item_t;
-typedef struct
-{
   int floor;
-  item_t childs[MAX_CHILDS];
-}key_t;
+  unsigned int childs[MAX_CHILDS];
+}my_key_t;
 
 //first floor
-key_t root = {0}
+my_key_t key_root = {0};
 
 typedef struct
 {
@@ -179,19 +174,18 @@ typedef struct
   char file_name[10];
   char date[8];        //year-month-day
   short code_type;
-  char name[20];
   short unit;
   char open_close_time[50];
   entity_t * list;
   int entity_list_size;
-  sort_t * s_price_list; //sort by price
+  // sort_t * s_price_list; //sort by price
 }market_t;
 
 market_t market_list[] = {
   //上证a股
-  {"1101.txt","20161012",0x1101,"上证A股",1000,"[570-690][780-900][-1--1][-1--1]"},
+  {"1101.txt","20161012",0x1101,1000,"[570-690][780-900][-1--1][-1--1]"},
   //深证a股
-  {"1201.txt","20161012",0x1201,"深证A股",1000,"[570-690][780-900][-1--1][-1--1]"}
+  {"1201.txt","20161012",0x1201,1000,"[570-690][780-900][-1--1][-1--1]"}
 };
 entity_t * entity_list;
 int init_market();
@@ -211,6 +205,6 @@ int parse_auto_push(char * buff, uLongf buff_len);
 int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len);
 int my_sort(int index);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
-int find_entity_by_key(char * code, unsigned int code_len, int code_type_index, unsigned int * address);
+int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
 #endif

@@ -24,9 +24,10 @@ int main()
   init_socket(&socket_fd);
   ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
   printf("ret:%d\n", ret);
+  return 0;
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
+  //send_realtime(socket_fd, 0, market_list[0].entity_list_size);  
   //---auto push data---
   //get auto push data and resort data
   //  send_realtime(socket_fd, 0, market_list[0].entity_list_size);
@@ -76,6 +77,8 @@ int init_market()
   //parse 1101
   get_market(root_json, index);
   free(root_json);
+  return 0;
+
   //parse 1201
   index = 1;
   memset(buff, 0x00, 1024*100);
@@ -143,7 +146,6 @@ int get_market(cJSON * root_json, int index)
     printf("get object of date err!\n");
     exit(-1);
   }
-  strcpy(market_list[index].name, obj->valuestring);
   obj = cJSON_GetObjectItem(root_json, "priceunit");
   if(obj == NULL){
     printf("get object of date err!\n");
@@ -172,27 +174,36 @@ int get_market(cJSON * root_json, int index)
   int i = 0;
   cJSON * item;
   entity = market_list[index].list;
-  for(;i< market_list[index].entity_list_size; i++){
+  for(; i< market_list[index].entity_list_size; i++){
     item = cJSON_GetArrayItem(obj, i);
-    strncpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring,6);
-    strcpy(entity->name, cJSON_GetObjectItem(item, "name")->valuestring);
-    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-    //save to key
-    assert(save_key(entity->code, 6, index, entity) == 0); 
-    /*
-    printf("index:%d,code:%s,name:%s,preclose:%d\n", 
+    strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
+    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);    
+    
+    printf("index:%d\tcode:%s\tpreclose:%d\n", 
 	   i,
 	   entity->code,
-	   entity->name,
 	   entity->pre_close);
-    */
+    
+    //save to key
+      assert(save_key(entity->code, 6, index, entity) == 0); 
+
     entity++;
   }
+  
+  /*
+  entity = market_list[index].list;
+  for(i=0; i<market_list[index].entity_list_size; i++){
+    printf("index:%d\tcode:%s\tpreclose:%d\n", 
+	   i,
+	   entity->code,
+	   entity->pre_close);
+    entity++;
+  }
+  */
 
-  printf("date:%s,code_type:%x,name:%s,unit:%d,open_close_time:%s,code_size:%d\n", 
+  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n", 
 	 market_list[index].date, 
 	 market_list[index].code_type,
-	 market_list[index].name,
 	 market_list[index].unit,
 	 market_list[index].open_close_time,
 	 market_list[index].entity_list_size);
@@ -439,12 +450,12 @@ do_stock(code_type, code, buff, i)
      char * buff;
      int i;
 {
-  unsigned int address = 0;
+  int address = 0;
   unsigned int code_type_index = 0;
   if(code_type == 0x1201){
     code_type_index = 1;
   }
-  assert(find_entity_by_key(code, 6, code_type_index, &address) == 0);
+  assert((address = find_entity_by_key(code, 6, code_type_index)) == 0);
   
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
@@ -456,7 +467,6 @@ do_stock(code_type, code, buff, i)
 	 code,
 	 tmp->m_lNewPrice);
 }
-
 
 int parse_auto_push(char * buff, uLong   buff_len)
 {
@@ -511,37 +521,66 @@ int my_sort(int index)
 }
 
 /**
-   
+   from first letter to last,every letter point floor
 */
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
 {
+  int i              = 0;
+  char ascii         = 0;
+  int unit           = 0;
+  my_key_t * cur_key = &key_root;
+  my_key_t * tmp_key = NULL;;
+  void * last_key    = NULL;
+  int location       = 0;
+
+  for(i=0; i<6; i++){
+    ascii = *(code+i); 
+    location = get_index_by_code_ascii(ascii); 
+    //check location is malloc
+    if(cur_key->childs[location] == NULL){
+      tmp_key = (key_t *)malloc(sizeof(my_key_t));
+      if(tmp_key == NULL){
+	printf("malloc error!\n");
+	exit(-1);
+      }
+      memset(tmp_key, 0x00, sizeof(my_key_t));
+      tmp_key->floor = i+1;
+      cur_key->childs[location] = tmp_key;
+      cur_key = tmp_key;
+    }
+    else{
+      cur_key = cur_key->childs[location];
+    }
+  }
+  //code_type node
+  //save entity of point
+  if(cur_key != NULL && cur_key->childs[code_type_index] == NULL){
+    cur_key->childs[code_type_index] = entity;
+  }
   
+  return 0;
 }
 
-int find_entity_by_key(char * code, unsigned int code_len, int code_type_index, unsigned int * i_address)
+int find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
 {
   int location = 0;
-  unsigned int unit;
-  char ascii;
-  int i = 0;
-  int mask_code = 0x0000000f;
-  int off_bit = 0;
-  int address = 0;
+  char ascii   = 0;
+  int i        = 0;
+  int address  = 0;
+  my_key_t * cur_key = &key_root;
 
   //from first to sixth bit
   for(i=0; i<6; i++){
     ascii = *(code+i);
-    off_bit = mask_code<<((7-i)*4);
     location = get_index_by_code_ascii(ascii);
-    address |= key_map[location] & off_bit; 
+    cur_key = cur_key->childs[location];
   }
 
   //7th bit
-  off_bit = mask_code<<((7-i)*4);
   location = code_type_index;
-  address |= key_map[location] & off_bit;
+  address = cur_key->childs[location];
 
-  return 0;
+  return address;
 }
 
 int get_index_by_code_ascii(char ascii)

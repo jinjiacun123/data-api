@@ -15201,3 +15201,80 @@ t· : accept client connection!
 [ 15736] : 127.0.0.1	recive info from server!
 [ 15736] : 127.0.0.1	send to client
 [ 15736] : 127.0.0.1	process timeout
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 21830] : connection to server!
+[ 21830] : send login info!
+[ 21830] : recive login info!
+[ 21830] : recive login info check ok!
+[ 21830] : 127.0.0.1	read client info!
+[ 21830] : 127.0.0.1	recive client info complete!
+[ 21830] : 127.0.0.1	recive info from server!
+[ 21830] : 127.0.0.1	send to client
+[ 21830] : 127.0.0.1	read client info!
+[ 21830] : 127.0.0.1	recive client info complete!
+[ 21830] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 21930] : connection to server!
+[ 21930] : send login info!
+[ 21930] : recive login info!
+[ 21930] : recive login info check ok!
+[ 21930] : 127.0.0.1	read client info!
+[ 21930] : 127.0.0.1	recive client info complete!
+[ 21930] : 127.0.0.1	recive info from server!
+[ 21930] : 127.0.0.1	send to client
+[ 21930] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 21980] : connection to server!
+[ 21980] : send login info!
+[ 21980] : recive login info!
+[ 21980] : recive login info check ok!
+[ 21980] : 127.0.0.1	read client info!
+[ 21980] : 127.0.0.1	recive client info complete!
+[ 21980] : 127.0.0.1	recive info from server!
+[ 21980] : 127.0.0.1	send to client
+[ 21980] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22004] : connection to server!
+[ 22004] : send login info!
+[ 22004] : recive login info!
+[ 22004] : recive login info check ok!
+[ 22004] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22031] : connection to server!
+[ 22031] : send login info!
+[ 22031] : recive login info!
+[ 22031] : recive login info check ok!
+[ 22031] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22052] : connection to server!
+[ 22052] : send login info!
+[ 22052] : recive login info!
+[ 22052] : recive login info check ok!
+[ 22052] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22300] : connection to server!
+[ 22300] : send login info!
+[ 22300] : recive login info!
+[ 22300] : recive login info check ok!
+[ 22300] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22330] : connection to server!
+[ 22330] : send login info!
+[ 22330] : recive login info!
+[ 22330] : recive login info check ok!
+[ 22330] : 127.0.0.1	client connection close
+[  7759]ò‹f·°p	B : accept client connection!
+[  7759]ò‹127.0.0.1 : create child process!
+[ 22939] : connection to server!
+[ 22939] : send login info!
+[ 22939] : recive login info!
+[ 22939] : recive login info check ok!
+[ 22939] : 127.0.0.1	client connection close
