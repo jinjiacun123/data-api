@@ -172,7 +172,7 @@ my_key_t key_root = {0};
 //unsigned int key_map[36] = {0};//0-9 A-Z
 
 typedef struct
-{
+{2
   char file_name[10];
   char date[8];        //year-month-day
   short code_type;
@@ -180,7 +180,7 @@ typedef struct
   char open_close_time[50];
   entity_t * list;
   int entity_list_size;
-  entity_t ** sort_price_list; //sort by price
+  int * sort_price_list; //sort by price
 }market_t;
 
 market_t market_list[] = {
