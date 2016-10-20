@@ -7,5 +7,8 @@ main.o:main.c
 cJSON.o:cJSON.o
 	$(CC) -g -w -c cJSON.c
 
+test_sort:test_sort.c
+	$(CC) -g -w test_sort.c -o test_sort
+
 clean:
 	rm jim_sort

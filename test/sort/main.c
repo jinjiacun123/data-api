@@ -8,7 +8,6 @@
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<assert.h>
-//#include <zlib.h>
 #include "cJSON.h"
 #include "config.h"
 
@@ -547,7 +546,22 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
 //from samll to big
 int my_sort(int code_type_index, int column_index)
 {
-  
+  int i = 0, j = 0;
+  int size = market_list[0].entity_list_size;
+  market_t * my_market = &market_list[0];
+  entity_t *p, *q, *swap;
+  int sort_size = sizeof(market_t *);
+
+  for(i=0; i<size; i++){
+    for(j=i+1; j< size; i++){
+      p = my_market->sort_price_list+(j-1) * sort_size;
+      q = *my_market->sort_price_list+j* sort_size;
+      if(p->price > q->price){
+	swap = p; p = q; q = swap;
+      }
+    }
+  }
+
   return 0;
 }
 
@@ -630,3 +644,19 @@ int get_index_by_code_ascii(char ascii)
 
   return -1;
 }
+
+int out_market(int code_type_index)
+{
+  int i = 0;
+  entity_t * entity;
+  char * template = "code_type:%2x\tcode:%s\tprice:%d\n";
+
+  entity = market_list[code_type_index].list;
+  for(; i<market_list[code_type_index].entity_list_size; i++){
+    printf(template, market_list[code_type_index].code_type,
+	   entity->code,
+	   entity->price);
+  } 
+  return 0;
+}
+

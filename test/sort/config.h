@@ -167,11 +167,6 @@ typedef struct
 //first floor
 my_key_t key_root = {0};
 
-typedef struct
-{
-  unsigned int address;//point to entity_t
-}sort_t;
-
 ////4byte, every byte map two byte of code and code_type
 //code and code_type map to dictionary
 //unsigned int key_map[36] = {0};//0-9 A-Z
@@ -185,7 +180,7 @@ typedef struct
   char open_close_time[50];
   entity_t * list;
   int entity_list_size;
-  sort_t * sort_price_list; //sort by price
+  entity_t ** sort_price_list; //sort by price
 }market_t;
 
 market_t market_list[] = {
@@ -214,4 +209,6 @@ int my_sort(int code_type_index, int column_index);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
+int out_market(int code_type_index);
+int get_quick_image(int code_type_index, int begin, int end); 
 #endif
