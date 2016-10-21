@@ -6,8 +6,8 @@ b main
 #b parse
 b get_market
 #b unpack
-#b get_market
+b get_market
 #b save_key
 #b find_entity_by_key
-#b my_sort
+b my_sort
 r

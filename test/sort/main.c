@@ -189,11 +189,12 @@ int get_market(cJSON * root_json, int index)
   int i = 0;
   cJSON * item;
   entity = market_list[index].list;
+  int * target = market_list[index].sort_price_list;
   for(; i< market_list[index].entity_list_size; i++){
     item = cJSON_GetArrayItem(obj, i);
     strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
     entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-    *(market_list[index].sort_price_list+i) = entity;
+    *target = entity;
 
     printf("index:%d\tcode:%s\tpreclose:%d\n",
 	   i,
@@ -204,6 +205,7 @@ int get_market(cJSON * root_json, int index)
     assert(save_key(entity->code, 6, index, entity) == 0);
 
     entity++;
+    target++;
   }
 
   /*
@@ -574,18 +576,24 @@ int my_sort(int code_type_index, int column_index)
   market_t * my_market = &market_list[0];
   entity_t *p, *q, *swap;
   int sort_size = sizeof(market_t *);
+  int *ip = 0, *iq = 0, iswap = 0;
 
   printf("begin sort...\n");
 
   for(i=0; i<size; i++){
-    for(j=i+1; j< size; i++){
+    for(j=i+1; j< size; j++){
+      ip = my_market->sort_price_list+(j-1);
       p = (entity_t*)(*(my_market->sort_price_list+(j-1)));
+      iq = my_market->sort_price_list+j;
       q = (entity_t *)(*(my_market->sort_price_list+j));
       if(p->price > q->price){
-	swap = p; p = q; q = swap;
+	iswap = *ip;
+	*ip = *iq;
+	*iq = iswap;
       }
     }
   }
+  printf("sort complete...\n");
 
   return 0;
 }
@@ -693,10 +701,10 @@ int display_sort(int code_type_index)
   char * template = "code:%s\tprice:%d\n";
 
   for(; i<market_list[index].entity_list_size; i++){
-    entity = (entity_t *)(market_list[index].sort_price_list+i*sizeof(int *));
+    entity = (entity_t *)(*(market_list[index].sort_price_list+i));
     printf(template, entity->code, entity->price);
   }
-  printf("display sort\nz");
+  printf("display sort complete...\n");
 
   return 0;
 }
