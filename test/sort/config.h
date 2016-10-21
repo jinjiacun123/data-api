@@ -156,7 +156,12 @@ typedef struct
   int  pre_close;  //close price of yestoday
   int price;       //now price
   float add;
-  float down;      
+  float down;
+  float range;      
+  int max;
+  int min;
+  int buy;
+  int sell;
 }entity_t;
 
 //from first floor to sixth floor
@@ -181,11 +186,41 @@ typedef struct
   short code_type;
   short unit;
   char open_close_time[50];
+	
   entity_t * list;
   int entity_list_size;
+
   int * sort_price_list; //sort by price
-  int * sort_up_list;    //up range
-  int * sort_down_list;  //down range
+  int max_price;
+  int min_price;
+
+  int * sort_up_list;    //sort up range
+  int max_up;
+  int min_up;
+
+  int * sort_down_list;  //sort down range
+  int max_down;
+  int min_down;
+
+  int * sort_range_list; //sort range
+  int max_range;
+  int min_range;
+  
+  int * sort_max_list; //sort max price
+  int max_max;
+  int min_max;
+  
+  int * sort_min_list; //sort min price
+  int max_min;
+  int min_min;
+
+  int * sort_buy_list; //sort buy price
+  int max_buy;
+  int min_buy;
+
+  int * sort_sell_list; //sort sell price
+  int max_sell;
+  int min_sell;
 }market_t;
 
 market_t market_list[] = {
