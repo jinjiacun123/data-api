@@ -29,7 +29,7 @@
 typedef enum
 {
   NEW_PRICE,
-  ADD_RANGE,
+  UP_RANGE,
   DOWN_RANGE
 }column_n;
 
@@ -69,7 +69,7 @@ typedef struct
 {
   short m_cCodeType;
   char m_cCode[6];
-  
+
   char m_othData[24];
   int m_cNowData[1];
 
@@ -155,6 +155,8 @@ typedef struct
   char code[6];
   int  pre_close;  //close price of yestoday
   int price;       //now price
+  float add;
+  float down;      
 }entity_t;
 
 //from first floor to sixth floor
@@ -165,7 +167,6 @@ typedef struct
   int floor;
   unsigned int childs[MAX_CHILDS];
 }my_key_t;
-
 //first floor
 my_key_t key_root = {0};
 
@@ -183,6 +184,8 @@ typedef struct
   entity_t * list;
   int entity_list_size;
   int * sort_price_list; //sort by price
+  int * sort_up_list;    //up range
+  int * sort_down_list;  //down range
 }market_t;
 
 market_t market_list[] = {

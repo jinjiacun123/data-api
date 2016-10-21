@@ -174,27 +174,51 @@ int get_market(cJSON * root_json, int index)
   }
   market_list[index].entity_list_size = cJSON_GetArraySize(obj);
   if(market_list[index].list != NULL){free(market_list[index].list);}
+  //init list
   market_list[index].list = (entity_t *)malloc(market_list[index].entity_list_size*sizeof(entity_t));
   if(market_list[index].list == NULL){
     printf("molloc menory err!\n");
     exit(-1);
   }
-  memset(market_list[index].list, 0x00, market_list[index].entity_list_size);
+  memset(market_list[index].list, 0x00, market_list[index].entity_list_size*sizeof(entity_t));
+  if(market_list[index].sort_price_list != NULL){free(market_list[index].sort_price_list);}
+  //init sort_price_list
   market_list[index].sort_price_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
   if(market_list[index].sort_price_list == NULL){
     printf("malloc memory err!\n");
     exit(-1);
   }
-  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size);
+  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+  if(market_list[index].sort_up_list != NULL){free(market_list[index].sort_up_list);}
+  //init sort_up_list
+  market_list[index].sort_up_list = (int*)malloc(market_list[index].entity_list_size*sizeof(int *)); 
+  if(market_list[index].sort_up_list == NULL){
+	printf("malloc memory err!\n");
+	exit(-1);
+  }
+  memset(market_list[index].sort_up_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+  if(market_list[index].sort_down_list != NULL){free(market_list[index].sort_down_list);}
+  //init sort_down_list
+  market_list[index].sort_down_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
+  if(market_list[index].sort_down_list == NULL){
+ 	printf("malloc memory err!\n");		
+	exit(-1);
+  }
+  memset(market_list[index].sort_down_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+	
   int i = 0;
   cJSON * item;
   entity = market_list[index].list;
-  int * target = market_list[index].sort_price_list;
+  int * item_sort_price = market_list[index].sort_price_list;
+  int * item_sort_up    = market_list[index].sort_up_list;
+  int * item_sort_down  = market_list[index].sort_down_list;
   for(; i< market_list[index].entity_list_size; i++){
     item = cJSON_GetArrayItem(obj, i);
     strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
     entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-    *target = entity;
+    *item_sort_price = entity;
+    *item_sort_up    = entity;
+    *item_sort_down  = entity;
 
     printf("index:%d\tcode:%s\tpreclose:%d\n",
 	   i,
@@ -204,20 +228,11 @@ int get_market(cJSON * root_json, int index)
     //save to key
     assert(save_key(entity->code, 6, index, entity) == 0);
 
-    entity++;
-    target++;
+    entity ++;
+    item_sort_price ++;
+    item_sort_up ++;
+    item_sort_down ++;
   }
-
-  /*
-  entity = market_list[index].list;
-  for(i=0; i<market_list[index].entity_list_size; i++){
-    printf("index:%d\tcode:%s\tpreclose:%d\n",
-	   i,
-	   entity->code,
-	   entity->pre_close);
-    entity++;
-  }
-  */
 
   printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
 	 market_list[index].date,
