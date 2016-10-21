@@ -21,7 +21,7 @@
 #define TYPE_REALTIME   0x0201 //
 #define TYPE_HISTORY    0x0402 //
 #define TYPE_TIME_SHARE 0x0301 //
-#define TYPE_AUTO_PUSH  0x0A01 //
+#define TYPE_AUTO_PUSH  0x0A03 //
 #define TYPE_SERVERINFO 0x0103 //
 #define TYPE_DAY_CURPOS 0x020c //
 
@@ -46,7 +46,9 @@ typedef struct
   short m_cCodeType;
   char  m_cCode[6];
   short m_nSize;
-  unsigned short m_nOption; 
+  unsigned short m_nOption;
+  unsigned short code_type;
+  char code[6];
 }RealPack;
 
 typedef struct
@@ -172,7 +174,7 @@ my_key_t key_root = {0};
 //unsigned int key_map[36] = {0};//0-9 A-Z
 
 typedef struct
-{2
+{
   char file_name[10];
   char date[8];        //year-month-day
   short code_type;
@@ -211,4 +213,6 @@ int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
 int out_market(int code_type_index);
 int get_quick_image(int code_type_index, int begin, int end); 
+int display_sort(int code_type_index);
+void sig_stop(int signo);
 #endif

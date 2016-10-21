@@ -8,16 +8,22 @@
 #include<fcntl.h>
 #include<sys/stat.h>
 #include<assert.h>
+#include<stdbool.h>
+#include<signal.h>
 #include "cJSON.h"
 #include "config.h"
 
 static void do_stock(unsigned short, char *, char *, int);
+bool is_exit = false;
+int socket_fd = 0;
 
 int main()
 {
   pthread_t p_id = 0;
-  int socket_fd = 0;
+  //  int socket_fd = 0;
   int ret = 0;
+
+  signal(SIGINT, sig_stop);
   //--receive both shanghhai and shenzhen market stock
   init_market();
   init_socket(&socket_fd);
@@ -25,24 +31,29 @@ int main()
   printf("ret:%d\n", ret);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);  
+  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
   //get auto push data and resort data
-  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, 1, 0);
+
   int menu = 1;
-  while(1){
+  while(!is_exit){
     sleep(3);
     send_heart(socket_fd);
     heart_times++;
   }
 
+
+  printf("exit system...\n");
+  return 0;
 }
 
 //get code for both market
 int init_market()
 {
-  //get both txt  
-  
+  //get both txt
+
   char template_str[][100] =  {
     "rm ./txt/%s ./txt/%s",
     "wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/%s",
@@ -55,7 +66,7 @@ int init_market()
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[0].file_name);
   system(cmd);
-  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");  
+  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[1].file_name);
   system(cmd);
@@ -90,7 +101,7 @@ int init_market()
       return;
   }
   get_market(root_json, index);
- 
+
   return 0;
 }
 
@@ -117,7 +128,7 @@ int get_content(char * filename, char * buff, int buff_len)
       break;
     }
   }
-  
+
   close(fd);
   return length;
 }
@@ -169,29 +180,36 @@ int get_market(cJSON * root_json, int index)
     exit(-1);
   }
   memset(market_list[index].list, 0x00, market_list[index].entity_list_size);
+  market_list[index].sort_price_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
+  if(market_list[index].sort_price_list == NULL){
+    printf("malloc memory err!\n");
+    exit(-1);
+  }
+  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size);
   int i = 0;
   cJSON * item;
   entity = market_list[index].list;
   for(; i< market_list[index].entity_list_size; i++){
     item = cJSON_GetArrayItem(obj, i);
     strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
-    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);    
-    
-    printf("index:%d\tcode:%s\tpreclose:%d\n", 
+    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
+    *(market_list[index].sort_price_list+i) = entity;
+
+    printf("index:%d\tcode:%s\tpreclose:%d\n",
 	   i,
 	   entity->code,
 	   entity->pre_close);
-    
+
     //save to key
-      assert(save_key(entity->code, 6, index, entity) == 0); 
+    assert(save_key(entity->code, 6, index, entity) == 0);
 
     entity++;
   }
-  
+
   /*
   entity = market_list[index].list;
   for(i=0; i<market_list[index].entity_list_size; i++){
-    printf("index:%d\tcode:%s\tpreclose:%d\n", 
+    printf("index:%d\tcode:%s\tpreclose:%d\n",
 	   i,
 	   entity->code,
 	   entity->pre_close);
@@ -199,13 +217,13 @@ int get_market(cJSON * root_json, int index)
   }
   */
 
-  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n", 
-	 market_list[index].date, 
+  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
+	 market_list[index].date,
 	 market_list[index].code_type,
 	 market_list[index].unit,
 	 market_list[index].open_close_time,
 	 market_list[index].entity_list_size);
-  
+
   return 0;
 }
 
@@ -213,7 +231,7 @@ int init_socket(int * socket_fd)
 {
   int c_len = 0;
   struct sockaddr_in cli;
-  
+
   cli.sin_family = AF_INET;
   cli.sin_port = htons(SERVER_MARKET_PORT);
   cli.sin_addr.s_addr = inet_addr(SERVER_MARKET);
@@ -227,7 +245,7 @@ int init_socket(int * socket_fd)
   if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
     printf("connect() failure!\n");
     return -1;
-  } 
+  }
   printf("connect() success\n");
   return 0;
 }
@@ -241,42 +259,42 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
   CodeInfo * codeinfo;
   entity_t * entity;
   int entity_length = sizeof(entity_t);
-  
+
   request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
   if(request == NULL){
     printf("malloc err!\n");
     exit(-1);
   }
   int request_length = sizeof(RealPack)+ codeinfo_length * size;
- 
+
   if(request == NULL){
     printf("malloc err!\n");
     exit(-1);
   }
   memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
 
-  RealPack * data = (RealPack*)request;  
+  RealPack * data = (RealPack*)request;
   memcpy(data->m_head, HEADER, 4);
   data->m_length =  request_length - 8;
   data->m_nType = TYPE_REALTIME;
   data->m_nSize = size;
   data->m_nOption= 0x0080;
-  
-  //股票:pass  
+
+  //股票:pass
   int i=0;
   entity = (entity_t *)(market_list[0].list+i*entity_length);
-  for(i=index; i<(index+1)*size; i++){ 
+  for(i=index; i<(index+1)*size; i++){
     codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
     codeinfo->code_type = market_list[0].code_type;
     strncpy(codeinfo->code, entity->code, 6);
     entity ++;
   }
- 
+
   if(send(socket_fd, request, request_length, 0)){
     printf("send success!\n");
     return 0;
   }
-  
+
   return -1;
 }
 
@@ -287,7 +305,7 @@ void init_receive(void * socket_fd)
   int package_body_length = 0;
   int ret_count = 0;
   int head_length = 8;
-  int length = head_length;  
+  int length = head_length;
   int off = 0;
   int fd = *((int *)socket_fd);
 
@@ -308,7 +326,7 @@ void init_receive(void * socket_fd)
       return 0;
       //      continue;
       //pthread_exit();
-    } 
+    }
     if(ret_count <0){
       printf("recive server err!\n");
       sleep(3);
@@ -316,7 +334,7 @@ void init_receive(void * socket_fd)
       // continue;
       //pthread_exit(-1);
     }
-    
+
     if(ret_count == length){
       //receive body of package
       strncpy(head, buff, 4);
@@ -330,7 +348,7 @@ void init_receive(void * socket_fd)
       memset(buff, 0x00, length);
       while(length != (ret_count = read(fd, buff+off, length))){
 	off += ret_count;
-	length -= ret_count;	
+	length -= ret_count;
       }
       //parse
       printf("%s\n", buff);
@@ -357,14 +375,14 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
     exit(-1);
   }
   memset(request, 0x00, request_length);
-  
-  RealPack * data = (RealPack *)request;  
+
+  RealPack * data = (RealPack *)request;
   memcpy(data->m_head,HEADER,4);
-  data->m_length =  request - 8;
+  data->m_length =  request_length-8;
   data->m_nType = TYPE_AUTO_PUSH;
   data->m_nSize = size;
   data->m_nOption= 0x0080;
-  
+
   entity = (entity_t *)(market_list[code_type_index].list+i*entity_length);
   for(i = index; i<(index+1)*size; i++){
     codeinfo = (CodeInfo *)(request + off + i * codeinfo_length);
@@ -377,7 +395,7 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
     printf("send auto_push success!\n");
     return 0;
   }
-  
+
   return -1;
 }
 
@@ -387,7 +405,7 @@ int send_heart(int socket_fd)
   TestSrvData2 data ;
   memset(&data,0x00,sizeof(TestSrvData2));
   memcpy(data.head, HEADER,4);
-  data.length      = sizeof(TestSrvData2) -8;    
+  data.length      = sizeof(TestSrvData2) -8;
   data.m_nType     = TYPE_HEART;
   data.m_nIndex= 1;
 
@@ -401,7 +419,7 @@ int send_heart(int socket_fd)
 int parse(char * buff, uLongf  buff_len)
 {
   unsigned short type;
-  
+
   if(buff == NULL)
     return -2;
   type = (*(unsigned short *)buff);
@@ -411,11 +429,18 @@ int parse(char * buff, uLongf  buff_len)
     printf("realtime...\n");
     parse_realtime(buff, buff_len);
     free(buff);
+    //sort
+    column_n sort_column = NEW_PRICE;
+    my_sort(0, sort_column);
+    //display sort
+    display_sort(0);
+    //    is_exit = true;
   }
     break;
   case TYPE_AUTO_PUSH:{
     printf("auto_push...\n");
-    parse_auto_push(buff, buff_len);
+    parse_realtime(buff, buff_len);
+    // parse_auto_push(buff, buff_len);
     free(buff);
   }
     break;
@@ -433,7 +458,7 @@ int parse(char * buff, uLongf  buff_len)
     parse(src_buff, src_buff_len);
   }
     break;
-  default:{ 
+  default:{
     printf("unknown type:%d...\n", type);
   }
     break;
@@ -488,13 +513,11 @@ do_stock(code_type, code, buff, i)
 	 tmp->m_lNewPrice);
   */
   entity->price = tmp->m_lNewPrice;
-  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 entity->price);
-  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)
@@ -518,7 +541,7 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
     return -1;
   }
   memset(*src_buff, 0 , *src_buff_len);
-  
+
   int unzip =  uncompress((Bytef *)(*src_buff), src_buff_len,
 			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
   if(unzip == Z_MEM_ERROR){
@@ -552,10 +575,12 @@ int my_sort(int code_type_index, int column_index)
   entity_t *p, *q, *swap;
   int sort_size = sizeof(market_t *);
 
+  printf("begin sort...\n");
+
   for(i=0; i<size; i++){
     for(j=i+1; j< size; i++){
-      p = my_market->sort_price_list+(j-1) * sort_size;
-      q = *my_market->sort_price_list+j* sort_size;
+      p = (entity_t*)(*(my_market->sort_price_list+(j-1)));
+      q = (entity_t *)(*(my_market->sort_price_list+j));
       if(p->price > q->price){
 	swap = p; p = q; q = swap;
       }
@@ -579,8 +604,8 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
   int location       = 0;
 
   for(i=0; i<6; i++){
-    ascii = *(code+i); 
-    location = get_index_by_code_ascii(ascii); 
+    ascii = *(code+i);
+    location = get_index_by_code_ascii(ascii);
     //check location is malloc
     if(cur_key->childs[location] == NULL){
       tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
@@ -602,7 +627,7 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
   if(cur_key != NULL && cur_key->childs[code_type_index] == NULL){
     cur_key->childs[code_type_index] = entity;
   }
-  
+
   return 0;
 }
 
@@ -640,7 +665,7 @@ int get_index_by_code_ascii(char ascii)
   //alphabet
   if(ascii>=65 || ascii <= 80){
     return base_alphabet+ascii-65;
-  } 
+  }
 
   return -1;
 }
@@ -656,7 +681,30 @@ int out_market(int code_type_index)
     printf(template, market_list[code_type_index].code_type,
 	   entity->code,
 	   entity->price);
-  } 
+  }
   return 0;
 }
 
+int display_sort(int code_type_index)
+{
+  entity_t * entity;
+  int i = 0;
+  int index = code_type_index;
+  char * template = "code:%s\tprice:%d\n";
+
+  for(; i<market_list[index].entity_list_size; i++){
+    entity = (entity_t *)(market_list[index].sort_price_list+i*sizeof(int *));
+    printf(template, entity->code, entity->price);
+  }
+  printf("display sort\nz");
+
+  return 0;
+}
+
+void sig_stop(int signo)
+{
+  printf("abovt exit!\n");
+  shutdown(socket_fd, SHUT_RDWR);
+  //close(socket_fd);
+  exit(-1);
+}

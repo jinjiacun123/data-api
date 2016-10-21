@@ -1,14 +1,14 @@
-CC = gcc-4.4
-jim_sort:main.o cJSON.o
-	$(CC) -w -g main.o cJSON.o  -o jim_sort -lm -lpthread -lz
+#CC = gcc-4.4
+main:main.o cJSON.o
+	$(CC) -w -g -fprofile-arcs -ftest-coverage main.o cJSON.o  -o main -pg -lm -lpthread -lz
 main.o:main.c
-	$(CC) -w -g -c main.c
+	$(CC) -w -g -fprofile-arcs -ftest-coverage -c main.c -pg
 
 cJSON.o:cJSON.o
-	$(CC) -g -w -c cJSON.c
+	$(CC) -g -w -fprofile-arcs -ftest-coverage -c cJSON.c -pg
 
 test_sort:test_sort.c
 	$(CC) -g -w test_sort.c -o test_sort
 
 clean:
-	rm jim_sort
+	rm *.o main
