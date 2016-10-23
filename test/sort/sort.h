@@ -13,21 +13,24 @@ typedef struct
 {
   int area_index;
 
-  int min_value;
-  int max_value;
+  value_t min_value;
+  value_t max_value;
 
   sort_area_queue_t * pre;
   sort_area_queue_t * next;
   sort_area_queue_t * cur;
 
-  int effect_min_value;
-  int effect_max_value;
+  value_t effect_min_value;
+  value_t effect_max_value;
 
   int allow_size;
   int real_size;
 }sort_area_t;
 
-
-int my_sort(int code_type_index, column_n column);
-int init_sort_area(int code_type_index);
+int init_sort_area(market_t * my_market);
+int sort_add(market_t * my_market, entity_t * entity, column_n column);
+int sort_update(market_t * my_market, entity_t * entity, column_n column);
+int my_sort(market_t * my_market, column_n column);
+int display_sort(market_t * my_market);
+int sort_get(market_t * my_market, int index, int size);
 #endif

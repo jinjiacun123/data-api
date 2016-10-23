@@ -8,7 +8,11 @@ struct entity_s
 {
   char code[6];
   int  pre_close;  //close price of yestoday
+
+  int pre_price;  //prefix value,use to check is sort
   int price;       //now price
+  int price_area[2]; //first is area, second is queue
+
   float add;
   float down;
   float range;

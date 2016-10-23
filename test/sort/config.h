@@ -28,10 +28,30 @@
 #define AREA_NUMBER 50
 #define AREA_QUEUE_DEFAULT_LEN 50
 
+#define system_32
+//#define system_64
+
+//basic type
+#ifdef system_32
+#define int_t int
+#define uint_t unsigned int
+#define long_t long
+#define short_t short
+#define ushort_t unsigned short
+#else
+
+#endif
+
+
 typedef enum column_s column_n;
 typedef struct sort_area_queue_s sort_area_queue_t;
 typedef struct market_s market_t;
 typedef struct entity_s entity_t;
+
+typedef union{
+  int ivalue;
+  float fvalue;
+}value_t;
 
 //column of sort
 enum column_s
@@ -160,7 +180,6 @@ entity_t * entity_list;
 
 int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
-int init_sort_area(int market_index);
 int get_content(char * filename, char * buff, int length);
 int send_realtime(int socket_fd, int index, int size, int code_type_index);
 int send_auto_push(int socket_fd, int index, int size, int code_type_index);
@@ -173,6 +192,6 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
 int get_quick_image(int code_type_index, int begin, int end); 
-int display_sort(int code_type_index);
+int display_sort(market_t * my_market);
 void sig_stop(int signo);
 #endif
