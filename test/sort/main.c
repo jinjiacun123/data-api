@@ -11,16 +11,28 @@
 #include<stdbool.h>
 #include<signal.h>
 #include "cJSON.h"
-#include "config.h"
+#include "comm.h"
+#include "market.h"
+
+int last_time_market;//effective time
+int cur_time;        //current time
+int heart_times = 0;
 
 static void do_stock(unsigned short, char *, char *, int);
+
 bool is_exit = false;
 int socket_fd = 0;
+
+market_t market_list[] = {
+  //上证a股
+  {"1101.txt","20161012",0x1101,1000,"[570-690][780-900][-1--1][-1--1]"},
+  //深证a股
+  {"1201.txt","20161012",0x1201,1000,"[570-690][780-900][-1--1][-1--1]"}
+};
 
 int main()
 {
   pthread_t p_id = 0;
-  //  int socket_fd = 0;
   int ret = 0;
 
   signal(SIGINT, sig_stop);
@@ -34,7 +46,7 @@ int main()
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
   //get auto push data and resort data
-  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+   //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 1, 0);
 
   int menu = 1;
@@ -46,62 +58,6 @@ int main()
 
 
   printf("exit system...\n");
-  return 0;
-}
-
-//get code for both market
-int init_market()
-{
-  //get both txt
-
-  char template_str[][100] =  {
-    "rm ./txt/%s ./txt/%s",
-    "wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/%s",
-    "./txt/%s"
-  };
-  char cmd[100];
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
-  system(cmd);
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[1], market_list[0].file_name);
-  system(cmd);
-  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[1], market_list[1].file_name);
-  system(cmd);
-
-  //parse
-  int index = 0;
-  memset(buff, 0x00, 1024*100);
-  memset(&cmd, 0x00, 50);
-  sprintf(cmd, template_str[2], market_list[index].file_name);
-  int length = get_content(cmd, buff, 1024*100);
-  cJSON * root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-  if (NULL == root_json){
-      printf("error:%s\n", cJSON_GetErrorPtr());
-      cJSON_Delete(root_json);
-      return -1;
-  }
-  //parse 1101
-  get_market(root_json, index);
-  free(root_json);
-  return 0;
-
-  //parse 1201
-  index = 1;
-  memset(buff, 0x00, 1024*100);
-  memset(&cmd, 0x00, 50);
-  sprintf(cmd, template_str[2], market_list[index].file_name);
-  length = get_content(cmd, buff, 1024*100);
-  root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-  if (NULL == root_json){
-      printf("error:%s\n", cJSON_GetErrorPtr());
-      cJSON_Delete(root_json);
-      return;
-  }
-  get_market(root_json, index);
-
   return 0;
 }
 
@@ -133,116 +89,7 @@ int get_content(char * filename, char * buff, int buff_len)
   return length;
 }
 
-int get_market(cJSON * root_json, int index)
-{
-  entity_t * entity;
-  cJSON * obj;
-  int entity_list_len = 0;
-  obj = cJSON_GetObjectItem(root_json, "date");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  strncpy(market_list[index].date, obj->valuestring, 6);
-  obj = cJSON_GetObjectItem(root_json, "codetype");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  market_list[index].code_type = strtol(obj->valuestring, NULL, 16);
-  obj = cJSON_GetObjectItem(root_json, "szname");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  obj = cJSON_GetObjectItem(root_json, "priceunit");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  market_list[index].unit = atoi(obj->valuestring);
-  obj = cJSON_GetObjectItem(root_json, "open_close_time");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  strcpy(market_list[index].open_close_time, obj->valuestring);
-  obj = cJSON_GetObjectItem(root_json, "list");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  market_list[index].entity_list_size = cJSON_GetArraySize(obj);
-  if(market_list[index].list != NULL){free(market_list[index].list);}
-  //init list
-  market_list[index].list = (entity_t *)malloc(market_list[index].entity_list_size*sizeof(entity_t));
-  if(market_list[index].list == NULL){
-    printf("molloc menory err!\n");
-    exit(-1);
-  }
-  memset(market_list[index].list, 0x00, market_list[index].entity_list_size*sizeof(entity_t));
-  if(market_list[index].sort_price_list != NULL){free(market_list[index].sort_price_list);}
-  //init sort_price_list
-  market_list[index].sort_price_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_price_list == NULL){
-    printf("malloc memory err!\n");
-    exit(-1);
-  }
-  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_up_list != NULL){free(market_list[index].sort_up_list);}
-  //init sort_up_list
-  market_list[index].sort_up_list = (int*)malloc(market_list[index].entity_list_size*sizeof(int *)); 
-  if(market_list[index].sort_up_list == NULL){
-	printf("malloc memory err!\n");
-	exit(-1);
-  }
-  memset(market_list[index].sort_up_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_down_list != NULL){free(market_list[index].sort_down_list);}
-  //init sort_down_list
-  market_list[index].sort_down_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_down_list == NULL){
- 	printf("malloc memory err!\n");		
-	exit(-1);
-  }
-  memset(market_list[index].sort_down_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
-	
-  int i = 0;
-  cJSON * item;
-  entity = market_list[index].list;
-  int * item_sort_price = market_list[index].sort_price_list;
-  int * item_sort_up    = market_list[index].sort_up_list;
-  int * item_sort_down  = market_list[index].sort_down_list;
-  for(; i< market_list[index].entity_list_size; i++){
-    item = cJSON_GetArrayItem(obj, i);
-    strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
-    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-    *item_sort_price = entity;
-    *item_sort_up    = entity;
-    *item_sort_down  = entity;
 
-    printf("index:%d\tcode:%s\tpreclose:%d\n",
-	   i,
-	   entity->code,
-	   entity->pre_close);
-
-    //save to key
-    assert(save_key(entity->code, 6, index, entity) == 0);
-
-    entity ++;
-    item_sort_price ++;
-    item_sort_up ++;
-    item_sort_down ++;
-  }
-
-  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
-	 market_list[index].date,
-	 market_list[index].code_type,
-	 market_list[index].unit,
-	 market_list[index].open_close_time,
-	 market_list[index].entity_list_size);
-
-  return 0;
-}
 
 int init_socket(int * socket_fd)
 {
@@ -374,6 +221,8 @@ void init_receive(void * socket_fd)
     }
    }
 }
+
+
 
 int send_auto_push(int socket_fd, int index, int size, int code_type_index)
 {
@@ -583,99 +432,6 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
   return -1;
 }
 
-//from samll to big
-int my_sort(int code_type_index, int column_index)
-{
-  int i = 0, j = 0;
-  int size = market_list[0].entity_list_size;
-  market_t * my_market = &market_list[0];
-  entity_t *p, *q, *swap;
-  int sort_size = sizeof(market_t *);
-  int *ip = 0, *iq = 0, iswap = 0;
-
-  printf("begin sort...\n");
-
-  for(i=0; i<size; i++){
-    for(j=i+1; j< size; j++){
-      ip = my_market->sort_price_list+(j-1);
-      p = (entity_t*)(*(my_market->sort_price_list+(j-1)));
-      iq = my_market->sort_price_list+j;
-      q = (entity_t *)(*(my_market->sort_price_list+j));
-      if(p->price > q->price){
-	iswap = *ip;
-	*ip = *iq;
-	*iq = iswap;
-      }
-    }
-  }
-  printf("sort complete...\n");
-
-  return 0;
-}
-
-/**
-   from first letter to last,every letter point floor
-*/
-int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
-{
-  int i              = 0;
-  char ascii         = 0;
-  int unit           = 0;
-  my_key_t * cur_key = &key_root;
-  my_key_t * tmp_key = NULL;;
-  void * last_key    = NULL;
-  int location       = 0;
-
-  for(i=0; i<6; i++){
-    ascii = *(code+i);
-    location = get_index_by_code_ascii(ascii);
-    //check location is malloc
-    if(cur_key->childs[location] == NULL){
-      tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
-      if(tmp_key == NULL){
-	printf("malloc error!\n");
-	exit(-1);
-      }
-      memset(tmp_key, 0x00, sizeof(my_key_t));
-      tmp_key->floor = i+1;
-      cur_key->childs[location] = tmp_key;
-      cur_key = tmp_key;
-    }
-    else{
-      cur_key = cur_key->childs[location];
-    }
-  }
-  //code_type node
-  //save entity of point
-  if(cur_key != NULL && cur_key->childs[code_type_index] == NULL){
-    cur_key->childs[code_type_index] = entity;
-  }
-
-  return 0;
-}
-
-int find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
-{
-  int location = 0;
-  char ascii   = 0;
-  int i        = 0;
-  int address  = 0;
-  my_key_t * cur_key = &key_root;
-
-  //from first to sixth bit
-  for(i=0; i<6; i++){
-    ascii = *(code+i);
-    location = get_index_by_code_ascii(ascii);
-    cur_key = cur_key->childs[location];
-  }
-
-  //7th bit
-  location = code_type_index;
-  address = cur_key->childs[location];
-
-  return address;
-}
-
 int get_index_by_code_ascii(char ascii)
 {
   int base_digit = 0;
@@ -691,37 +447,6 @@ int get_index_by_code_ascii(char ascii)
   }
 
   return -1;
-}
-
-int out_market(int code_type_index)
-{
-  int i = 0;
-  entity_t * entity;
-  char * template = "code_type:%2x\tcode:%s\tprice:%d\n";
-
-  entity = market_list[code_type_index].list;
-  for(; i<market_list[code_type_index].entity_list_size; i++){
-    printf(template, market_list[code_type_index].code_type,
-	   entity->code,
-	   entity->price);
-  }
-  return 0;
-}
-
-int display_sort(int code_type_index)
-{
-  entity_t * entity;
-  int i = 0;
-  int index = code_type_index;
-  char * template = "code:%s\tprice:%d\n";
-
-  for(; i<market_list[index].entity_list_size; i++){
-    entity = (entity_t *)(*(market_list[index].sort_price_list+i));
-    printf(template, entity->code, entity->price);
-  }
-  printf("display sort complete...\n");
-
-  return 0;
 }
 
 void sig_stop(int signo)

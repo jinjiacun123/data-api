@@ -330,27 +330,31 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   int heart_times = 0;
   int length = 8;
   p_response_header p_header;
-  
+
   int alive_times = 0;
-    
+
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
   client[1].fd = clientSocketId;
   client[1].events = POLLIN;
-  
+
 
   //init server's login
   assert(init_login(proxyClientSocketId) == 0);
-  
+
   char client_ip[15];
   memset(&client_ip, 0x00, 15);
   assert(get_client_ip(client[1].fd, &client_ip) == 0);
 
   while(1){
-    nready = poll(client, 2, 50000);
-    
+    nready = poll(client, 2, 10000);
+
     if(nready == 0){//timeout
       WriteErrLog("%s\tprocess timeout\n", client_ip);
+      close(client[0].fd);
+      shutdown(client[0].fd,2);
+      close(client[1].fd);
+      shutdown(client[1].fd,2);
       exit(-1);
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);

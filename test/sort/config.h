@@ -25,15 +25,21 @@
 #define TYPE_SERVERINFO 0x0103 //
 #define TYPE_DAY_CURPOS 0x020c //
 
+#define AREA_NUMBER 50
+#define AREA_QUEUE_DEFAULT_LEN 50
+
+typedef enum column_s column_n;
+typedef struct sort_area_queue_s sort_area_queue_t;
+typedef struct market_s market_t;
+typedef struct entity_s entity_t;
+
 //column of sort
-typedef enum
+enum column_s
 {
   NEW_PRICE,
   UP_RANGE,
   DOWN_RANGE
-}column_n;
-
-char buff[100*1024];
+};
 
 typedef struct
 {
@@ -135,7 +141,7 @@ typedef struct
   char   m_cOperator;
 }TestSrvData2;
 
-typedef struct 
+typedef struct
 {
   unsigned short m_nType;
   short m_nAlignment;
@@ -150,94 +156,12 @@ typedef struct
   char code[6];
 }CodeInfo;
 
-typedef struct
-{
-  char code[6];
-  int  pre_close;  //close price of yestoday
-  int price;       //now price
-  float add;
-  float down;
-  float range;      
-  int max;
-  int min;
-  int buy;
-  int sell;
-}entity_t;
-
-//from first floor to sixth floor
-//every floor one item of node have child node
-#define MAX_CHILDS 36 //0-9 A-Z
-typedef struct
-{
-  int floor;
-  unsigned int childs[MAX_CHILDS];
-}my_key_t;
-//first floor
-my_key_t key_root = {0};
-
-////4byte, every byte map two byte of code and code_type
-//code and code_type map to dictionary
-//unsigned int key_map[36] = {0};//0-9 A-Z
-
-typedef struct
-{
-  char file_name[10];
-  char date[8];        //year-month-day
-  short code_type;
-  short unit;
-  char open_close_time[50];
-	
-  entity_t * list;
-  int entity_list_size;
-
-  int * sort_price_list; //sort by price
-  int max_price;
-  int min_price;
-
-  int * sort_up_list;    //sort up range
-  int max_up;
-  int min_up;
-
-  int * sort_down_list;  //sort down range
-  int max_down;
-  int min_down;
-
-  int * sort_range_list; //sort range
-  int max_range;
-  int min_range;
-  
-  int * sort_max_list; //sort max price
-  int max_max;
-  int min_max;
-  
-  int * sort_min_list; //sort min price
-  int max_min;
-  int min_min;
-
-  int * sort_buy_list; //sort buy price
-  int max_buy;
-  int min_buy;
-
-  int * sort_sell_list; //sort sell price
-  int max_sell;
-  int min_sell;
-}market_t;
-
-market_t market_list[] = {
-  //上证a股
-  {"1101.txt","20161012",0x1101,1000,"[570-690][780-900][-1--1][-1--1]"},
-  //深证a股
-  {"1201.txt","20161012",0x1201,1000,"[570-690][780-900][-1--1][-1--1]"}
-};
 entity_t * entity_list;
-int init_market();
-int last_time_market;//effective time
-int cur_time;        //current time
-int heart_times = 0;
+
 int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
+int init_sort_area(int market_index);
 int get_content(char * filename, char * buff, int length);
-int get_market(cJSON * root_json, int index);
 int send_realtime(int socket_fd, int index, int size, int code_type_index);
 int send_auto_push(int socket_fd, int index, int size, int code_type_index);
 int send_heart(int socket_fd);
@@ -245,11 +169,9 @@ int parse(char * buff, uLongf buff_len);
 int parse_realtime(char * buff, uLongf buff_len);
 int parse_auto_push(char * buff, uLongf buff_len);
 int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len);
-int my_sort(int code_type_index, int column_index);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
-int out_market(int code_type_index);
 int get_quick_image(int code_type_index, int begin, int end); 
 int display_sort(int code_type_index);
 void sig_stop(int signo);
