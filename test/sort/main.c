@@ -1,4 +1,4 @@
- #include<stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<sys/types.h>
@@ -18,7 +18,7 @@ int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
 
-static void do_stock(unsigned short, char *, char *, int);
+static void do_stock(market_t * my_market, unsigned short, char *, char *, int);
 
 bool is_exit = false;
 int socket_fd = 0;
@@ -43,10 +43,10 @@ int main()
   printf("ret:%d\n", ret);
   //---init data and sort
   //get realtime data
-  //send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
   //get auto push data and resort data
-  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 1, 0);
 
   int menu = 1;
@@ -295,9 +295,9 @@ int parse(char * buff, uLongf  buff_len)
     free(buff);
     //sort
     column_n sort_column = NEW_PRICE;
-    my_sort(0, sort_column);
+    //my_sort(0, sort_column);
     //display sort
-    display_sort(0);
+    //display_sort(0);
     //    is_exit = true;
   }
     break;
@@ -335,6 +335,8 @@ int parse_realtime(char * buff, uLongf buff_len)
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
   int i=0;
+  int index = 0;
+  market_t * my_market = NULL;
 
   for(i=0; i< data_head->m_nSize; i++){
     CommRealTimeData * data_type = (CommRealTimeData *)(buff
@@ -342,7 +344,8 @@ int parse_realtime(char * buff, uLongf buff_len)
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
-      do_stock(data_type->m_cCodeType, code, buff, i);
+      my_market = &market_list[index];
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i);
     }
   }
   return 0;
@@ -350,7 +353,8 @@ int parse_realtime(char * buff, uLongf buff_len)
 
 //处理股票
 static void
-do_stock(code_type, code, buff, i)
+do_stock(my_market, code_type, code, buff, i)
+     market_t * my_market;
      unsigned short code_type;
      char * code;
      char * buff;
@@ -359,6 +363,7 @@ do_stock(code_type, code, buff, i)
   int address = 0;
   unsigned int code_type_index = 0;
   entity_t * entity;
+  column_n column = NEW_PRICE;
   if(code_type == 0x1201){
     code_type_index = 1;
   }
@@ -377,6 +382,10 @@ do_stock(code_type, code, buff, i)
 	 tmp->m_lNewPrice);
   */
   entity->price = tmp->m_lNewPrice;
+  //add to sort
+  sort_add(my_market, entity, column);
+  //printf("index:%d\n", i);
+
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
@@ -390,6 +399,8 @@ int parse_auto_push(char * buff, uLong   buff_len)
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
   int i=0;
+  int index = 0;
+  market_t * my_market = NULL;
 
   for(i=0; i< data_head->m_nSize; i++){
     CommRealTimeData * data_type = (CommRealTimeData *)(buff
@@ -397,7 +408,8 @@ int parse_auto_push(char * buff, uLong   buff_len)
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
-      do_stock(data_type->m_cCodeType, code, buff, i);
+      my_market = &market_list[index];
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i);
     }
   }
 

@@ -181,8 +181,8 @@ static int find_location(my_market, entity, column, area_index, queue_index)
   }
   else{
     if(area->real_size< area->allow_size){//enough
-      i = real_size/2;
-      queue = queue+i;
+      //i = real_size/2;
+      //queue = queue+i;
       //      *queue_index = search_queue_index(value.ivalue, 0, real_size, queue, column);
       for(i=0; i < real_size; i++){
 	item = queue->entity;

@@ -191,11 +191,11 @@ int get_market(cJSON * root_json, int index)
 	 *yestoday_max_price,
 	 *yestoday_min_price);
   //set setting_price
-  market_list[index].setting_max *= 1.1;
-  market_list[index].setting_min *= 0.9;
+  market_list[index].setting_max = market_list[index].yestoday_max * 1.1;
+  market_list[index].setting_min = market_list[index].yestoday_min * 0.9;
 
   //init sort area
-  //init_sort_area(index);
+  init_sort_area(&market_list[index]);
 
   printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
 	 market_list[index].date,
