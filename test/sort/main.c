@@ -1,4 +1,4 @@
-#include<stdio.h>
+ #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<sys/types.h>
@@ -43,10 +43,10 @@ int main()
   printf("ret:%d\n", ret);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
   //get auto push data and resort data
-   //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 1, 0);
 
   int menu = 1;
@@ -222,18 +222,16 @@ void init_receive(void * socket_fd)
    }
 }
 
-
-
 int send_auto_push(int socket_fd, int index, int size, int code_type_index)
 {
   char * request;
-  int off = sizeof(RealPack);
+  int off = sizeof(RealPack_ex);
   int codeinfo_length = sizeof(CodeInfo);
   CodeInfo * codeinfo;
   entity_t * entity;
   int entity_length = sizeof(entity_t);
   int i = 0;
-  int request_length = sizeof(RealPack)+codeinfo_length*size;
+  int request_length = sizeof(RealPack_ex)+codeinfo_length*size;
 
   request = (char *)malloc(request_length);
   if(request == NULL){
@@ -242,7 +240,7 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
   }
   memset(request, 0x00, request_length);
 
-  RealPack * data = (RealPack *)request;
+  RealPack_ex * data = (RealPack_ex *)request;
   memcpy(data->m_head,HEADER,4);
   data->m_length =  request_length-8;
   data->m_nType = TYPE_AUTO_PUSH;
@@ -304,8 +302,8 @@ int parse(char * buff, uLongf  buff_len)
   }
     break;
   case TYPE_AUTO_PUSH:{
-    printf("auto_push...\n");
-    parse_realtime(buff, buff_len);
+    printf("recieve auto_push...\n");
+    parse_auto_push(buff, buff_len);
     // parse_auto_push(buff, buff_len);
     free(buff);
   }
@@ -388,6 +386,21 @@ do_stock(code_type, code, buff, i)
 
 int parse_auto_push(char * buff, uLong   buff_len)
 {
+  printf("parse auto_push...\n");
+  AskData2 * data_head = (AskData2 *)(buff);
+  char code[7]={0};
+  int i=0;
+
+  for(i=0; i< data_head->m_nSize; i++){
+    CommRealTimeData * data_type = (CommRealTimeData *)(buff
+							+ 20
+							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+    memcpy(code, data_type->m_cCode, 6);
+    if(data_type->m_cCodeType == 0x1101){//股票
+      do_stock(data_type->m_cCodeType, code, buff, i);
+    }
+  }
+
   return 0;
 }
 

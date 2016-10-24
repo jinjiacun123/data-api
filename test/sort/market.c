@@ -146,7 +146,7 @@ int get_market(cJSON * root_json, int index)
   //init sort_down_list
   market_list[index].sort_down_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
   if(market_list[index].sort_down_list == NULL){
- 	printf("malloc memory err!\n");		
+ 	printf("malloc memory err!\n");
 	exit(-1);
   }
   memset(market_list[index].sort_down_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
@@ -195,7 +195,7 @@ int get_market(cJSON * root_json, int index)
   market_list[index].setting_min *= 0.9;
 
   //init sort area
-  init_sort_area(index);
+  //init_sort_area(index);
 
   printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
 	 market_list[index].date,

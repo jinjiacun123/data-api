@@ -63,11 +63,11 @@ enum column_s
 
 typedef struct
 {
-  char m_head[4]; 
-  int  m_length;  
+  char m_head[4];
+  int  m_length;
   unsigned short m_nType;
-  char  m_nIndex;   
-  char  m_Not;   
+  char  m_nIndex;
+  char  m_Not;
   long  m_lKey;
   short m_cCodeType;
   char  m_cCode[6];
@@ -76,6 +76,20 @@ typedef struct
   unsigned short code_type;
   char code[6];
 }RealPack;
+
+typedef struct
+{
+  char m_head[4];
+  int  m_length;
+  unsigned short m_nType;
+  char  m_nIndex;
+  char  m_Not;
+  long  m_lKey;
+  short m_cCodeType;
+  char  m_cCode[6];
+  short m_nSize;
+  unsigned short m_nOption;
+}RealPack_ex;
 
 typedef struct
 {

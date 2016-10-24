@@ -6,7 +6,8 @@
 
 static int sort_area(market_t * my_market, column_n column);
 static int find_location(market_t * my_market, entity_t * entity, column_n column, int * area_index, int * queue_index);
-static int remove_entity(market_t * my_market, entity_t * entity, column_n column, int area_index, int queue_index);
+static int remove_entity(market_t * my_market, entity_t * entity, column_n column);
+static int search_queue_index(int value, int begin, int length, sort_area_queue_t * queue, column_n column);
 extern market_t market_list[];
 
 //init area and queueof area
@@ -125,24 +126,14 @@ int sort_update(my_market, entity, column)
 {
   int area_index = 0;
   int queue_index = 0;
-  union{
-    int ivalue;
-    float fvalue;
-  }pre_value;
 
+  //remove
+  remove_entity(my_market, entity, column);
+  //find
+  assert(find_location(my_market, entity, column, &area_index, &queue_index) >= 0);
+  //add
+  sort_add(my_market, entity, column);
 
-  //find entity from area
-  assert(find_location(my_market, entity, column, &area_index, &queue_index) == 0);
-  //check is exits,by pre_*
-  switch(column){
-  case NEW_PRICE:{
-    //revmoe
-    //add
-  }break;
-  default:{
-
-  }break;
-  }
   return 0;
 }
 
@@ -190,6 +181,9 @@ static int find_location(my_market, entity, column, area_index, queue_index)
   }
   else{
     if(area->real_size< area->allow_size){//enough
+      i = real_size/2;
+      queue = queue+i;
+      //      *queue_index = search_queue_index(value.ivalue, 0, real_size, queue, column);
       for(i=0; i < real_size; i++){
 	item = queue->entity;
 	if(value.ivalue > item->price){
@@ -202,6 +196,7 @@ static int find_location(my_market, entity, column, area_index, queue_index)
 	}
 	queue++;
       }
+
     }
     else{//not enough, remalloc
       tmp_queue = (sort_area_queue_t *)malloc(2 * area->allow_size * sizeof(sort_area_queue_t));
@@ -223,12 +218,10 @@ static int find_location(my_market, entity, column, area_index, queue_index)
 }
 
 //from pre_value remove prefix time value,and update relatively area
-static int remove_entity(my_market, entity, column, area_index, queue_index)
+static int remove_entity(my_market, entity, column)
      market_t * my_market;
      entity_t * entity;
      column_n column;
-     int area_index;
-     int queue_index;
 {
   return 0;
 }
@@ -292,5 +285,32 @@ int sort_get(my_market, index, size)
      int index;
      int size;
 {
+  return 0;
+}
+
+static int search_queue_index(value, begin, length, queue, column)
+     int value;
+     int begin;
+     int length;
+     sort_area_queue_t * queue;
+     column_n column;
+{
+  if( begin > length){
+    return -1;
+  }
+  else{
+    if(value == (queue+((begin + length)/2))->entity->price){
+      return (begin+length)/2;
+    }
+    else{
+      if(value < (queue+((begin + length)/2))->entity->price){
+	return search_queue_index(value, begin, ((begin + length)/2) -1, queue, column);
+      }
+      else{
+	return search_queue_index(value, ((begin + length)/2)+1, length, queue, column);
+      }
+    }
+  }
+
   return 0;
 }

@@ -1,9 +1,11 @@
 b main
 #b send_realtime
-#b send_auto_push
+b send_auto_push
 #b 414
 #b 427
-#b parse
+b parse
+b parse_auto_push
+b do_stock
 b get_market
 #b unpack
 b get_market
