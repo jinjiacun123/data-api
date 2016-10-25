@@ -3,6 +3,7 @@
 #include "sort.h"
 #include "market.h"
 #include <assert.h>
+#include <stdbool.h>
 
 static int sort_area(market_t * my_market, column_n column);
 static int find_location(market_t * my_market, entity_t * entity, column_n column, int * area_index, int * queue_index);
@@ -334,11 +335,95 @@ int display_sort(my_market)
   return 0;
 }
 
-int sort_get(my_market, index, size)
+int sort_get(my_market, index, size, entity_list)
      market_t * my_market;
      int index;
      int size;
+     entity_t * entity_list;
 {
+  sort_area_t * area = NULL;
+  int cur_real_size = 0;
+  area = &my_market->sort_area_price;
+  entity_t * entity_target = entity_list;
+  entity_t * entity = NULL;
+  int off = index;
+  int off_size = size;
+  int i = 0, j = 0;
+  int entity_index = 0;
+  bool is_finish = false;
+  int begin = 1;
+
+  if(entity_list == NULL){
+    printf("malloc error!\n");
+    exit(-1);
+  }
+
+  for(i = 0; i< AREA_NUMBER; i++){
+    cur_real_size = area->real_size;
+    if(off > cur_real_size){
+      off -= cur_real_size;
+      area ++;
+      continue;
+    }else{
+      break;
+    }
+  }
+
+  begin = off;
+
+  //target area and queue
+  do{
+    if(size > cur_real_size - begin){
+      for(j = begin; j< cur_real_size; j++){
+	entity_target = (area->cur+j)->entity;
+	entity_index ++;
+	entity_target ++;
+	off_size --;
+      }
+      off_size = cur_real_size - begin;
+      area++;
+      cur_real_size = area->real_size;
+      if(off_size >0){
+	while(true){
+	  if(off_size > cur_real_size){
+	    for(j = 0; j < cur_real_size; j++){
+	      entity_target = (area->cur + j)->entity;
+	      entity_target ++;
+	      entity_index ++;
+	      off_size --;
+	    }
+	    area ++;
+	    cur_real_size = area->real_size;
+	  }else{
+	    for(j = 0; j< off_size; j++){
+	      entity_target = (area->cur + j)->entity;
+	      entity_target ++;
+	      entity_index ++;
+	      off_size --;
+	    }
+	    break;
+	  }
+	}
+      }else{
+	break;
+      }
+    }
+    else{
+      for(j = begin; j< begin+size; j++){
+	entity_target = area->cur+j;
+	entity_target ++;
+	entity_index ++;
+	off_size --;
+      }
+    }
+  }while(!is_finish);
+
+  entity = entity_list;
+  for(i = 0; i< size; i++){
+    printf("code:%s\tprice:%d\n", entity->code, entity->price);
+    entity ++;
+  }
+
   return 0;
 }
 

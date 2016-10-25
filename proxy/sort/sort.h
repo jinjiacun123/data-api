@@ -32,5 +32,5 @@ int sort_add(market_t * my_market, entity_t * entity, column_n column);
 int sort_update(market_t * my_market, entity_t * entity, column_n column);
 int my_sort(market_t * my_market, column_n column);
 int display_sort(market_t * my_market);
-int sort_get(market_t * my_market, int index, int size);
+int sort_get(market_t * my_market, int index, int size, entity_t * entity_list);
 #endif

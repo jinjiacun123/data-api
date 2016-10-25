@@ -18,7 +18,7 @@ int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
 
-static void do_stock(market_t * my_market, unsigned short, char *, char *, int);
+static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 
 bool is_exit = false;
 int socket_fd = 0;
