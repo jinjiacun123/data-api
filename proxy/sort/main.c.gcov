@@ -1,0 +1,672 @@
+        -:    0:Source:main.c
+        -:    0:Programs:1
+        -:    1:#include<stdio.h>
+        -:    2:#include<stdlib.h>
+        -:    3:#include<unistd.h>
+        -:    4:#include<sys/types.h>
+        -:    5:#include <sys/socket.h>
+        -:    6:#include <netinet/in.h>
+        -:    7:#include <arpa/inet.h>
+        -:    8:#include<fcntl.h>
+        -:    9:#include<sys/stat.h>
+        -:   10:#include<assert.h>
+        -:   11:#include<stdbool.h>
+        -:   12:#include "cJSON.h"
+        -:   13:#include "config.h"
+        -:   14:
+        -:   15:static void do_stock(unsigned short, char *, char *, int);
+        -:   16:bool is_exit = false;
+        -:   17:
+        -:   18:int main()
+        -:   19:{
+        -:   20:  pthread_t p_id = 0;
+        -:   21:  int socket_fd = 0;
+        -:   22:  int ret = 0;
+        -:   23:  //--receive both shanghhai and shenzhen market stock
+        -:   24:  init_market();
+        -:   25:  init_socket(&socket_fd);
+        -:   26:  //ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
+        -:   27:  printf("ret:%d\n", ret);
+        -:   28:  //---init data and sort
+        -:   29:  //get realtime data
+        -:   30:  //send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);  
+        -:   31:  //---auto push data---
+        -:   32:  //get auto push data and resort data
+        -:   33:  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+        -:   34:
+        -:   35:  /*
+        -:   36:  int menu = 1;
+        -:   37:  while(!is_exit){
+        -:   38:    sleep(3);
+        -:   39:    send_heart(socket_fd);
+        -:   40:    heart_times++;
+        -:   41:  }
+        -:   42:  */
+        -:   43:
+        -:   44:  printf("exit system...\n");
+        -:   45:  return 0;
+        -:   46:}
+        -:   47:
+        -:   48://get code for both market
+        -:   49:int init_market()
+        -:   50:{
+        -:   51:  //get both txt  
+        -:   52:  
+        -:   53:  char template_str[][100] =  {
+        -:   54:    "rm ./txt/%s ./txt/%s",
+        -:   55:    "wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/%s",
+        -:   56:    "./txt/%s"
+        -:   57:  };
+        -:   58:  char cmd[100];
+        -:   59:  memset(&cmd, 0x00, 100);
+        -:   60:  sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
+        -:   61:  system(cmd);
+        -:   62:  memset(&cmd, 0x00, 100);
+        -:   63:  sprintf(cmd, template_str[1], market_list[0].file_name);
+        -:   64:  system(cmd);
+        -:   65:  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");  
+        -:   66:  memset(&cmd, 0x00, 100);
+        -:   67:  sprintf(cmd, template_str[1], market_list[1].file_name);
+        -:   68:  system(cmd);
+        -:   69:
+        -:   70:  //parse
+        -:   71:  int index = 0;
+        -:   72:  memset(buff, 0x00, 1024*100);
+        -:   73:  memset(&cmd, 0x00, 50);
+        -:   74:  sprintf(cmd, template_str[2], market_list[index].file_name);
+        -:   75:  int length = get_content(cmd, buff, 1024*100);
+        -:   76:  cJSON * root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
+        -:   77:  if (NULL == root_json){
+        -:   78:      printf("error:%s\n", cJSON_GetErrorPtr());
+        -:   79:      cJSON_Delete(root_json);
+        -:   80:      return -1;
+        -:   81:  }
+        -:   82:  //parse 1101
+        -:   83:  get_market(root_json, index);
+        -:   84:  free(root_json);
+        -:   85:  return 0;
+        -:   86:
+        -:   87:  //parse 1201
+        -:   88:  index = 1;
+        -:   89:  memset(buff, 0x00, 1024*100);
+        -:   90:  memset(&cmd, 0x00, 50);
+        -:   91:  sprintf(cmd, template_str[2], market_list[index].file_name);
+        -:   92:  length = get_content(cmd, buff, 1024*100);
+        -:   93:  root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
+        -:   94:  if (NULL == root_json){
+        -:   95:      printf("error:%s\n", cJSON_GetErrorPtr());
+        -:   96:      cJSON_Delete(root_json);
+        -:   97:      return;
+        -:   98:  }
+        -:   99:  get_market(root_json, index);
+        -:  100: 
+        -:  101:  return 0;
+        -:  102:}
+        -:  103:
+        -:  104:int get_content(char * filename, char * buff, int buff_len)
+        -:  105:{
+        -:  106:  int fd;
+        -:  107:  fd = open(filename, O_RDONLY);
+        -:  108:  if( fd == -1){
+        -:  109:    printf("open err!\n");
+        -:  110:    exit(-1);
+        -:  111:  }
+        -:  112:
+        -:  113:  int ret = 0;
+        -:  114:  int length = 0;
+        -:  115:  while(1){
+        -:  116:    ret = read( fd, buff, buff_len);
+        -:  117:    if(ret == -1){
+        -:  118:      printf("read err!\n");
+        -:  119:      exit(-1);
+        -:  120:    }
+        -:  121:    length += ret;
+        -:  122:    //   printf("buff:%s\n", buff);
+        -:  123:    if(ret == 0){
+        -:  124:      break;
+        -:  125:    }
+        -:  126:  }
+        -:  127:  
+        -:  128:  close(fd);
+        -:  129:  return length;
+        -:  130:}
+        -:  131:
+        -:  132:int get_market(cJSON * root_json, int index)
+        -:  133:{
+        -:  134:  entity_t * entity;
+        -:  135:  cJSON * obj;
+        -:  136:  int entity_list_len = 0;
+        -:  137:  obj = cJSON_GetObjectItem(root_json, "date");
+        -:  138:  if(obj == NULL){
+        -:  139:    printf("get object of date err!\n");
+        -:  140:    exit(-1);
+        -:  141:  }
+        -:  142:  strncpy(market_list[index].date, obj->valuestring, 6);
+        -:  143:  obj = cJSON_GetObjectItem(root_json, "codetype");
+        -:  144:  if(obj == NULL){
+        -:  145:    printf("get object of date err!\n");
+        -:  146:    exit(-1);
+        -:  147:  }
+        -:  148:  market_list[index].code_type = strtol(obj->valuestring, NULL, 16);
+        -:  149:  obj = cJSON_GetObjectItem(root_json, "szname");
+        -:  150:  if(obj == NULL){
+        -:  151:    printf("get object of date err!\n");
+        -:  152:    exit(-1);
+        -:  153:  }
+        -:  154:  obj = cJSON_GetObjectItem(root_json, "priceunit");
+        -:  155:  if(obj == NULL){
+        -:  156:    printf("get object of date err!\n");
+        -:  157:    exit(-1);
+        -:  158:  }
+        -:  159:  market_list[index].unit = atoi(obj->valuestring);
+        -:  160:  obj = cJSON_GetObjectItem(root_json, "open_close_time");
+        -:  161:  if(obj == NULL){
+        -:  162:    printf("get object of date err!\n");
+        -:  163:    exit(-1);
+        -:  164:  }
+        -:  165:  strcpy(market_list[index].open_close_time, obj->valuestring);
+        -:  166:  obj = cJSON_GetObjectItem(root_json, "list");
+        -:  167:  if(obj == NULL){
+        -:  168:    printf("get object of date err!\n");
+        -:  169:    exit(-1);
+        -:  170:  }
+        -:  171:  market_list[index].entity_list_size = cJSON_GetArraySize(obj);
+        -:  172:  if(market_list[index].list != NULL){free(market_list[index].list);}
+        -:  173:  market_list[index].list = (entity_t *)malloc(market_list[index].entity_list_size*sizeof(entity_t));
+        -:  174:  if(market_list[index].list == NULL){
+        -:  175:    printf("molloc menory err!\n");
+        -:  176:    exit(-1);
+        -:  177:  }
+        -:  178:  memset(market_list[index].list, 0x00, market_list[index].entity_list_size);
+        -:  179:  int i = 0;
+        -:  180:  cJSON * item;
+        -:  181:  entity = market_list[index].list;
+        -:  182:  for(; i< market_list[index].entity_list_size; i++){
+        -:  183:    item = cJSON_GetArrayItem(obj, i);
+        -:  184:    strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
+        -:  185:    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);    
+        -:  186:    
+        -:  187:    printf("index:%d\tcode:%s\tpreclose:%d\n", 
+        -:  188:	   i,
+        -:  189:	   entity->code,
+        -:  190:	   entity->pre_close);
+        -:  191:    
+        -:  192:    //save to key
+        -:  193:      assert(save_key(entity->code, 6, index, entity) == 0); 
+        -:  194:
+        -:  195:    entity++;
+        -:  196:  }
+        -:  197:  
+        -:  198:  /*
+        -:  199:  entity = market_list[index].list;
+        -:  200:  for(i=0; i<market_list[index].entity_list_size; i++){
+        -:  201:    printf("index:%d\tcode:%s\tpreclose:%d\n", 
+        -:  202:	   i,
+        -:  203:	   entity->code,
+        -:  204:	   entity->pre_close);
+        -:  205:    entity++;
+        -:  206:  }
+        -:  207:  */
+        -:  208:
+        -:  209:  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n", 
+        -:  210:	 market_list[index].date, 
+        -:  211:	 market_list[index].code_type,
+        -:  212:	 market_list[index].unit,
+        -:  213:	 market_list[index].open_close_time,
+        -:  214:	 market_list[index].entity_list_size);
+        -:  215:  
+        -:  216:  return 0;
+        -:  217:}
+        -:  218:
+        -:  219:int init_socket(int * socket_fd)
+        -:  220:{
+        -:  221:  int c_len = 0;
+        -:  222:  struct sockaddr_in cli;
+        -:  223:  
+        -:  224:  cli.sin_family = AF_INET;
+        -:  225:  cli.sin_port = htons(SERVER_MARKET_PORT);
+        -:  226:  cli.sin_addr.s_addr = inet_addr(SERVER_MARKET);
+        -:  227:
+        -:  228:  *socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+        -:  229:  if(*socket_fd < 0){
+        -:  230:    printf("socket() failrue!\n");
+        -:  231:    return -1;
+        -:  232:  }
+        -:  233:
+        -:  234:  if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
+        -:  235:    printf("connect() failure!\n");
+        -:  236:    return -1;
+        -:  237:  } 
+        -:  238:  printf("connect() success\n");
+        -:  239:  return 0;
+        -:  240:}
+        -:  241:
+        -:  242:int send_realtime(int socket_fd, int index, int size, int code_type_index)
+        -:  243:{
+        -:  244:  char * request;
+        -:  245:  int entity_count = market_list[0].entity_list_size;
+        -:  246:  int off = sizeof(RealPack);
+        -:  247:  int codeinfo_length = sizeof(CodeInfo);
+        -:  248:  CodeInfo * codeinfo;
+        -:  249:  entity_t * entity;
+        -:  250:  int entity_length = sizeof(entity_t);
+        -:  251:  
+        -:  252:  request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
+        -:  253:  if(request == NULL){
+        -:  254:    printf("malloc err!\n");
+        -:  255:    exit(-1);
+        -:  256:  }
+        -:  257:  int request_length = sizeof(RealPack)+ codeinfo_length * size;
+        -:  258: 
+        -:  259:  if(request == NULL){
+        -:  260:    printf("malloc err!\n");
+        -:  261:    exit(-1);
+        -:  262:  }
+        -:  263:  memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
+        -:  264:
+        -:  265:  RealPack * data = (RealPack*)request;  
+        -:  266:  memcpy(data->m_head, HEADER, 4);
+        -:  267:  data->m_length =  request_length - 8;
+        -:  268:  data->m_nType = TYPE_REALTIME;
+        -:  269:  data->m_nSize = size;
+        -:  270:  data->m_nOption= 0x0080;
+        -:  271:  
+        -:  272:  //股票:pass  
+        -:  273:  int i=0;
+        -:  274:  entity = (entity_t *)(market_list[0].list+i*entity_length);
+        -:  275:  for(i=index; i<(index+1)*size; i++){ 
+        -:  276:    codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
+        -:  277:    codeinfo->code_type = market_list[0].code_type;
+        -:  278:    strncpy(codeinfo->code, entity->code, 6);
+        -:  279:    entity ++;
+        -:  280:  }
+        -:  281: 
+        -:  282:  if(send(socket_fd, request, request_length, 0)){
+        -:  283:    printf("send success!\n");
+        -:  284:    return 0;
+        -:  285:  }
+        -:  286:  
+        -:  287:  return -1;
+        -:  288:}
+        -:  289:
+        -:  290:void init_receive(void * socket_fd)
+        -:  291:{
+        -:  292:  char head[4];
+        -:  293:  char * buff = NULL;
+        -:  294:  int package_body_length = 0;
+        -:  295:  int ret_count = 0;
+        -:  296:  int head_length = 8;
+        -:  297:  int length = head_length;  
+        -:  298:  int off = 0;
+        -:  299:  int fd = *((int *)socket_fd);
+        -:  300:
+        -:  301:   while(1){
+        -:  302:    memset(&head, 0x00, 4);
+        -:  303:    buff = (char *)malloc(length);
+        -:  304:    if(buff == NULL){
+        -:  305:      printf("malloc err!\n");
+        -:  306:      exit(-1);
+        -:  307:    }
+        -:  308:    memset(buff, 0x00, length);
+        -:  309:    //接受头部
+        -:  310:    ret_count = read(fd, buff,length);
+        -:  311:    printf("fd:%d\n", fd);
+        -:  312:    if(ret_count == 0){
+        -:  313:      printf("connect close!\n");
+        -:  314:      sleep(3);
+        -:  315:      return 0;
+        -:  316:      //      continue;
+        -:  317:      //pthread_exit();
+        -:  318:    } 
+        -:  319:    if(ret_count <0){
+        -:  320:      printf("recive server err!\n");
+        -:  321:      sleep(3);
+        -:  322:            return 0;
+        -:  323:      // continue;
+        -:  324:      //pthread_exit(-1);
+        -:  325:    }
+        -:  326:    
+        -:  327:    if(ret_count == length){
+        -:  328:      //receive body of package
+        -:  329:      strncpy(head, buff, 4);
+        -:  330:      length = *((int *)(buff+4));
+        -:  331:      free(buff);
+        -:  332:      buff = (char *)malloc(length);
+        -:  333:      if(buff == NULL){
+        -:  334:	printf("malloc err!\n");
+        -:  335:	exit(-1);
+        -:  336:      }
+        -:  337:      memset(buff, 0x00, length);
+        -:  338:      while(length != (ret_count = read(fd, buff+off, length))){
+        -:  339:	off += ret_count;
+        -:  340:	length -= ret_count;	
+        -:  341:      }
+        -:  342:      //parse
+        -:  343:      printf("%s\n", buff);
+        -:  344:      printf("recive complete!\n");
+        -:  345:      parse(buff, length);
+        -:  346:    }
+        -:  347:   }
+        -:  348:}
+        -:  349:
+        -:  350:int send_auto_push(int socket_fd, int index, int size, int code_type_index)
+        -:  351:{
+        -:  352:  char * request;
+        -:  353:  int off = sizeof(RealPack);
+        -:  354:  int codeinfo_length = sizeof(CodeInfo);
+        -:  355:  CodeInfo * codeinfo;
+        -:  356:  entity_t * entity;
+        -:  357:  int entity_length = sizeof(entity_t);
+        -:  358:  int i = 0;
+        -:  359:  int request_length = sizeof(RealPack)+codeinfo_length*size;
+        -:  360:
+        -:  361:  request = (char *)malloc(request_length);
+        -:  362:  if(request == NULL){
+        -:  363:    printf("malloc err!\n");
+        -:  364:    exit(-1);
+        -:  365:  }
+        -:  366:  memset(request, 0x00, request_length);
+        -:  367:  
+        -:  368:  RealPack * data = (RealPack *)request;  
+        -:  369:  memcpy(data->m_head,HEADER,4);
+        -:  370:  data->m_length =  request - 8;
+        -:  371:  data->m_nType = TYPE_AUTO_PUSH;
+        -:  372:  data->m_nSize = size;
+        -:  373:  data->m_nOption= 0x0080;
+        -:  374:  
+        -:  375:  entity = (entity_t *)(market_list[code_type_index].list+i*entity_length);
+        -:  376:  for(i = index; i<(index+1)*size; i++){
+        -:  377:    codeinfo = (CodeInfo *)(request + off + i * codeinfo_length);
+        -:  378:    codeinfo->code_type = market_list[code_type_index].code_type;
+        -:  379:    strncpy(codeinfo->code, entity->code, 6);
+        -:  380:    entity ++;
+        -:  381:  }
+        -:  382:
+        -:  383:  if(send(socket_fd, request, request_length, 0)){
+        -:  384:    printf("send auto_push success!\n");
+        -:  385:    return 0;
+        -:  386:  }
+        -:  387:  
+        -:  388:  return -1;
+        -:  389:}
+        -:  390:
+        -:  391:int send_heart(int socket_fd)
+        -:  392:{
+        -:  393:  char request[1024];
+        -:  394:  TestSrvData2 data ;
+        -:  395:  memset(&data,0x00,sizeof(TestSrvData2));
+        -:  396:  memcpy(data.head, HEADER,4);
+        -:  397:  data.length      = sizeof(TestSrvData2) -8;    
+        -:  398:  data.m_nType     = TYPE_HEART;
+        -:  399:  data.m_nIndex= 1;
+        -:  400:
+        -:  401:  memset(request, 0, 1024);
+        -:  402:  memcpy(request, &data, sizeof(data));
+        -:  403:  send(socket_fd, request, sizeof(data), 0);
+        -:  404:  printf("心跳请求发送完毕\n");
+        -:  405:  return 0;
+        -:  406:}
+        -:  407:
+        -:  408:int parse(char * buff, uLongf  buff_len)
+        -:  409:{
+        -:  410:  unsigned short type;
+        -:  411:  
+        -:  412:  if(buff == NULL)
+        -:  413:    return -2;
+        -:  414:  type = (*(unsigned short *)buff);
+        -:  415:  printf("type:%02x\n", type);
+        -:  416:  switch(type){
+        -:  417:  case TYPE_REALTIME:{
+        -:  418:    printf("realtime...\n");
+        -:  419:    parse_realtime(buff, buff_len);
+        -:  420:    free(buff);
+        -:  421:    is_exit = true;
+        -:  422:  }
+        -:  423:    break;
+        -:  424:  case TYPE_AUTO_PUSH:{
+        -:  425:    printf("auto_push...\n");
+        -:  426:    parse_auto_push(buff, buff_len);
+        -:  427:    free(buff);
+        -:  428:  }
+        -:  429:    break;
+        -:  430:  case TYPE_HEART:{
+        -:  431:    printf("heart...\n");
+        -:  432:    heart_times--;
+        -:  433:  }
+        -:  434:    break;
+        -:  435:  case TYPE_ZIB:{
+        -:  436:    printf("bzib...\n");
+        -:  437:    char * src_buff = NULL;
+        -:  438:    uLongf src_buff_len = 0;
+        -:  439:    assert(unpack(buff, buff_len, &src_buff, &src_buff_len) == 0);
+        -:  440:    free(buff);
+        -:  441:    parse(src_buff, src_buff_len);
+        -:  442:  }
+        -:  443:    break;
+        -:  444:  default:{ 
+        -:  445:    printf("unknown type:%d...\n", type);
+        -:  446:  }
+        -:  447:    break;
+        -:  448:  }
+        -:  449:  return 0;
+        -:  450:}
+        -:  451:
+        -:  452:int parse_realtime(char * buff, uLongf buff_len)
+        -:  453:{
+        -:  454:  AskData2 * data_head = (AskData2 *)(buff);
+        -:  455:  char code[7]={0};
+        -:  456:  int i=0;
+        -:  457:
+        -:  458:  for(i=0; i< data_head->m_nSize; i++){
+        -:  459:    CommRealTimeData * data_type = (CommRealTimeData *)(buff
+        -:  460:							+ 20
+        -:  461:							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+        -:  462:    memcpy(code, data_type->m_cCode, 6);
+        -:  463:    if(data_type->m_cCodeType == 0x1101){//股票
+        -:  464:      do_stock(data_type->m_cCodeType, code, buff, i);
+        -:  465:    }
+        -:  466:  }
+        -:  467:  return 0;
+        -:  468:}
+        -:  469:
+        -:  470://处理股票
+        -:  471:static void
+        -:  472:do_stock(code_type, code, buff, i)
+        -:  473:     unsigned short code_type;
+        -:  474:     char * code;
+        -:  475:     char * buff;
+        -:  476:     int i;
+        -:  477:{
+        -:  478:  int address = 0;
+        -:  479:  unsigned int code_type_index = 0;
+        -:  480:  entity_t * entity;
+        -:  481:  if(code_type == 0x1201){
+        -:  482:    code_type_index = 1;
+        -:  483:  }
+        -:  484:  assert((address = find_entity_by_key(code, 6, code_type_index)) > 0);
+        -:  485:  entity = (entity_t *)address;
+        -:  486:
+        -:  487:  HSStockRealTime * tmp = (HSStockRealTime *)(buff
+        -:  488:					      +20
+        -:  489:					      +sizeof(CommRealTimeData)
+        -:  490:					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+        -:  491:  /*
+        -:  492:  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
+        -:  493:	 i,
+        -:  494:	 code_type,
+        -:  495:	 code,
+        -:  496:	 tmp->m_lNewPrice);
+        -:  497:  */
+        -:  498:  entity->price = tmp->m_lNewPrice;
+        -:  499:  /*
+        -:  500:  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
+        -:  501:	 i,
+        -:  502:	 code_type,
+        -:  503:	 code,
+        -:  504:	 entity->price);
+        -:  505:  */
+        -:  506:}
+        -:  507:
+        -:  508:int parse_auto_push(char * buff, uLong   buff_len)
+        -:  509:{
+        -:  510:  return 0;
+        -:  511:}
+        -:  512:
+        -:  513:int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len)
+        -:  514:{
+        -:  515:  TransZipData2   * zheader;
+        -:  516:  zheader = (TransZipData2 *)des_buff;
+        -:  517:  if(zheader->m_nType != TYPE_ZIB){
+        -:  518:    printf("parse zlib package type error!\n");
+        -:  519:    return -100;
+        -:  520:  }
+        -:  521:
+        -:  522:  *src_buff_len = (uLongf)zheader->m_lOrigLen;
+        -:  523:  *src_buff = (char *)malloc(*src_buff_len);
+        -:  524:  if(*src_buff == NULL){
+        -:  525:    printf("malloc err!\n");
+        -:  526:    return -1;
+        -:  527:  }
+        -:  528:  memset(*src_buff, 0 , *src_buff_len);
+        -:  529:  
+        -:  530:  int unzip =  uncompress((Bytef *)(*src_buff), src_buff_len,
+        -:  531:			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
+        -:  532:  if(unzip == Z_MEM_ERROR){
+        -:  533:    printf("memory not enough\n");
+        -:  534:    return -2;
+        -:  535:  }
+        -:  536:  if(unzip == Z_BUF_ERROR){
+        -:  537:    printf("buff not enough!\n");
+        -:  538:    return -3;
+        -:  539:  }
+        -:  540:  if(unzip == Z_DATA_ERROR){
+        -:  541:    printf("unpack data err!\n");
+        -:  542:    return -4;
+        -:  543:   }
+        -:  544:  if(unzip == Z_OK
+        -:  545:     && *((long*)src_buff_len) == zheader->m_lOrigLen){
+        -:  546:    // my_buff->p_res_media_h = (p_response_meta_header)my_buff->unpack_buff;
+        -:  547:    return 0;
+        -:  548:    //parse(my_buff);
+        -:  549:    //return;
+        -:  550:  }
+        -:  551:  return -1;
+        -:  552:}
+        -:  553:
+        -:  554://from samll to big
+        -:  555:int my_sort(int code_type_index, int column_index)
+        -:  556:{
+        -:  557:  int i = 0, j = 0;
+        -:  558:  int size = market_list[0].entity_list_size;
+        -:  559:  market_t * my_market = &market_list[0];
+        -:  560:  entity_t *p, *q, *swap;
+        -:  561:  int sort_size = sizeof(market_t *);
+        -:  562:
+        -:  563:  for(i=0; i<size; i++){
+        -:  564:    for(j=i+1; j< size; i++){
+        -:  565:      p = my_market->sort_price_list+(j-1) * sort_size;
+        -:  566:      q = *my_market->sort_price_list+j* sort_size;
+        -:  567:      if(p->price > q->price){
+        -:  568:	swap = p; p = q; q = swap;
+        -:  569:      }
+        -:  570:    }
+        -:  571:  }
+        -:  572:
+        -:  573:  return 0;
+        -:  574:}
+        -:  575:
+        -:  576:/**
+        -:  577:   from first letter to last,every letter point floor
+        -:  578:*/
+        -:  579:int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
+        -:  580:{
+        -:  581:  int i              = 0;
+        -:  582:  char ascii         = 0;
+        -:  583:  int unit           = 0;
+        -:  584:  my_key_t * cur_key = &key_root;
+        -:  585:  my_key_t * tmp_key = NULL;;
+        -:  586:  void * last_key    = NULL;
+        -:  587:  int location       = 0;
+        -:  588:
+        -:  589:  for(i=0; i<6; i++){
+        -:  590:    ascii = *(code+i); 
+        -:  591:    location = get_index_by_code_ascii(ascii); 
+        -:  592:    //check location is malloc
+        -:  593:    if(cur_key->childs[location] == NULL){
+        -:  594:      tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
+        -:  595:      if(tmp_key == NULL){
+        -:  596:	printf("malloc error!\n");
+        -:  597:	exit(-1);
+        -:  598:      }
+        -:  599:      memset(tmp_key, 0x00, sizeof(my_key_t));
+        -:  600:      tmp_key->floor = i+1;
+        -:  601:      cur_key->childs[location] = tmp_key;
+        -:  602:      cur_key = tmp_key;
+        -:  603:    }
+        -:  604:    else{
+        -:  605:      cur_key = cur_key->childs[location];
+        -:  606:    }
+        -:  607:  }
+        -:  608:  //code_type node
+        -:  609:  //save entity of point
+        -:  610:  if(cur_key != NULL && cur_key->childs[code_type_index] == NULL){
+        -:  611:    cur_key->childs[code_type_index] = entity;
+        -:  612:  }
+        -:  613:  
+        -:  614:  return 0;
+        -:  615:}
+        -:  616:
+        -:  617:int find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
+        -:  618:{
+        -:  619:  int location = 0;
+        -:  620:  char ascii   = 0;
+        -:  621:  int i        = 0;
+        -:  622:  int address  = 0;
+        -:  623:  my_key_t * cur_key = &key_root;
+        -:  624:
+        -:  625:  //from first to sixth bit
+        -:  626:  for(i=0; i<6; i++){
+        -:  627:    ascii = *(code+i);
+        -:  628:    location = get_index_by_code_ascii(ascii);
+        -:  629:    cur_key = cur_key->childs[location];
+        -:  630:  }
+        -:  631:
+        -:  632:  //7th bit
+        -:  633:  location = code_type_index;
+        -:  634:  address = cur_key->childs[location];
+        -:  635:
+        -:  636:  return address;
+        -:  637:}
+        -:  638:
+        -:  639:int get_index_by_code_ascii(char ascii)
+        -:  640:{
+        -:  641:  int base_digit = 0;
+        -:  642:  int base_alphabet = 10;
+        -:  643:  //digit
+        -:  644:  if(ascii>=48 || ascii <=57){
+        -:  645:    return base_digit+ascii-48;
+        -:  646:  }
+        -:  647:
+        -:  648:  //alphabet
+        -:  649:  if(ascii>=65 || ascii <= 80){
+        -:  650:    return base_alphabet+ascii-65;
+        -:  651:  } 
+        -:  652:
+        -:  653:  return -1;
+        -:  654:}
+        -:  655:
+        -:  656:int out_market(int code_type_index)
+        -:  657:{
+        -:  658:  int i = 0;
+        -:  659:  entity_t * entity;
+        -:  660:  char * template = "code_type:%2x\tcode:%s\tprice:%d\n";
+        -:  661:
+        -:  662:  entity = market_list[code_type_index].list;
+        -:  663:  for(; i<market_list[code_type_index].entity_list_size; i++){
+        -:  664:    printf(template, market_list[code_type_index].code_type,
+        -:  665:	   entity->code,
+        -:  666:	   entity->price);
+        -:  667:  } 
+        -:  668:  return 0;
+        -:  669:}
+        -:  670:

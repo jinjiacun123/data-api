@@ -1,0 +1,27 @@
+#include<stdio.h>
+#include<assert.h>
+
+typedef struct{
+  short code_type;
+  char code[6];
+}entity_t;
+
+entity_t * entity_list;
+int init_market();
+int last_time_market;//effective time
+int cur_time;        //current time
+
+int
+main()
+{
+  //--receive both shanghhai and shenzhen market stock
+  assert(init_market() == 0);
+  //---init data and sort
+  //get realtime data
+  //sort by price
+
+  //---auto push data---
+  //get auto push data and resort data
+  
+  
+}
