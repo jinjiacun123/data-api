@@ -92,9 +92,9 @@ int sort_add(my_market, entity, column)
     else if(queue_index < cur_area->real_size-1){//in btween real_size
       //move
       i = cur_area->real_size -1;
-      sort_area_queue_t * pre_queue = cur_area->cur + i;
-      cur_queue = cur_area->cur + (i +1);
-      for(; i>queue_index; i--){
+      sort_area_queue_t * pre_queue = cur_area->cur + i -1;
+      cur_queue = cur_area->cur + i;
+      for(; i>queue_index+1; i--){
 	cur_queue->index = pre_queue->index+1;
 	cur_queue->entity = pre_queue->entity;
 	cur_queue --;

@@ -347,7 +347,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   assert(get_client_ip(client[1].fd, &client_ip) == 0);
 
   while(1){
-    nready = poll(client, 2, 10000);
+    nready = poll(client, 2, -1);
 
     if(nready == 0){//timeout
       WriteErrLog("%s\tprocess timeout\n", client_ip);
