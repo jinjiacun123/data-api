@@ -74,6 +74,8 @@ int sort_add(my_market, entity, column)
 
   //find entity from area
   assert(find_location(my_market, entity, column, &area_index, &queue_index) == 0);
+  entity->price_area[0] = area_index;
+  entity->price_area[1] = queue_index;
   //check is exits,by pre_*
   switch(column){
   case NEW_PRICE:{
@@ -141,13 +143,8 @@ int sort_update(my_market, entity, column)
      entity_t * entity;
      column_n column;
 {
-  int area_index = 0;
-  int queue_index = 0;
-
   //remove
   remove_entity(my_market, entity, column);
-  //find
-  assert(find_location(my_market, entity, column, &area_index, &queue_index) >= 0);
   //add
   sort_add(my_market, entity, column);
 
@@ -242,6 +239,44 @@ static int remove_entity(my_market, entity, column)
      entity_t * entity;
      column_n column;
 {
+  int i = 0;
+  int area_index = 0;
+  int queue_index = 0;
+  sort_area_t * cur_area = NULL;
+  sort_area_queue_t * cur_queue = NULL;
+  sort_area_queue_t * after_queue = NULL;
+
+  area_index = entity->price_area[0];
+  queue_index = entity->price_area[1];
+
+  switch(column){
+  case NEW_PRICE:{
+    cur_area = &my_market->sort_area_price[area_index];
+    if(queue_index != cur_area->real_size-1){//not last
+      i = queue_index;
+      cur_queue = cur_area->cur+i;
+      after_queue = cur_area->cur +i + 1;
+      for(; i< cur_area->real_size; i++){
+	cur_queue->index = after_queue->index -1;
+	cur_queue->entity = after_queue->entity;
+	cur_queue ++;
+	after_queue ++;
+      }
+      after_queue->index = -1;
+      after_queue->entity = NULL;
+    }
+    else if(queue_index == cur_area->real_size-1){//last
+      cur_queue = cur_area->cur+cur_area->real_size-1;
+      cur_queue->index = -1;
+      cur_queue->entity = NULL;
+    }
+    cur_area->real_size --;
+  }break;
+  default:{
+
+  }
+  }
+
   return 0;
 }
 

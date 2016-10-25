@@ -345,7 +345,7 @@ int parse_realtime(char * buff, uLongf buff_len)
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
       my_market = &market_list[index];
-      do_stock(my_market, data_type->m_cCodeType, code, buff, i);
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
     }
   }
   return 0;
@@ -353,12 +353,13 @@ int parse_realtime(char * buff, uLongf buff_len)
 
 //处理股票
 static void
-do_stock(my_market, code_type, code, buff, i)
+do_stock(my_market, code_type, code, buff, i, option)
      market_t * my_market;
      unsigned short code_type;
      char * code;
      char * buff;
      int i;
+     option_n option;
 {
   int address = 0;
   unsigned int code_type_index = 0;
@@ -409,7 +410,7 @@ int parse_auto_push(char * buff, uLong   buff_len)
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
       my_market = &market_list[index];
-      do_stock(my_market, data_type->m_cCodeType, code, buff, i);
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
     }
   }
 

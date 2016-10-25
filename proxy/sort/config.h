@@ -42,7 +42,7 @@
 
 #endif
 
-
+typedef enum option_s option_n;
 typedef enum column_s column_n;
 typedef struct sort_area_queue_s sort_area_queue_t;
 typedef struct market_s market_t;
@@ -59,6 +59,13 @@ enum column_s
   NEW_PRICE,
   UP_RANGE,
   DOWN_RANGE
+};
+
+//option type
+enum option_s
+{
+  ADD,
+  UPDATE
 };
 
 typedef struct
