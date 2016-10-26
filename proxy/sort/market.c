@@ -2,12 +2,12 @@
 #include "assert.h"
 
 my_key_t key_root = {0};
-char buff[100*1024];
 extern market_t market_list[];
 
 //get code for both market
 int init_market()
 {
+  char buff[100*1024];
   //get both txt
 
   char template_str[][100] =  {

@@ -21,7 +21,7 @@
 #define TYPE_REALTIME   0x0201 //
 #define TYPE_HISTORY    0x0402 //
 #define TYPE_TIME_SHARE 0x0301 //
-#define TYPE_AUTO_PUSH  0x0A03 //
+#define TYPE_AUTO_PUSH  0x0A01 //
 #define TYPE_SERVERINFO 0x0103 //
 #define TYPE_DAY_CURPOS 0x020c //
 

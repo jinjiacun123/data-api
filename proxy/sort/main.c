@@ -45,8 +45,9 @@ int main()
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
+  sleep(4);
   //get auto push data and resort data
-  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 1, 0);
 
   int menu = 1;
@@ -172,53 +173,54 @@ void init_receive(void * socket_fd)
   int length = head_length;
   int off = 0;
   int fd = *((int *)socket_fd);
+  int buff_len = 0;
 
    while(1){
-    memset(&head, 0x00, 4);
-    buff = (char *)malloc(length);
-    if(buff == NULL){
-      printf("malloc err!\n");
-      exit(-1);
-    }
-    memset(buff, 0x00, length);
-    //接受头部
-    ret_count = read(fd, buff,length);
-    printf("fd:%d\n", fd);
-    if(ret_count == 0){
-      printf("connect close!\n");
-      sleep(3);
-      return 0;
-      //      continue;
-      //pthread_exit();
-    }
-    if(ret_count <0){
-      printf("recive server err!\n");
-      sleep(3);
-            return 0;
-      // continue;
-      //pthread_exit(-1);
-    }
-
-    if(ret_count == length){
-      //receive body of package
-      strncpy(head, buff, 4);
-      length = *((int *)(buff+4));
-      free(buff);
-      buff = (char *)malloc(length);
-      if(buff == NULL){
-	printf("malloc err!\n");
-	exit(-1);
-      }
-      memset(buff, 0x00, length);
-      while(length != (ret_count = read(fd, buff+off, length))){
-	off += ret_count;
-	length -= ret_count;
-      }
-      //parse
-      printf("%s\n", buff);
-      printf("recive complete!\n");
-      parse(buff, length);
-    }
+     memset(&head, 0x00, 4);
+     buff = (char *)malloc(head_length);
+     if(buff == NULL){
+       printf("malloc err!\n");
+       exit(-1);
+     }
+     memset(buff, 0x00, head_length);
+     //接受头部
+     ret_count = read(fd, buff, head_length);
+     printf("fd:%d\n", fd);
+     if(ret_count == 0){
+       printf("connect close!\n");
+       sleep(3);
+       return 0;
+       //      continue;
+       //pthread_exit();
+     }
+     else if(ret_count <0){
+       printf("recive server err!\n");
+       sleep(3);
+       return 0;
+       // continue;
+       //pthread_exit(-1);
+     }else if(ret_count == head_length){
+       off = 0;
+       //receive body of package
+       strncpy(head, buff, 4);
+       length = *((int *)(buff+4));
+       buff_len = length;
+       free(buff);
+       buff = (char *)malloc(length);
+       if(buff == NULL){
+	 printf("malloc err!\n");
+	 exit(-1);
+       }
+       memset(buff, 0x00, length);
+       while(length != (ret_count = read(fd, buff+off, length))){
+	 off += ret_count;
+	 length -= ret_count;
+       }
+       //parse
+       printf("%s\n", buff);
+       printf("recive complete!\n");
+       parse(buff, buff_len);
+     }
    }
 }
 
@@ -304,7 +306,6 @@ int parse(char * buff, uLongf  buff_len)
   case TYPE_AUTO_PUSH:{
     printf("recieve auto_push...\n");
     parse_auto_push(buff, buff_len);
-    // parse_auto_push(buff, buff_len);
     free(buff);
   }
     break;
@@ -383,9 +384,19 @@ do_stock(my_market, code_type, code, buff, i, option)
 	 tmp->m_lNewPrice);
   */
   entity->price = tmp->m_lNewPrice;
-  //add to sort
-  sort_add(my_market, entity, column);
-  //printf("index:%d\n", i);
+  switch(option){
+  case ADD:{
+    //add to sort
+    sort_add(my_market, entity, column);
+  }break;
+  case UPDATE:{
+    //update
+    sort_update(my_market, entity, column);
+  }break;
+  default:{
+
+  }
+  }
 
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
@@ -410,6 +421,7 @@ int parse_auto_push(char * buff, uLong   buff_len)
     memcpy(code, data_type->m_cCode, 6);
     if(data_type->m_cCodeType == 0x1101){//股票
       my_market = &market_list[index];
+      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
       do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
     }
   }
