@@ -467,6 +467,7 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
     //parse(my_buff);
     //return;
   }
+  printf("unzip:%d\n", unzip);
   return -1;
 }
 
