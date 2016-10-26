@@ -197,15 +197,16 @@ typedef struct
   char code[6];
 }CodeInfo;
 
-entity_t * entity_list;
+//entity_t * entity_list;
 
 int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
+void init_sort_display(void * param);
 int get_content(char * filename, char * buff, int length);
 int send_realtime(int socket_fd, int index, int size, int code_type_index);
 int send_auto_push(int socket_fd, int index, int size, int code_type_index);
 int send_heart(int socket_fd);
-2int parse(char * buff, uLongf buff_len);
+int parse(char * buff, uLongf buff_len);
 int parse_realtime(char * buff, uLongf buff_len);
 int parse_auto_push(char * buff, uLongf buff_len);
 int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len);

@@ -1,4 +1,4 @@
-#include<stdio.h>
+# include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<sys/types.h>
@@ -17,6 +17,7 @@
 int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
+bool may_show_sort = false;
 
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 
@@ -34,27 +35,46 @@ int main()
 {
   pthread_t p_id = 0;
   int ret = 0;
+  int test_times = 0;
 
   signal(SIGINT, sig_stop);
   //--receive both shanghhai and shenzhen market stock
   init_market();
   init_socket(&socket_fd);
   ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
-  printf("ret:%d\n", ret);
+  printf("init_receive ret:%d\n", ret);
+  //dynamic show sort area
+  ret = pthread_create(&p_id , NULL, (void *)init_sort_display, NULL);
+  printf("init_sort_display ret:%d\n", ret);
   //---init data and sort
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //---auto push data---
   sleep(4);
   //get auto push data and resort data
-  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 1, 0);
 
   int menu = 1;
   while(!is_exit){
+    /*
+    printf("please choice:\n");
+    scanf("%d", &menu);
+    printf("menu:%d\n", menu);
+    if(menu == 2){
+      market_t * my_market = &market_list[0];
+      entity_t entity_list[10];
+      memset(&entity_list, 0x00, 10*sizeof(entity_t));
+      sort_get(my_market, 0, 10, entity_list);
+      menu = 1;
+      printf("display show complete ... \n");
+    }
+    */
     sleep(3);
     send_heart(socket_fd);
     heart_times++;
+    test_times++;
+    if(test_times >20) break;
   }
 
 
@@ -217,11 +237,35 @@ void init_receive(void * socket_fd)
 	 length -= ret_count;
        }
        //parse
-       printf("%s\n", buff);
+       //printf("%s\n", buff);
        printf("recive complete!\n");
        parse(buff, buff_len);
      }
    }
+}
+
+void init_sort_display(void * param)
+{
+  market_t * my_market = &market_list[0];
+  entity_t entity_list[10];
+  entity_t * cur_entity = NULL;
+  int i = 0;
+
+  while(1){
+    if(may_show_sort){
+      memset(&entity_list, 0x00, 10*sizeof(entity_t));
+      sort_get(my_market, 0, 10, entity_list);
+      cur_entity = &entity_list[0];
+      for(i = 0; i< 10; i++){
+	printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
+	cur_entity ++;
+      }
+      printf("display show complete ... \n");
+      sleep(2);
+    }else{
+      sleep(3);
+    }
+  }
 }
 
 int send_auto_push(int socket_fd, int index, int size, int code_type_index)
@@ -278,7 +322,7 @@ int send_heart(int socket_fd)
   memset(request, 0, 1024);
   memcpy(request, &data, sizeof(data));
   send(socket_fd, request, sizeof(data), 0);
-  printf("心跳请求发送完毕\n");
+  printf("send heart message...\n");
   return 0;
 }
 
@@ -293,24 +337,25 @@ int parse(char * buff, uLongf  buff_len)
   switch(type){
   case TYPE_REALTIME:{
     printf("realtime...\n");
+    may_show_sort = false;
     parse_realtime(buff, buff_len);
     free(buff);
+    may_show_sort = true;
     //sort
     column_n sort_column = NEW_PRICE;
-    //my_sort(0, sort_column);
-    //display sort
-    //display_sort(0);
     //    is_exit = true;
   }
     break;
   case TYPE_AUTO_PUSH:{
     printf("recieve auto_push...\n");
+    may_show_sort = false;
     parse_auto_push(buff, buff_len);
+    may_show_sort = true;
     free(buff);
   }
     break;
   case TYPE_HEART:{
-    printf("heart...\n");
+    //printf("heart...\n");
     heart_times--;
   }
     break;
@@ -397,12 +442,13 @@ do_stock(my_market, code_type, code, buff, i, option)
 
   }
   }
-
+  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 entity->price);
+  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)

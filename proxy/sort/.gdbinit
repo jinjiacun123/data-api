@@ -3,9 +3,11 @@ b main
 #b send_auto_push
 #b 414
 #b 427
-b parse
-b parse_auto_push
-b parse_realtime
+#b parse
+#b parse_auto_push
+#b parse_realtime
+#b init_sort_display
+b sort_get
 #b do_stock
 #b sort_add
 #b get_market

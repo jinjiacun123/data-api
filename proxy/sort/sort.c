@@ -344,7 +344,7 @@ int sort_get(my_market, index, size, entity_list)
   sort_area_t * area = NULL;
   int cur_real_size = 0;
   area = &my_market->sort_area_price;
-  entity_t * entity_target = entity_list;
+  entity_t * entity_target = &entity_list[0];
   entity_t * entity = NULL;
   int off = index;
   int off_size = size;
@@ -375,7 +375,7 @@ int sort_get(my_market, index, size, entity_list)
   do{
     if(size > cur_real_size - begin){
       for(j = begin; j< cur_real_size; j++){
-	entity_target = (area->cur+j)->entity;
+	entity_list[entity_index] = *(area->cur+j)->entity;
 	entity_index ++;
 	entity_target ++;
 	off_size --;
@@ -387,7 +387,7 @@ int sort_get(my_market, index, size, entity_list)
 	while(true){
 	  if(off_size > cur_real_size){
 	    for(j = 0; j < cur_real_size; j++){
-	      entity_target = (area->cur + j)->entity;
+	      entity_list[entity_index] = *(area->cur + j)->entity;
 	      entity_target ++;
 	      entity_index ++;
 	      off_size --;
@@ -396,7 +396,7 @@ int sort_get(my_market, index, size, entity_list)
 	    cur_real_size = area->real_size;
 	  }else{
 	    for(j = 0; j< off_size; j++){
-	      entity_target = (area->cur + j)->entity;
+	      entity_list[entity_index] = *(area->cur + j)->entity;
 	      entity_target ++;
 	      entity_index ++;
 	      off_size --;
@@ -410,17 +410,18 @@ int sort_get(my_market, index, size, entity_list)
     }
     else{
       for(j = begin; j< begin+size; j++){
-	entity_target = area->cur+j;
-	entity_target ++;
-	entity_index ++;
+	entity_list[j] = *(area->cur+j)->entity;
+	//entity_target ++;
+	//entity_index ++;
 	off_size --;
       }
+      break;
     }
   }while(!is_finish);
 
-  entity = entity_list;
+  // entity = entity_list[0];
   for(i = 0; i< size; i++){
-    printf("code:%s\tprice:%d\n", entity->code, entity->price);
+    printf("code:%s\tprice:%d\n", entity_list[i].code, entity_list[i].price);
     entity ++;
   }
 
