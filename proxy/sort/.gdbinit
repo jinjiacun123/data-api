@@ -7,9 +7,10 @@ b main
 #b parse_auto_push
 #b parse_realtime
 #b init_sort_display
-b sort_get
+#b sort_get
 #b do_stock
 #b sort_add
+b sort_get
 #b get_market
 #b init_sort_area
 #b unpack

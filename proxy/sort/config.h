@@ -25,8 +25,9 @@
 #define TYPE_SERVERINFO 0x0103 //
 #define TYPE_DAY_CURPOS 0x020c //
 
-#define AREA_NUMBER 50
-#define AREA_QUEUE_DEFAULT_LEN 50
+#define AREA_NUMBER 10
+#define AREA_QUEUE_DEFAULT_LEN 10
+#define SORT_SHOW_MAX_NUM 19
 
 #define system_32
 //#define system_64

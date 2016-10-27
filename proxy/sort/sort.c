@@ -371,59 +371,54 @@ int sort_get(my_market, index, size, entity_list)
 
   begin = off;
 
+  int part_end = 0;
   //target area and queue
-  do{
-    if(size > cur_real_size - begin){
-      for(j = begin; j< cur_real_size; j++){
-	entity_list[entity_index] = *(area->cur+j)->entity;
-	entity_index ++;
+  if(area == NULL) return -1;
+  if(size > cur_real_size - begin){
+    for(j = begin; j< cur_real_size; j++){
+      entity_list[entity_index] = *(area->cur+j)->entity;
+      entity_index ++;
+      entity_target ++;
+      off_size --;
+    }
+  }else{
+    part_end = begin + size;
+    for(j = begin; j< part_end; j++){
+      entity_list[entity_index] = *(area->cur+j)->entity;
+      entity_index ++;
+      entity_target ++;
+      off_size --;
+    }
+  }
+  while(off_size >0){
+    area++;
+    if(area == NULL) break;
+    cur_real_size = area->real_size;if(cur_real_size == 0) continue;
+    if(off_size > cur_real_size){//area all
+      for(j = 0; j< cur_real_size; j++){
+	entity_list[entity_index] = *(area->cur + j)->entity;
 	entity_target ++;
+	entity_index ++;
 	off_size --;
       }
-      off_size = cur_real_size - begin;
-      area++;
-      cur_real_size = area->real_size;
-      if(off_size >0){
-	while(true){
-	  if(off_size > cur_real_size){
-	    for(j = 0; j < cur_real_size; j++){
-	      entity_list[entity_index] = *(area->cur + j)->entity;
-	      entity_target ++;
-	      entity_index ++;
-	      off_size --;
-	    }
-	    area ++;
-	    cur_real_size = area->real_size;
-	  }else{
-	    for(j = 0; j< off_size; j++){
-	      entity_list[entity_index] = *(area->cur + j)->entity;
-	      entity_target ++;
-	      entity_index ++;
-	      off_size --;
-	    }
-	    break;
-	  }
-	}
-      }else{
-	break;
-      }
-    }
-    else{
-      for(j = begin; j< begin+size; j++){
-	entity_list[j] = *(area->cur+j)->entity;
-	//entity_target ++;
-	//entity_index ++;
+    }else{//area part
+      part_end = off_size;
+      for(j = 0; j< part_end; j++){
+	entity_list[entity_index] = *(area->cur + j)->entity;
+	entity_target ++;
+	entity_index ++;
 	off_size --;
       }
-      break;
     }
-  }while(!is_finish);
+  }
 
   // entity = entity_list[0];
+  /*
   for(i = 0; i< size; i++){
     printf("code:%s\tprice:%d\n", entity_list[i].code, entity_list[i].price);
     entity ++;
-  }
+    }
+  */
 
   return 0;
 }

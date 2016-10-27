@@ -1,4 +1,4 @@
-# include<stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
 #include<sys/types.h>
@@ -13,6 +13,7 @@
 #include "cJSON.h"
 #include "comm.h"
 #include "market.h"
+#include <gperftools/profiler.h>
 
 int last_time_market;//effective time
 int cur_time;        //current time
@@ -37,6 +38,9 @@ int main()
   int ret = 0;
   int test_times = 0;
 
+  char program[1024] = {0};
+  snprintf(program, 1023, "main_%d.prof" ,getpid());
+  ProfilerStart(program);
   signal(SIGINT, sig_stop);
   //--receive both shanghhai and shenzhen market stock
   init_market();
@@ -49,34 +53,23 @@ int main()
   //---init data and sort
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_realtime(socket_fd, 0, 20, 0);
   //---auto push data---
   sleep(4);
   //get auto push data and resort data
-  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-  //send_auto_push(socket_fd, 0, 1, 0);
+  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, 20, 0);
 
   int menu = 1;
   while(!is_exit){
-    /*
-    printf("please choice:\n");
-    scanf("%d", &menu);
-    printf("menu:%d\n", menu);
-    if(menu == 2){
-      market_t * my_market = &market_list[0];
-      entity_t entity_list[10];
-      memset(&entity_list, 0x00, 10*sizeof(entity_t));
-      sort_get(my_market, 0, 10, entity_list);
-      menu = 1;
-      printf("display show complete ... \n");
-    }
-    */
     sleep(3);
     send_heart(socket_fd);
     heart_times++;
     test_times++;
-    if(test_times >20) break;
+    if(test_times > 10) break;
   }
 
+  ProfilerStop();
 
   printf("exit system...\n");
   return 0;
@@ -246,17 +239,19 @@ void init_receive(void * socket_fd)
 
 void init_sort_display(void * param)
 {
-  market_t * my_market = &market_list[0];
-  entity_t entity_list[10];
+  market_t * my_market = NULL;
+  entity_t entity_list[SORT_SHOW_MAX_NUM];
   entity_t * cur_entity = NULL;
   int i = 0;
+  int begin = 100;
 
   while(1){
     if(may_show_sort){
-      memset(&entity_list, 0x00, 10*sizeof(entity_t));
-      sort_get(my_market, 0, 10, entity_list);
+      my_market = &market_list[0];
+      memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
+      sort_get(my_market, begin, SORT_SHOW_MAX_NUM, entity_list);
       cur_entity = &entity_list[0];
-      for(i = 0; i< 10; i++){
+      for(i = 0; i< SORT_SHOW_MAX_NUM; i++){
 	printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
 	cur_entity ++;
       }
@@ -442,13 +437,11 @@ do_stock(my_market, code_type, code, buff, i, option)
 
   }
   }
-  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 entity->price);
-  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)
