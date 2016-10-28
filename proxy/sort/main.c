@@ -53,7 +53,7 @@ int main()
   //---init data and sort
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
-  //send_realtime(socket_fd, 0, 20, 0);
+  //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
   sleep(4);
   //get auto push data and resort data
@@ -66,7 +66,8 @@ int main()
     send_heart(socket_fd);
     heart_times++;
     test_times++;
-    if(test_times > 10) break;
+    //if(is_exit) break;
+    // if(test_times > 1000) break;
   }
 
   ProfilerStop();
@@ -179,6 +180,7 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
 void init_receive(void * socket_fd)
 {
   char head[4];
+  char head_buff[9];
   char * buff = NULL;
   int package_body_length = 0;
   int ret_count = 0;
@@ -187,38 +189,40 @@ void init_receive(void * socket_fd)
   int off = 0;
   int fd = *((int *)socket_fd);
   int buff_len = 0;
+  int max_buff = 1;
 
    while(1){
      memset(&head, 0x00, 4);
-     buff = (char *)malloc(head_length);
-     if(buff == NULL){
-       printf("malloc err!\n");
-       exit(-1);
-     }
-     memset(buff, 0x00, head_length);
+     memset(&head_buff, 0x00, 8);
      //接受头部
-     ret_count = read(fd, buff, head_length);
+     ret_count = read(fd, head_buff, head_length);
      printf("fd:%d\n", fd);
      if(ret_count == 0){
        printf("connect close!\n");
        sleep(3);
        return 0;
-       //      continue;
-       //pthread_exit();
      }
      else if(ret_count <0){
        printf("recive server err!\n");
        sleep(3);
        return 0;
-       // continue;
-       //pthread_exit(-1);
      }else if(ret_count == head_length){
        off = 0;
        //receive body of package
-       strncpy(head, buff, 4);
-       length = *((int *)(buff+4));
+       strncpy(head, head_buff, 4);
+       length = *((int *)(head_buff+4));
        buff_len = length;
-       free(buff);
+       /*
+       if(buff_len > max_buff*4){
+	 if(buff != NULL) free(buff);
+	 max_buff++;
+	 buff = (char *)malloc(max_buff*4);
+	 if(buff == NULL){
+	   printf("malloc err!\n");
+	   exit(-1);
+	 }
+       }
+       */
        buff = (char *)malloc(length);
        if(buff == NULL){
 	 printf("malloc err!\n");
@@ -229,6 +233,7 @@ void init_receive(void * socket_fd)
 	 off += ret_count;
 	 length -= ret_count;
        }
+       buff[buff_len] = '\0';
        //parse
        //printf("%s\n", buff);
        printf("recive complete!\n");
@@ -243,7 +248,7 @@ void init_sort_display(void * param)
   entity_t entity_list[SORT_SHOW_MAX_NUM];
   entity_t * cur_entity = NULL;
   int i = 0;
-  int begin = 100;
+  int begin = 0;
 
   while(1){
     if(may_show_sort){
@@ -274,12 +279,7 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
   int i = 0;
   int request_length = sizeof(RealPack_ex)+codeinfo_length*size;
 
-  request = (char *)malloc(request_length);
-  if(request == NULL){
-    printf("malloc err!\n");
-    exit(-1);
-  }
-  memset(request, 0x00, request_length);
+  assert(jim_malloc(request_length, &request) == 0);
 
   RealPack_ex * data = (RealPack_ex *)request;
   memcpy(data->m_head,HEADER,4);
@@ -338,7 +338,7 @@ int parse(char * buff, uLongf  buff_len)
     may_show_sort = true;
     //sort
     column_n sort_column = NEW_PRICE;
-    //    is_exit = true;
+    //is_exit = true;
   }
     break;
   case TYPE_AUTO_PUSH:{
@@ -375,15 +375,18 @@ int parse_realtime(char * buff, uLongf buff_len)
 {
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
-  int i=0;
+  int i= 0;
   int index = 0;
   market_t * my_market = NULL;
+  int code_len = 0;
 
   for(i=0; i< data_head->m_nSize; i++){
     CommRealTimeData * data_type = (CommRealTimeData *)(buff
 							+ 20
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-    memcpy(code, data_type->m_cCode, 6);
+    //    code_len = strlen(data_type->m_cCode);
+    strncpy(code, data_type->m_cCode, 6);
+    code[6] = '\0';
     if(data_type->m_cCodeType == 0x1101){//股票
       my_market = &market_list[index];
       do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
@@ -437,11 +440,13 @@ do_stock(my_market, code_type, code, buff, i, option)
 
   }
   }
+  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 entity->price);
+  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)
@@ -449,7 +454,7 @@ int parse_auto_push(char * buff, uLong   buff_len)
   printf("parse auto_push...\n");
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
-  int i=0;
+  int i = 0;
   int index = 0;
   market_t * my_market = NULL;
 

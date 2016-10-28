@@ -20,25 +20,31 @@ int init_sort_area(my_market)
   sort_area_t * sort_area = NULL;
   sort_area_t * sort_area_zero = NULL;
   int step_len = (my_market->setting_max - my_market->setting_min)/AREA_NUMBER;
-  int default_area_queue_len = AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
+  int area_queue_len = 0;
+  int default_area_queue_len = AREA_NUMBER*AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
+  int page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
+  area_queue_len = page_size * PAGE_SIZE;
+  sort_area_queue_t * base_queue = (char *)malloc(area_queue_len);
+  if(base_queue == NULL){
+    printf("malloc error!\n");
+    return -1;
+  }
+  memset(base_queue, 0x00, area_queue_len);
 
+  /*
   //deal zero
   sort_area_zero = &my_market->sort_area_price_zero;
-  sort_area_zero->cur = (sort_area_queue_t *)malloc(AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t));
+  sort_area_zero->cur = (sort_area_queue_t *)malloc(area_queue_len);
   if(sort_area_zero->cur == NULL){
     printf("malloc err!\n");
     return -1;
   }
-  memset(sort_area_zero->cur, 0x00, default_area_queue_len);
+  memset(sort_area_zero->cur, 0x00, default_area_queue_len+1);
+  */
 
   sort_area = &my_market->sort_area_price;
   for(; i< AREA_NUMBER; i++){
-    sort_area->cur = (sort_area_queue_t *)malloc(default_area_queue_len);
-    if(sort_area->cur == NULL){
-      printf("malloc err!\n");
-      return -1;
-    }
-    memset(sort_area->cur, 0x00, default_area_queue_len);
+    sort_area->cur = base_queue +AREA_QUEUE_DEFAULT_LEN * i;
     sort_area->min_value.ivalue = my_market->setting_min + step_len * i;
     sort_area->max_value.ivalue = sort_area->min_value.ivalue + step_len +1;
     sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
@@ -189,7 +195,7 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     queue = area->cur;
     break;
   }
-  
+
   //find queue
   if(area->real_size == 0){
     *queue_index = 0;
@@ -224,10 +230,11 @@ static int find_location(my_market, entity, column, area_index, queue_index)
       memset(tmp_queue, 0x00, 2 * area->allow_size * sizeof(sort_area_queue_t));
       //copy old to new
       memcpy(tmp_queue, area->cur, area->allow_size * sizeof(sort_area_queue_t));
-      free(area->cur);
+      //sort_area_queue_t * ttt = area->cur;
       area->cur = tmp_queue;
       area->allow_size = area->allow_size *  2;
       *queue_index = area->real_size;
+      //free(ttt);
     }
   }
 

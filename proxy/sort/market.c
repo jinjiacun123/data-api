@@ -120,36 +120,16 @@ int get_market(cJSON * root_json, int index)
   market_list[index].entity_list_size = cJSON_GetArraySize(obj);
   if(market_list[index].list != NULL){free(market_list[index].list);}
   //init list
-  market_list[index].list = (entity_t *)malloc(market_list[index].entity_list_size*sizeof(entity_t));
-  if(market_list[index].list == NULL){
-    printf("molloc menory err!\n");
-    exit(-1);
-  }
-  memset(market_list[index].list, 0x00, market_list[index].entity_list_size*sizeof(entity_t));
+  assert(jim_malloc(market_list[index].entity_list_size*sizeof(entity_t), &market_list[index].list) == 0);
   if(market_list[index].sort_price_list != NULL){free(market_list[index].sort_price_list);}
   //init sort_price_list
-  market_list[index].sort_price_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_price_list == NULL){
-    printf("malloc memory err!\n");
-    exit(-1);
-  }
-  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_price_list) == 0);
   if(market_list[index].sort_up_list != NULL){free(market_list[index].sort_up_list);}
   //init sort_up_list
-  market_list[index].sort_up_list = (int*)malloc(market_list[index].entity_list_size*sizeof(int *)); 
-  if(market_list[index].sort_up_list == NULL){
-	printf("malloc memory err!\n");
-	exit(-1);
-  }
-  memset(market_list[index].sort_up_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_up_list) == 0);
   if(market_list[index].sort_down_list != NULL){free(market_list[index].sort_down_list);}
   //init sort_down_list
-  market_list[index].sort_down_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-  if(market_list[index].sort_down_list == NULL){
- 	printf("malloc memory err!\n");
-	exit(-1);
-  }
-  memset(market_list[index].sort_down_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_down_list) == 0);
 
   int i = 0;
   cJSON * item;

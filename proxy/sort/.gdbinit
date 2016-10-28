@@ -9,8 +9,9 @@ b main
 #b init_sort_display
 #b sort_get
 #b do_stock
+b do_stcok if i == 368
 #b sort_add
-b sort_get
+#b sort_get
 #b get_market
 #b init_sort_area
 #b unpack

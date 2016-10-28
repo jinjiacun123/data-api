@@ -1,5 +1,5 @@
 #CC = gcc-4.4
-SOURCE_LIST = main.o cJSON.o sort.c market.o
+SOURCE_LIST = main.o cJSON.o sort.c market.o help.o
 CCFLAGS = -fno-omit-frame-pointer
 main:$(SOURCE_LIST)
 	$(CC) -w -g -fprofile-arcs -ftest-coverage $(SOURCE_LIST)  -o main -pg -lm -lpthread -lz -lprofiler
@@ -14,6 +14,9 @@ sort.o:sort.c
 
 market.o:market.c
 	$(CC) -g -w -fprofile-arcs -ftest-coverage -c market.c -pg -lprofiler
+help.o:help.c
+	$(CC) -g -w -fprofile-arcs -ftest-coverage -c help.c -pg -lprofiler
+
 
 test_sort:test_sort.c
 	$(CC) -g -w test_sort.c -o test_sort

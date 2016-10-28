@@ -34,3 +34,6 @@ test_poll:test_poll.c
 
 test_byte:byte.c
 	$(CC) -g -o test_byte byte.c
+
+test_point_param:test_point_param.c
+	$(CC) -g -o test_point_param test_point_param.c

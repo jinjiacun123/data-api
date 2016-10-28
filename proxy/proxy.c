@@ -188,11 +188,13 @@ void main(int argc,char *argv[])
     }
     
     //check ip is connected
+    /*
     if((i=is_connected(clientSocketId, process_ip_list)) < 0){
       WriteErrLog("this client is connected!\n");
       close(clientSocketId);
       continue;
     }
+    */
     i = add_connected(clientSocketId, process_ip_list);
     
     
