@@ -19,6 +19,7 @@ int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
 bool may_show_sort = false;
+app_request_t app_list[APP_SIZE] = {0};
 
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 
@@ -38,9 +39,9 @@ int main()
   int ret = 0;
   int test_times = 0;
 
-  char program[1024] = {0};
-  snprintf(program, 1023, "main_%d.prof" ,getpid());
-  ProfilerStart(program);
+  //char program[1024] = {0};
+  //snprintf(program, 1023, "main_%d.prof" ,getpid());
+  //ProfilerStart(program);
   signal(SIGINT, sig_stop);
   //--receive both shanghhai and shenzhen market stock
   init_market();
@@ -48,16 +49,19 @@ int main()
   ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
   printf("init_receive ret:%d\n", ret);
   //dynamic show sort area
-  ret = pthread_create(&p_id , NULL, (void *)init_sort_display, NULL);
+  ret = pthread_create(&p_id, NULL, (void *)init_sort_display, NULL);
   printf("init_sort_display ret:%d\n", ret);
+  //init app
+  ret = pthread_create(&p_id, NULL, (void *)init_app, NULL);
+  printf("init app ret:%d\n", ret);
   //---init data and sort
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
-  sleep(4);
+  //sleep(4);
   //get auto push data and resort data
-  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
   //send_auto_push(socket_fd, 0, 20, 0);
 
   int menu = 1;
@@ -70,7 +74,7 @@ int main()
     // if(test_times > 1000) break;
   }
 
-  ProfilerStop();
+  //ProfilerStop();
 
   printf("exit system...\n");
   return 0;
@@ -247,8 +251,10 @@ void init_sort_display(void * param)
   market_t * my_market = NULL;
   entity_t entity_list[SORT_SHOW_MAX_NUM];
   entity_t * cur_entity = NULL;
-  int i = 0;
-  int begin = 0;
+  int i = 0, j = 0;
+  int begin = 1000;
+  int res = 0;
+  const char * fifo_name = "" ;
 
   while(1){
     if(may_show_sort){
@@ -256,16 +262,93 @@ void init_sort_display(void * param)
       memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
       sort_get(my_market, begin, SORT_SHOW_MAX_NUM, entity_list);
       cur_entity = &entity_list[0];
-      for(i = 0; i< SORT_SHOW_MAX_NUM; i++){
-	printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
-	cur_entity ++;
+      //send to app
+      for(j = 0; j < APP_SIZE; j++){
+	if(app_list[j].app_fifo_fd > 0){
+	  printf("app_fifo_fd:%d\n", app_list[j].app_fifo_fd);
+	  res = write(app_list[j].app_fifo_fd, &entity_list, SORT_SHOW_MAX_NUM*sizeof(entity_t));
+	  if(res == -1){
+	    printf("write app fifo err!\n");
+	    continue;
+	  }
+	}
       }
+
+      /*
+	for(i = 0; i< SORT_SHOW_MAX_NUM; i++){
+	  printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
+	  cur_entity ++;
+	}
+      */
       printf("display show complete ... \n");
       sleep(2);
     }else{
       sleep(3);
     }
   }
+
+  for(j = 0; j < APP_SIZE; j++){
+    if(app_list[i].app_fifo_fd > 0){
+      close(app_list[i].app_fifo_fd);
+      app_list[i].pid = 0;
+    }
+  }
+}
+
+void init_app(void *param)
+{
+  int fifo_fd = -1;
+  int res = 0;
+  int i = 0;
+  int app_request_len = sizeof(app_request_t);
+  char app_request_buff[app_request_len];
+  int app_fifo_fd = 0;
+  char *template = "./sort_%d";
+  char app_fifo_name[20];
+
+  //open fifo
+  fifo_fd = open(PIPE_NAME, O_RDONLY);
+  if(fifo_fd == -1){
+    printf("open pipe error!\n");
+    exit(-1);
+  }
+
+  while(true){
+    res = read(fifo_fd, app_request_buff, app_request_len);
+    if(res == -1){
+      printf("receive client app request error!\nx");
+      exit(-1);
+      //continue;
+    }else if(res == 0){
+      printf("read finish...\n");
+      sleep(3);
+      continue;
+    }else{
+      for(i = 0; i< APP_SIZE; i++){
+	i = i % APP_SIZE;
+	if(app_list[i].pid == 0){
+	  memset(&app_fifo_name, 0x00, 20);
+	  //get
+	  app_list[i] = *((app_request_t*)app_request_buff);
+	  sprintf(app_fifo_name, template, app_list[i].pid);
+	  //open fifo
+	  app_fifo_fd = open(app_fifo_name, O_WRONLY);
+	  if(app_fifo_fd == -1){
+	    printf("open %s error!\n");
+	    app_list[i].pid = 0;
+	    app_list[i].app_fifo_fd = 0;
+	    continue;
+	  }
+	  app_list[i].app_fifo_fd = app_fifo_fd;
+	  break;
+	}else{
+	  continue;
+	}
+      }
+    }
+  }
+
+  close(fifo_fd);
 }
 
 int send_auto_push(int socket_fd, int index, int size, int code_type_index)

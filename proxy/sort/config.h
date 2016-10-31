@@ -27,11 +27,13 @@
 
 #define PAGE_SIZE 4096
 #define AREA_NUMBER 50
-#define AREA_QUEUE_DEFAULT_LEN 100
-#define SORT_SHOW_MAX_NUM 19
+#define AREA_QUEUE_DEFAULT_LEN 10
+#define SORT_SHOW_MAX_NUM 10
 
 #define system_32
 //#define system_64
+#define PIPE_NAME "./sort"
+#define APP_SIZE  1024
 
 //basic type
 #ifdef system_32
@@ -50,7 +52,8 @@ typedef struct sort_area_queue_s sort_area_queue_t;
 typedef struct market_s market_t;
 typedef struct entity_s entity_t;
 
-typedef union{
+typedef union
+{
   int ivalue;
   float fvalue;
 }value_t;
@@ -69,6 +72,15 @@ enum option_s
   ADD,
   UPDATE
 };
+
+//app request struct
+typedef struct
+{
+  pid_t pid;
+  int app_fifo_fd;
+  int begin;
+  int size;
+}app_request_t;
 
 typedef struct
 {
@@ -203,7 +215,9 @@ typedef struct
 
 int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
+void init_pipe(void * param);
 void init_sort_display(void * param);
+void init_app(void *param);
 int get_content(char * filename, char * buff, int length);
 int send_realtime(int socket_fd, int index, int size, int code_type_index);
 int send_auto_push(int socket_fd, int index, int size, int code_type_index);
@@ -218,4 +232,5 @@ int get_index_by_code_ascii(char ascii);
 int get_quick_image(int code_type_index, int begin, int end); 
 int display_sort(market_t * my_market);
 void sig_stop(int signo);
+void test();
 #endif

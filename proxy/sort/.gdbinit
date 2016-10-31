@@ -9,7 +9,7 @@ b main
 #b init_sort_display
 #b sort_get
 #b do_stock
-b do_stcok if i == 368
+#b do_stcok if i == 368
 #b sort_add
 #b sort_get
 #b get_market
@@ -19,4 +19,5 @@ b do_stcok if i == 368
 #b find_entity_by_key
 #b find_location
 #b my_sort
+b init_app
 r

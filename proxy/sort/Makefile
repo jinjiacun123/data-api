@@ -17,6 +17,8 @@ market.o:market.c
 help.o:help.c
 	$(CC) -g -w -fprofile-arcs -ftest-coverage -c help.c -pg -lprofiler
 
+app:app.c
+	$(CC) -g -w -fprofile-arcs -ftest-coverage -o app app.c -pg -lprofiler
 
 test_sort:test_sort.c
 	$(CC) -g -w test_sort.c -o test_sort
