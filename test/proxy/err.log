@@ -57864,3 +57864,34 @@ v∑ : accept client connection!
 [  4448] : 127.0.0.1	recive info from server!
 [  4448] : 127.0.0.1	send to client
 [  4448] : 127.0.0.1	client connection close
+[  2481]ÚY∑ê∏B : accept client connection!
+[  2481]Ú127.0.0.1 : create child process!
+[  4883] : connection to server!
+[  4883] : send login info!
+[  4883] : recive login info!
+[  4883] : recive login info check ok!
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	read client info!
+[  4883] : 127.0.0.1	recive client info complete!
+[  4883] : 127.0.0.1	recive info from server!
+[  4883] : 127.0.0.1	send to client
+[  4883] : 127.0.0.1	client connection close

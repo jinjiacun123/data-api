@@ -6,6 +6,7 @@
 
 struct entity_s
 {
+  unsigned short type;
   char code[6];
   int  pre_close;  //close price of yestoday
 

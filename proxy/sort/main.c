@@ -20,6 +20,7 @@ int cur_time;        //current time
 int heart_times = 0;
 bool may_show_sort = false;
 app_request_t app_list[APP_SIZE] = {0};
+pthread_mutex_t work_mutex;
 
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 
@@ -35,7 +36,7 @@ market_t market_list[] = {
 
 int main()
 {
-  pthread_t p_id = 0;
+  pthread_t p_socket_id = 0, p_sort_id = 0, p_app_id = 0;
   int ret = 0;
   int test_times = 0;
 
@@ -46,14 +47,24 @@ int main()
   //--receive both shanghhai and shenzhen market stock
   init_market();
   init_socket(&socket_fd);
-  ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
-  printf("init_receive ret:%d\n", ret);
+  //init mutext
+  ret = pthread_mutex_init(&work_mutex, NULL);
+  assert( ret == 0);
+  if(ret != 0){
+    perror("Mutext initialization failed");
+    exit(-1);
+  }
+  ret = pthread_create(&p_socket_id, NULL, (void *)init_receive, (void *)&socket_fd);
+  assert( ret == 0);
+  //printf("init_receive ret:%d\n", ret);
   //dynamic show sort area
-  ret = pthread_create(&p_id, NULL, (void *)init_sort_display, NULL);
-  printf("init_sort_display ret:%d\n", ret);
+  ret = pthread_create(&p_sort_id, NULL, (void *)init_sort_display, NULL);
+  assert( ret == 0);
+  //printf("init_sort_display ret:%d\n", ret);
   //init app
-  ret = pthread_create(&p_id, NULL, (void *)init_app, NULL);
-  printf("init app ret:%d\n", ret);
+  ret = pthread_create(&p_app_id, NULL, (void *)init_app, NULL);
+  assert (ret == 0);
+  //printf("init app ret:%d\n", ret);
   //---init data and sort
   //get realtime data
   send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
@@ -75,7 +86,12 @@ int main()
   }
 
   //ProfilerStop();
+  void * recycle;
+  pthread_join(p_socket_id, &recycle);
+  pthread_join(p_sort_id, &recycle);
+  pthread_join(p_app_id, &recycle);
 
+  pthread_mutex_destroy(&work_mutex);
   printf("exit system...\n");
   return 0;
 }
@@ -415,10 +431,14 @@ int parse(char * buff, uLongf  buff_len)
   switch(type){
   case TYPE_REALTIME:{
     printf("realtime...\n");
+    pthread_mutex_lock(&work_mutex);
     may_show_sort = false;
+    pthread_mutex_unlock(&work_mutex);
     parse_realtime(buff, buff_len);
     free(buff);
+    pthread_mutex_lock(&work_mutex);
     may_show_sort = true;
+    pthread_mutex_unlock(&work_mutex);
     //sort
     column_n sort_column = NEW_PRICE;
     //is_exit = true;
@@ -426,9 +446,13 @@ int parse(char * buff, uLongf  buff_len)
     break;
   case TYPE_AUTO_PUSH:{
     printf("recieve auto_push...\n");
+    pthread_mutex_lock(&work_mutex);
     may_show_sort = false;
+    pthread_mutex_lock(&work_mutex);
     parse_auto_push(buff, buff_len);
+    pthread_mutex_lock(&work_mutex);
     may_show_sort = true;
+    pthread_mutex_unlock(&work_mutex);
     free(buff);
   }
     break;
