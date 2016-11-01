@@ -40,10 +40,21 @@ int main()
   int ret = 0;
   int test_times = 0;
 
+#ifndef WIN32
+  sigset_t signal_mask;
+  sigemptyset(&signal_mask);
+  sigaddset(&signal_mask, SIGPIPE);
+  int rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
+  if(rc != 0){
+    printf("block sigpipe error\n");
+  }
+#endif
+
   //char program[1024] = {0};
   //snprintf(program, 1023, "main_%d.prof" ,getpid());
   //ProfilerStart(program);
   signal(SIGINT, sig_stop);
+  //signal(SIGPIPE, sig_pipe);
   //--receive both shanghhai and shenzhen market stock
   init_market();
   init_socket(&socket_fd);
@@ -67,16 +78,18 @@ int main()
   //printf("init app ret:%d\n", ret);
   //---init data and sort
   //get realtime data
-  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+  ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+  assert(ret == 0);
   //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
   //sleep(4);
   //get auto push data and resort data
-  //send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //assert(ret == 0);
   //send_auto_push(socket_fd, 0, 20, 0);
 
   int menu = 1;
-  while(!is_exit){
+  while(true){
     sleep(3);
     send_heart(socket_fd);
     heart_times++;
@@ -123,8 +136,6 @@ int get_content(char * filename, char * buff, int buff_len)
   close(fd);
   return length;
 }
-
-
 
 int init_socket(int * socket_fd)
 {
@@ -287,6 +298,7 @@ void init_sort_display(void * param)
 	    printf("write app fifo err!\n");
 	    continue;
 	  }
+	  break;
 	}
       }
 
@@ -337,6 +349,7 @@ void init_app(void *param)
       //continue;
     }else if(res == 0){
       printf("read finish...\n");
+      //close pipe
       sleep(3);
       continue;
     }else{
@@ -488,13 +501,18 @@ int parse_realtime(char * buff, uLongf buff_len)
   int code_len = 0;
 
   for(i=0; i< data_head->m_nSize; i++){
+    memset(&code, 0x00, 7);
     CommRealTimeData * data_type = (CommRealTimeData *)(buff
 							+ 20
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-    //    code_len = strlen(data_type->m_cCode);
+    //code_len = strlen(data_type->m_cCode);
     strncpy(code, data_type->m_cCode, 6);
     code[6] = '\0';
+    //printf("code:%s\n", code);
     if(data_type->m_cCodeType == 0x1101){//股票
+      my_market = &market_list[index];
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+    }else if(data_type->m_cCodeType == 0x1201){
       my_market = &market_list[index];
       do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
     }
@@ -645,4 +663,7 @@ void sig_stop(int signo)
   shutdown(socket_fd, SHUT_RDWR);
   //close(socket_fd);
   exit(-1);
+}
+
+void sig_pipe(int signo){ 
 }

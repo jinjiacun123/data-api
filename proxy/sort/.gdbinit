@@ -20,4 +20,5 @@ b main
 #b find_location
 #b my_sort
 b init_app
+b init_sort_display
 r

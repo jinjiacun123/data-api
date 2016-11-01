@@ -7,7 +7,7 @@
 struct entity_s
 {
   unsigned short type;
-  char code[6];
+  char code[7];
   int  pre_close;  //close price of yestoday
 
   int pre_price;  //prefix value,use to check is sort

@@ -140,9 +140,14 @@ int get_market(cJSON * root_json, int index)
   int * yestoday_max_price = &market_list[index].yestoday_max;
   int * yestoday_min_price = &market_list[index].yestoday_min;
   *yestoday_min_price = 100000;
+  char * code = NULL;
   for(; i< market_list[index].entity_list_size; i++){
     item = cJSON_GetArrayItem(obj, i);
-    strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
+    //printf("code:%s\n", cJSON_GetObjectItem(item, "code")->valuestring);
+    code = cJSON_GetObjectItem(item, "code")->valuestring;
+    //strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
+    strncpy(entity->code, code, 6);
+    entity->code[6] = '\0';
     entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
     *item_sort_price = entity;
     *item_sort_up    = entity;
