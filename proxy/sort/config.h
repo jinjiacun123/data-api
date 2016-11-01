@@ -1,6 +1,7 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 #include<zlib.h>
+#include<stdbool.h>
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 //#define SERVER_MARKET "221.6.167.245"
 //#define SERVER_MARKET_PORT 8881
@@ -76,6 +77,7 @@ enum option_s
 //app request struct
 typedef struct
 {
+  bool is_create;
   pid_t pid;
   int app_fifo_fd;
   int begin;
@@ -218,6 +220,7 @@ void init_receive(void * socket_fd);
 void init_pipe(void * param);
 void init_sort_display(void * param);
 void init_app(void *param);
+void write_app(void * param);
 int get_content(char * filename, char * buff, int length);
 int send_realtime(int socket_fd, int index, int size, int code_type_index);
 int send_auto_push(int socket_fd, int index, int size, int code_type_index);

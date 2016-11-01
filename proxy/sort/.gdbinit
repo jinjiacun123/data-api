@@ -19,6 +19,10 @@ b main
 #b find_entity_by_key
 #b find_location
 #b my_sort
-b init_app
-b init_sort_display
+#b init_app thread all
+#b init_sort_display
+#set scheduler-locking on
+#set target-async 1
+#set pagination off
+#set non-stop on
 r

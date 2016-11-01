@@ -10,14 +10,14 @@
 
 #define MAX_BUFF_SIZE 4*1024
 
-int main(int argc, char * argv)
+int main(int argc, char * argv[])
 {
   int begin = 0;
   int size = 0;
   pid_t pid = getpid();
-  //begin = argv[1];
+  begin = atoi(argv[1]);
   //size = argv[2];
-  begin = 0;
+  //begin = 0;
   size = 10;
   char * buff = NULL;
   int entity_len = sizeof(entity_t);

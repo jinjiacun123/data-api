@@ -39,6 +39,7 @@ int main()
   pthread_t p_socket_id = 0, p_sort_id = 0, p_app_id = 0;
   int ret = 0;
   int test_times = 0;
+  void * recycle;
 
 #ifndef WIN32
   sigset_t signal_mask;
@@ -69,7 +70,7 @@ int main()
   assert( ret == 0);
   //printf("init_receive ret:%d\n", ret);
   //dynamic show sort area
-  ret = pthread_create(&p_sort_id, NULL, (void *)init_sort_display, NULL);
+  ret = pthread_create(&p_sort_id, NULL, (void *)write_app, NULL);
   assert( ret == 0);
   //printf("init_sort_display ret:%d\n", ret);
   //init app
@@ -82,10 +83,10 @@ int main()
   assert(ret == 0);
   //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
-  //sleep(4);
+  sleep(4);
   //get auto push data and resort data
-  //ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-  //assert(ret == 0);
+  ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  assert(ret == 0);
   //send_auto_push(socket_fd, 0, 20, 0);
 
   int menu = 1;
@@ -99,11 +100,9 @@ int main()
   }
 
   //ProfilerStop();
-  void * recycle;
   pthread_join(p_socket_id, &recycle);
-  pthread_join(p_sort_id, &recycle);
+  //pthread_join(p_sort_id, &recycle);
   pthread_join(p_app_id, &recycle);
-
   pthread_mutex_destroy(&work_mutex);
   printf("exit system...\n");
   return 0;
@@ -275,39 +274,24 @@ void init_receive(void * socket_fd)
 
 void init_sort_display(void * param)
 {
-  market_t * my_market = NULL;
-  entity_t entity_list[SORT_SHOW_MAX_NUM];
-  entity_t * cur_entity = NULL;
   int i = 0, j = 0;
   int begin = 1000;
   int res = 0;
   const char * fifo_name = "" ;
+  int p_id = -1;
 
   while(1){
     if(may_show_sort){
-      my_market = &market_list[0];
-      memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-      sort_get(my_market, begin, SORT_SHOW_MAX_NUM, entity_list);
-      cur_entity = &entity_list[0];
       //send to app
       for(j = 0; j < APP_SIZE; j++){
-	if(app_list[j].app_fifo_fd > 0){
-	  printf("app_fifo_fd:%d\n", app_list[j].app_fifo_fd);
-	  res = write(app_list[j].app_fifo_fd, &entity_list, SORT_SHOW_MAX_NUM*sizeof(entity_t));
-	  if(res == -1){
-	    printf("write app fifo err!\n");
-	    continue;
-	  }
-	  break;
+	if(app_list[j].app_fifo_fd > 0 && app_list[j].is_create == false){
+	  //begin new pthread
+	  res = pthread_create(&p_id, NULL, write_app, (void *)&app_list[i]);
+	  assert(res == 0);
+	  app_list[j].is_create = true;
+	  continue;
 	}
       }
-
-      /*
-	for(i = 0; i< SORT_SHOW_MAX_NUM; i++){
-	  printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
-	  cur_entity ++;
-	}
-      */
       printf("display show complete ... \n");
       sleep(2);
     }else{
@@ -333,9 +317,10 @@ void init_app(void *param)
   int app_fifo_fd = 0;
   char *template = "./sort_%d";
   char app_fifo_name[20];
+  app_request_t * my_app = NULL;
 
   //open fifo
-  fifo_fd = open(PIPE_NAME, O_RDONLY);
+  fifo_fd = open(PIPE_NAME, O_RDONLY|O_NONBLOCK);
   if(fifo_fd == -1){
     printf("open pipe error!\n");
     exit(-1);
@@ -348,36 +333,83 @@ void init_app(void *param)
       exit(-1);
       //continue;
     }else if(res == 0){
-      printf("read finish...\n");
-      //close pipe
+      /*
+      if(may_show_sort){
+	//write pipe
+	for(i = 0; i < APP_SIZE; i++){
+	  my_app = &app_list[i];
+	  if(my_app->pid > 0){	   
+	    write_app(&app_list[i]);
+	  }
+	}
+      }
+      */
       sleep(3);
       continue;
     }else{
       for(i = 0; i< APP_SIZE; i++){
-	i = i % APP_SIZE;
-	if(app_list[i].pid == 0){
+	my_app = &app_list[i];
+	//i = i % APP_SIZE;
+	if(my_app->pid == 0){
 	  memset(&app_fifo_name, 0x00, 20);
 	  //get
-	  app_list[i] = *((app_request_t*)app_request_buff);
-	  sprintf(app_fifo_name, template, app_list[i].pid);
+	  *my_app = *((app_request_t*)app_request_buff);
+	  sprintf(app_fifo_name, template, my_app->pid);
 	  //open fifo
 	  app_fifo_fd = open(app_fifo_name, O_WRONLY);
 	  if(app_fifo_fd == -1){
-	    printf("open %s error!\n");
+	    // printf("open %s error!\n");
 	    app_list[i].pid = 0;
 	    app_list[i].app_fifo_fd = 0;
+	    app_list[i].is_create = false;
 	    continue;
 	  }
-	  app_list[i].app_fifo_fd = app_fifo_fd;
+	  my_app->app_fifo_fd = app_fifo_fd;
 	  break;
-	}else{
-	  continue;
 	}
       }
     }
   }
 
   close(fifo_fd);
+}
+
+void write_app(void *param)
+{
+  int res = -1;
+  entity_t entity_list[SORT_SHOW_MAX_NUM];
+  market_t * my_market = NULL;
+  int i = 0;
+  app_request_t * my_app = NULL;
+
+   while(true){
+     if(may_show_sort){
+       for(i = 0; i < APP_SIZE; i++){
+	 my_app = &app_list[i];
+	 if(my_app->app_fifo_fd >0 && may_show_sort){
+	   //write app pipe
+	   my_market = &market_list[0];
+	   memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
+	   sort_get(my_market, my_app->begin, SORT_SHOW_MAX_NUM, entity_list);
+	   res = write(my_app->app_fifo_fd, &entity_list, SORT_SHOW_MAX_NUM*sizeof(entity_t));
+	   if(res == -1){
+	     printf("write app fifo err!\n");
+	     //close pipe
+	     close(my_app->app_fifo_fd);
+	     my_app->app_fifo_fd = 0;
+	     my_app->pid = 0;
+	     my_app->begin = 0;
+	     my_app->size = 0;
+	     my_app->is_create = false;
+	   }
+	 }
+       }
+     }
+   }
+    // else{
+    //  pthread_exit("pthread close...\n");
+    // }
+    //}
 }
 
 int send_auto_push(int socket_fd, int index, int size, int code_type_index)
@@ -422,7 +454,7 @@ int send_heart(int socket_fd)
   TestSrvData2 data ;
   memset(&data,0x00,sizeof(TestSrvData2));
   memcpy(data.head, HEADER,4);
-  data.length      = sizeof(TestSrvData2) -8;
+  data .length      = sizeof(TestSrvData2) -8;
   data.m_nType     = TYPE_HEART;
   data.m_nIndex= 1;
 
@@ -461,7 +493,7 @@ int parse(char * buff, uLongf  buff_len)
     printf("recieve auto_push...\n");
     pthread_mutex_lock(&work_mutex);
     may_show_sort = false;
-    pthread_mutex_lock(&work_mutex);
+    pthread_mutex_unlock(&work_mutex);
     parse_auto_push(buff, buff_len);
     pthread_mutex_lock(&work_mutex);
     may_show_sort = true;
@@ -470,7 +502,7 @@ int parse(char * buff, uLongf  buff_len)
   }
     break;
   case TYPE_HEART:{
-    //printf("heart...\n");
+    printf("heart...\n");
     heart_times--;
   }
     break;
@@ -544,13 +576,13 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-  /*
+
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
-  */
+
   entity->price = tmp->m_lNewPrice;
   switch(option){
   case ADD:{
@@ -570,7 +602,7 @@ do_stock(my_market, code_type, code, buff, i, option)
 	 i,
 	 code_type,
 	 code,
-	 entity->price);
+  	 entity->price);
   */
 }
 
