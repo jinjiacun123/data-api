@@ -9,7 +9,9 @@ b main
 #b init_sort_display
 #b sort_get
 #b do_stock
-#b do_stcok if i == 368
+#b do_stock if i == 368
+b do_stock if i == 7 
+#b do_stock if((int)strcmp(600010", code)) == 0
 #b sort_add
 #b sort_get
 #b get_market
@@ -25,4 +27,7 @@ b main
 #set target-async 1
 #set pagination off
 #set non-stop on
+#b write_app
+#b sort_update
+#b remove_entity
 r

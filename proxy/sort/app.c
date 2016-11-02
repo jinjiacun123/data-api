@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
       entity ++;
     }
     printf("------------------------------------\n");
-    // sleep(1);
+    sleep(1);
   }
   close(pipe_read_fd);
 

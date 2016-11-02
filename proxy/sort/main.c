@@ -410,6 +410,7 @@ void write_app(void *param)
 
    while(true){
      if(may_show_sort){
+       sleep(2);
        for(i = 0; i < APP_SIZE; i++){
 	 my_app = &app_list[i];
 	 if(my_app->app_fifo_fd >0 && may_show_sort){
@@ -418,15 +419,6 @@ void write_app(void *param)
 	   memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
 	   res = sort_get(my_market, my_app->begin, my_app->size, entity_list);
 	   assert(res == 0);
-	   for(i = 0; i< my_app->size; i++){
-	     printf("app entity-index:%d,code:%s,price:%d\n", i+1, entity_list[i].code, entity_list[i].price);
-	   }
-	   printf("----------------------------------------------\n");
-	   //memset(&price, 0x00, 10);
-	   //strcpy(price, itoa(entity_list[i].price));
-	   //sprintf(price, "%d\n", entity_list[0].price);
-	   //price = entity_list[i].price;
-	   //res = write(my_app->app_fifo_fd, &price, 10);
 	   res = write(my_app->app_fifo_fd, &entity_list, my_app->size*sizeof(entity_t));
 	   if(res == -1){
 	     printf("write app fifo err!\n");
@@ -525,6 +517,8 @@ int parse(char * buff, uLongf  buff_len)
     column_n sort_column = NEW_PRICE;
     //is_exit = true;
     is_simulate = true;
+    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    //assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");

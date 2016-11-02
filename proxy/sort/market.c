@@ -117,7 +117,8 @@ int get_market(cJSON * root_json, int index)
     printf("get object of date err!\n");
     exit(-1);
   }
-  market_list[index].entity_list_size = cJSON_GetArraySize(obj);
+  // market_list[index].entity_list_size = cJSON_GetArraySize(obj);
+  market_list[index].entity_list_size = 12;
   if(market_list[index].list != NULL){free(market_list[index].list);}
   //init list
   assert(jim_malloc(market_list[index].entity_list_size*sizeof(entity_t), &market_list[index].list) == 0);
@@ -141,7 +142,9 @@ int get_market(cJSON * root_json, int index)
   int * yestoday_min_price = &market_list[index].yestoday_min;
   *yestoday_min_price = 100000;
   char * code = NULL;
+  int max = 0;
   for(; i< market_list[index].entity_list_size; i++){
+    if(max >12) break;
     item = cJSON_GetArrayItem(obj, i);
     //printf("code:%s\n", cJSON_GetObjectItem(item, "code")->valuestring);
     code = cJSON_GetObjectItem(item, "code")->valuestring;
@@ -170,6 +173,7 @@ int get_market(cJSON * root_json, int index)
     item_sort_price ++;
     item_sort_up ++;
     item_sort_down ++;
+    max ++;
   }
 
   printf("yestoday_max:%d\tyestoday_min:%d\m", 

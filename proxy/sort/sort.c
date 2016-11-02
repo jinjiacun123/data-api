@@ -269,8 +269,13 @@ static int remove_entity(my_market, entity, column)
 	cur_queue ++;
 	after_queue ++;
       }
-      //after_queue->index = -1;
-      //after_queue->entity = NULL;
+      /*
+      after_queue = cur_area->cur + cur_area->real_size -1;
+      after_queue->index = -1;
+      after_queue->entity = NULL;
+      */
+      after_queue->index = -1;
+      after_queue->entity = NULL;
     }
     else if(queue_index == cur_area->real_size-1){//last
       cur_queue = cur_area->cur+cur_area->real_size-1;
