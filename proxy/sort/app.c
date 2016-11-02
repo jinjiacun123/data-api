@@ -16,9 +16,9 @@ int main(int argc, char * argv[])
   int size = 0;
   pid_t pid = getpid();
   begin = atoi(argv[1]);
-  //size = argv[2];
+  size = atoi(argv[2]);
   //begin = 0;
-  size = 10;
+  //size = 1;
   char * buff = NULL;
   int entity_len = sizeof(entity_t);
   int buff_len = entity_len *size;
@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
   entity_t * entity = NULL;
   int i = 0;
 
-  buff = (entity_t *)malloc(buff_len);
+  buff = (entity_t *)malloc(buff_len+1);
   if(buff == NULL){
     printf("malloc error!\n");
     exit(-1);
@@ -77,6 +77,7 @@ int main(int argc, char * argv[])
 
   //read sort
   while(true){
+    memset(buff, 0x00, buff_len+1);
     res = read(pipe_read_fd, buff, buff_len);
     if(res == -1){
       printf("read error!\n");
@@ -84,9 +85,10 @@ int main(int argc, char * argv[])
     }else if(res == 0){
       printf("read complete...\n");
       sleep(3);
-      continue;
+      break;
     }
 
+    //printf("price:%s\n", buff);
     //display
     entity = (entity_t *)buff;
     for(i = 0; i<size; i++){
@@ -96,7 +98,7 @@ int main(int argc, char * argv[])
       entity ++;
     }
     printf("------------------------------------\n");
-    sleep(3);
+    // sleep(1);
   }
   close(pipe_read_fd);
 

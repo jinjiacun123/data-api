@@ -264,14 +264,13 @@ static int remove_entity(my_market, entity, column)
       i = queue_index;
       cur_queue = cur_area->cur+i;
       after_queue = cur_area->cur +i + 1;
-      for(; i< cur_area->real_size; i++){
-	cur_queue->index = after_queue->index -1;
+      for(; i < cur_area->real_size-1 ; i++){
 	cur_queue->entity = after_queue->entity;
 	cur_queue ++;
 	after_queue ++;
       }
-      after_queue->index = -1;
-      after_queue->entity = NULL;
+      //after_queue->index = -1;
+      //after_queue->entity = NULL;
     }
     else if(queue_index == cur_area->real_size-1){//last
       cur_queue = cur_area->cur+cur_area->real_size-1;

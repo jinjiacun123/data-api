@@ -5,8 +5,8 @@
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 //#define SERVER_MARKET "221.6.167.245"
 //#define SERVER_MARKET_PORT 8881
-//#define SERVER_MARKET "192.168.1.131"
-#define SERVER_MARKET "127.0.0.1"
+#define SERVER_MARKET "192.168.1.131"
+//#define SERVER_MARKET "127.0.0.1"
 #define SERVER_MARKET_PORT 8001
 
 #define USERNAME "jrjvip_android"
@@ -228,7 +228,7 @@ int send_heart(int socket_fd);
 int parse(char * buff, uLongf buff_len);
 int parse_realtime(char * buff, uLongf buff_len);
 int parse_auto_push(char * buff, uLongf buff_len);
-int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len);
+int unpack(char * des_buff, uLongf des_buff_len);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
 int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);

@@ -22,6 +22,17 @@ bool may_show_sort = false;
 app_request_t app_list[APP_SIZE] = {0};
 pthread_mutex_t work_mutex;
 
+//buff
+char * g_buff = NULL;
+unsigned long g_buff_max_len = 0;
+unsigned long g_buff_len = 0;
+char * g_zib_buff = NULL;
+uLong g_zib_buff_max_len = 0;
+uLong g_zib_buff_len = 0;
+
+//simulate
+bool is_simulate = false;
+
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 
 bool is_exit = false;
@@ -83,16 +94,21 @@ int main()
   assert(ret == 0);
   //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
-  sleep(4);
+  //sleep(4);
   //get auto push data and resort data
-  ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-  assert(ret == 0);
+  //ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  //assert(ret == 0);
   //send_auto_push(socket_fd, 0, 20, 0);
 
   int menu = 1;
   while(true){
     sleep(3);
     send_heart(socket_fd);
+    sleep(2);
+
+    ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+    assert(ret == 0);
+
     heart_times++;
     test_times++;
     //if(is_exit) break;
@@ -226,7 +242,7 @@ void init_receive(void * socket_fd)
      memset(&head_buff, 0x00, 8);
      //接受头部
      ret_count = read(fd, head_buff, head_length);
-     printf("fd:%d\n", fd);
+     //printf("fd:%d\n", fd);
      if(ret_count == 0){
        printf("connect close!\n");
        sleep(3);
@@ -242,32 +258,41 @@ void init_receive(void * socket_fd)
        strncpy(head, head_buff, 4);
        length = *((int *)(head_buff+4));
        buff_len = length;
-       /*
-       if(buff_len > max_buff*4){
-	 if(buff != NULL) free(buff);
-	 max_buff++;
-	 buff = (char *)malloc(max_buff*4);
-	 if(buff == NULL){
+       if(g_buff_len == 0){
+	 g_buff = (char *)malloc(length);
+	 if(g_buff == NULL){
 	   printf("malloc err!\n");
 	   exit(-1);
 	 }
+	 memset(g_buff, 0x00, length);
+	 g_buff_len = length;
+	 g_buff_max_len = length;
+       }else{
+	 if(length > g_buff_max_len){
+	   free(g_buff);
+	   //remalloc
+	   g_buff = (char *)malloc(length);
+	   if(g_buff == NULL){
+	     printf("malloc err!\n");
+	     exit(-1);
+	   }
+	   memset(g_buff, 0x00, length);
+	   g_buff_len = length;
+	   g_buff_max_len = length;
+	 }else{
+	   //clean
+	   memset(g_buff, 0x00, g_buff_len);
+	   g_buff_len = length;
+	 }
        }
-       */
-       buff = (char *)malloc(length);
-       if(buff == NULL){
-	 printf("malloc err!\n");
-	 exit(-1);
-       }
-       memset(buff, 0x00, length);
-       while(length != (ret_count = read(fd, buff+off, length))){
+       while(length != (ret_count = read(fd, g_buff+off, length))){
 	 off += ret_count;
 	 length -= ret_count;
        }
-       buff[buff_len] = '\0';
        //parse
        //printf("%s\n", buff);
-       printf("recive complete!\n");
-       parse(buff, buff_len);
+       //printf("recive complete!\n");
+       parse(g_buff, buff_len);
      }
    }
 }
@@ -381,6 +406,7 @@ void write_app(void *param)
   market_t * my_market = NULL;
   int i = 0;
   app_request_t * my_app = NULL;
+  char price[10];
 
    while(true){
      if(may_show_sort){
@@ -390,8 +416,18 @@ void write_app(void *param)
 	   //write app pipe
 	   my_market = &market_list[0];
 	   memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-	   sort_get(my_market, my_app->begin, SORT_SHOW_MAX_NUM, entity_list);
-	   res = write(my_app->app_fifo_fd, &entity_list, SORT_SHOW_MAX_NUM*sizeof(entity_t));
+	   res = sort_get(my_market, my_app->begin, my_app->size, entity_list);
+	   assert(res == 0);
+	   for(i = 0; i< my_app->size; i++){
+	     printf("app entity-index:%d,code:%s,price:%d\n", i+1, entity_list[i].code, entity_list[i].price);
+	   }
+	   printf("----------------------------------------------\n");
+	   //memset(&price, 0x00, 10);
+	   //strcpy(price, itoa(entity_list[i].price));
+	   //sprintf(price, "%d\n", entity_list[0].price);
+	   //price = entity_list[i].price;
+	   //res = write(my_app->app_fifo_fd, &price, 10);
+	   res = write(my_app->app_fifo_fd, &entity_list, my_app->size*sizeof(entity_t));
 	   if(res == -1){
 	     printf("write app fifo err!\n");
 	     //close pipe
@@ -441,7 +477,7 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
   }
 
   if(send(socket_fd, request, request_length, 0)){
-    printf("send auto_push success!\n");
+    //printf("send auto_push success!\n");
     return 0;
   }
 
@@ -461,64 +497,60 @@ int send_heart(int socket_fd)
   memset(request, 0, 1024);
   memcpy(request, &data, sizeof(data));
   send(socket_fd, request, sizeof(data), 0);
-  printf("send heart message...\n");
+  //printf("send heart message...\n");
   return 0;
 }
 
 int parse(char * buff, uLongf  buff_len)
 {
   unsigned short type;
+  int res = -1;
 
   if(buff == NULL)
     return -2;
   type = (*(unsigned short *)buff);
-  printf("type:%02x\n", type);
+  //printf("type:%02x\n", type);
   switch(type){
   case TYPE_REALTIME:{
-    printf("realtime...\n");
+    //printf("realtime...\n");
     pthread_mutex_lock(&work_mutex);
     may_show_sort = false;
     pthread_mutex_unlock(&work_mutex);
-    parse_realtime(buff, buff_len);
-    free(buff);
+    res = parse_realtime(buff, buff_len);
+    assert( res == 0);
     pthread_mutex_lock(&work_mutex);
     may_show_sort = true;
     pthread_mutex_unlock(&work_mutex);
     //sort
     column_n sort_column = NEW_PRICE;
     //is_exit = true;
-  }
-    break;
+    is_simulate = true;
+  }break;
   case TYPE_AUTO_PUSH:{
-    printf("recieve auto_push...\n");
+    //printf("recieve auto_push...\n");
     pthread_mutex_lock(&work_mutex);
     may_show_sort = false;
     pthread_mutex_unlock(&work_mutex);
-    parse_auto_push(buff, buff_len);
+    res = parse_auto_push(buff, buff_len);
+    assert( res == 0);
     pthread_mutex_lock(&work_mutex);
     may_show_sort = true;
     pthread_mutex_unlock(&work_mutex);
-    free(buff);
-  }
-    break;
+  }break;
   case TYPE_HEART:{
-    printf("heart...\n");
+    //printf("heart...\n");
     heart_times--;
-  }
-    break;
+  }break;
   case TYPE_ZIB:{
-    printf("bzib...\n");
-    char * src_buff = NULL;
-    uLongf src_buff_len = 0;
-    assert(unpack(buff, buff_len, &src_buff, &src_buff_len) == 0);
-    free(buff);
-    parse(src_buff, src_buff_len);
-  }
-    break;
+    //printf("bzib...\n");
+    res = unpack(buff, buff_len);
+    assert( res == 0);
+    res = parse(g_zib_buff, g_zib_buff_len);
+    assert( res == 0);
+  }break;
   default:{
     printf("unknown type:%d...\n", type);
-  }
-    break;
+  }break;
   }
   return 0;
 }
@@ -576,14 +608,19 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-
+  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
-
+  */
   entity->price = tmp->m_lNewPrice;
+  if(is_simulate){
+    srand(time(0));
+    entity->price = tmp->m_lNewPrice + (rand()%10);
+    option = UPDATE;
+  }
   switch(option){
   case ADD:{
     //add to sort
@@ -608,7 +645,7 @@ do_stock(my_market, code_type, code, buff, i, option)
 
 int parse_auto_push(char * buff, uLong   buff_len)
 {
-  printf("parse auto_push...\n");
+  //printf("parse auto_push...\n");
   AskData2 * data_head = (AskData2 *)(buff);
   char code[7]={0};
   int i = 0;
@@ -630,8 +667,9 @@ int parse_auto_push(char * buff, uLong   buff_len)
   return 0;
 }
 
-int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len)
+int unpack(char * des_buff, uLongf des_buff_len)
 {
+  uLong src_length = 0;
   TransZipData2   * zheader;
   zheader = (TransZipData2 *)des_buff;
   if(zheader->m_nType != TYPE_ZIB){
@@ -639,15 +677,35 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
     return -100;
   }
 
-  *src_buff_len = (uLongf)zheader->m_lOrigLen;
-  *src_buff = (char *)malloc(*src_buff_len);
-  if(*src_buff == NULL){
-    printf("malloc err!\n");
-    return -1;
+  src_length = (uLongf)zheader->m_lOrigLen;
+  if(g_zib_buff_len == 0){
+    g_zib_buff_len = src_length;
+    g_zib_buff_max_len= src_length;
+    g_zib_buff = (char *)malloc(g_zib_buff_len);
+    if(g_zib_buff == NULL){
+      printf("malloc err!\n");
+      return -1;
+    }
+    memset(g_zib_buff, 0x00, g_zib_buff_len);
+  }else{
+    if(src_length > g_zib_buff_max_len){//remalloc
+      free(g_zib_buff);
+      g_zib_buff_len = src_length;
+      g_zib_buff_max_len = src_length;
+      g_zib_buff = (char *)malloc(g_zib_buff_len);
+      if(g_zib_buff == NULL){
+	printf("malloc err!\n");
+	return -1;
+      }
+      memset(g_zib_buff, 0x00, g_zib_buff_len);
+    }else{//clean
+      memset(g_zib_buff, 0x00, g_zib_buff_len);
+      g_zib_buff_len = src_length;
+    }
   }
-  memset(*src_buff, 0 , *src_buff_len);
 
-  int unzip =  uncompress((Bytef *)(*src_buff), src_buff_len,
+
+  int unzip =  uncompress((Bytef *)(g_zib_buff), &g_zib_buff_len,
 			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
   if(unzip == Z_MEM_ERROR){
     printf("memory not enough\n");
@@ -662,11 +720,8 @@ int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_
     return -4;
    }
   if(unzip == Z_OK
-     && *((long*)src_buff_len) == zheader->m_lOrigLen){
-    // my_buff->p_res_media_h = (p_response_meta_header)my_buff->unpack_buff;
+     && g_zib_buff_len == zheader->m_lOrigLen){
     return 0;
-    //parse(my_buff);
-    //return;
   }
   printf("unzip:%d\n", unzip);
   return -1;
