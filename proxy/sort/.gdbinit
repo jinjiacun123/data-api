@@ -10,7 +10,7 @@ b main
 #b sort_get
 #b do_stock
 #b do_stock if i == 368
-b do_stock if i == 7 
+#b do_stock if i == 7 
 #b do_stock if((int)strcmp(600010", code)) == 0
 #b sort_add
 #b sort_get

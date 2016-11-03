@@ -28,7 +28,7 @@
 
 #define PAGE_SIZE 4096
 #define AREA_NUMBER 50
-#define AREA_QUEUE_DEFAULT_LEN 10
+#define AREA_QUEUE_DEFAULT_LEN 100
 #define SORT_SHOW_MAX_NUM 10
 
 #define system_32
@@ -217,6 +217,7 @@ typedef struct
 
 int init_socket(int * sock_fd);
 void init_receive(void * socket_fd);
+void reset_socket(int * sock_fd);
 void init_pipe(void * param);
 void init_sort_display(void * param);
 void init_app(void *param);

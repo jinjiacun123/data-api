@@ -106,8 +106,8 @@ int main()
     send_heart(socket_fd);
     sleep(2);
 
-    ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
-    assert(ret == 0);
+    //ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+    //assert(ret == 0);
 
     heart_times++;
     test_times++;
@@ -173,6 +173,17 @@ int init_socket(int * socket_fd)
   }
   printf("connect() success\n");
   return 0;
+}
+
+void reset_socket(int * sock_fd)
+{
+  int ret = 0;
+  close(socket_fd);
+  ret = init_socket(socket_fd);
+  assert( ret == 0);
+  //send auto_push
+  ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+  assert(ret == 0);
 }
 
 int send_realtime(int socket_fd, int index, int size, int code_type_index)
@@ -250,6 +261,7 @@ void init_receive(void * socket_fd)
      }
      else if(ret_count <0){
        printf("recive server err!\n");
+       reset_socket(socket_fd);
        sleep(3);
        return 0;
      }else if(ret_count == head_length){
@@ -516,9 +528,9 @@ int parse(char * buff, uLongf  buff_len)
     //sort
     column_n sort_column = NEW_PRICE;
     //is_exit = true;
-    is_simulate = true;
-    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    //assert(res == 0);
+    //is_simulate = true;
+    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
