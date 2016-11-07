@@ -2,21 +2,21 @@
 typedef struct
 {
   char m_head[4];
-  int  m_length; 
+  int  m_length;
   unsigned short m_nType;
   char m_nIndex;
   char m_No;
   int m_lKey;
   unsigned short m_cCodeType;
   char m_cCode[6];
-  short  m_nSize;   
-  unsigned short m_nOption;        
+  short  m_nSize;
+  unsigned short m_nOption;
   short m_nPeriodNum;
   unsigned short m_nSize2;
   int m_lBeginPosition;
   unsigned short m_nDay;
   short m_cPeriod;
-  unsigned short m_cCodeType2;   
+  unsigned short m_cCodeType2;
   char m_cCode2[6];
 }TeachPack;
 
@@ -63,7 +63,7 @@ static int deal_response_of_realtime();
 static void do_foreign_exchange(char * code, buff_t * my_buff,int i);
 static void do_no_foreign_exchange(char * code, buff_t * my_buff, int i);
 static void do_exponent(char * code, buff_t * my_buff, int i);
-static void do_stock(char * code, buff_t * my_buff, int i);      
+static void do_stock(char * code, buff_t * my_buff, int i);
 //response of auto_push
 static int deal_response_of_auto_push();
 //response of time_share
@@ -95,7 +95,7 @@ void catchcld(int sig)
 /*
 函数：tcp代理服务
 功能：创建一个Socket服务，等待客户端连接，在客户段和服务器端建立代理连接
-参数：       
+参数
         代理服务端口号
         服务器地址
         服务器端口号
@@ -114,7 +114,7 @@ void main(int argc,char *argv[])
   size_t iAddrLen;
 #endif
   pid_t iChildPid;
-               
+
   char cService[20];
   char cHost[20];
   char cPort[20];
@@ -125,26 +125,26 @@ void main(int argc,char *argv[])
   signal(SIGCHLD,catchcld);
   //忽略管道信号
   signal(SIGPIPE,SIG_IGN);
-       
+
   //将进程设置成精灵进程 交由init管理
   if(fork()>0)
     exit(0);
   setsid();
-       
+
   //创建代理服务端套接字
   proxyServerSocketId = PassiveSock();
   if(proxyServerSocketId<0){
     WriteErrLog("创建sock在服务%s失败/n",cService);
     exit(-1);
   }
-  
+
   int i = 0;
-  while(1){        
+  while(1){
     signal(SIGCHLD,catchcld);
     signal(SIGPIPE,SIG_IGN);
     errno=0;
     iAddrLen = sizeof(sAddrIn);
-               
+
     //等待客户端的连接
     if((clientSocketId = accept(proxyServerSocketId,(struct sockaddr *)&sAddrIn,&iAddrLen))<(long)0){
       WriteErrLog("Accept error (%d):%s/n",errno,strerror(errno));
@@ -159,8 +159,8 @@ void main(int argc,char *argv[])
     int keepIDie = 5;    //首次探测开始前的tcp无数手法空闲实际
     int keepInterval = 3;//每次侦探的间隔实际
     int keepCount = 2;   //侦探次数
-    
-    
+
+
     if(setsockopt(clientSocketId, SOL_SOCKET, SO_KEEPALIVE,(void*)&keepAlive, sizeof(keepAlive)) == SOCKET_ERROR){
       WriteErrLog("Call setsockopt error,error is %d\n", errno);
       exit(-1);
@@ -350,6 +350,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 
   while(1){
     nready = poll(client, 2, -1);
+
+    if((nready == -1) && (errno == EINTR))
+      continue;
+    else if(nready == -1){
+      break;
+    }
 
     if(nready == 0){//timeout
       WriteErrLog("%s\tprocess timeout\n", client_ip);

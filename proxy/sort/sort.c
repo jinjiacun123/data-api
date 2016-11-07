@@ -91,8 +91,9 @@ int sort_add(my_market, entity, column)
     if(queue_index == 0){//first
       if(cur_area->real_size == 0){
 	cur_queue = cur_area->cur;
-	cur_queue->entity = entity;
 	cur_queue->index = 0;
+	cur_queue->entity = entity;
+	cur_queue->entity->price_area[1] = cur_queue->index;
       }
       else{
 	i = cur_area->real_size;
@@ -108,6 +109,7 @@ int sort_add(my_market, entity, column)
 	cur_queue = cur_area->cur + queue_index;
 	cur_queue->entity = entity;
 	cur_queue->index = queue_index;
+	cur_queue->entity->price_area[1] = cur_queue->index;
       }
     }
     else if(queue_index == cur_area->real_size){//last
@@ -124,17 +126,20 @@ int sort_add(my_market, entity, column)
       for(; i>queue_index; i--){
 	cur_queue->index = pre_queue->index+1;
 	cur_queue->entity = pre_queue->entity;
+	cur_queue->entity->price_area[1] = cur_queue->index;
 	cur_queue --;
 	pre_queue --;
       }
       cur_queue = cur_area->cur + queue_index;
       cur_queue->entity = entity;
       cur_queue->index = queue_index;
+      cur_queue->entity->price_area[1] = cur_queue->index;
     }
     else{//not enough and remalloc
       cur_queue = cur_area->cur + queue_index;
       cur_queue->index = queue_index;
       cur_queue->entity = entity;
+      cur_queue->entity->price_area[1] = cur_queue->index;
     }
 
     cur_area->real_size ++;
@@ -277,10 +282,12 @@ static int remove_entity(my_market, entity, column)
       after_queue->index = -1;
       after_queue->entity = NULL;
       */
-      after_queue->entity->price_area[0] = -1;
-      after_queue->entity->price_area[1] = -1;
-      after_queue->index = -1;
-      after_queue->entity = NULL;
+      /*
+      cur_queue->entity->price_area[0] = -1;
+      cur_queue->entity->price_area[1] = -1;
+      cur_queue->index = -1;
+      cur_queue->entity = NULL;
+      */
     }
     else if(queue_index == cur_area->real_size-1){//last
       cur_queue = cur_area->cur+cur_area->real_size-1;

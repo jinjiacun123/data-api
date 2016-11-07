@@ -614,13 +614,11 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
-  */
   entity->price = tmp->m_lNewPrice;
   if(is_simulate){
     srand(time(0));
