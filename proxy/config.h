@@ -32,7 +32,12 @@
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"
 #define HEADER   "ZJHR"
+#define HEADER_EX "SERV"
 #define MAX_BUFF 1024*1024
+
+//public pipe
+#define PUBLIC_PIPE "./jim_sort"
+#define PRIVATE_PIPE_TEMPLATE "./child_pipe/sort_%d"
 
 #define TYPE_EMPTY 0x0D03
 #define TYPE_INIT  0X0101
@@ -67,20 +72,50 @@ typedef struct{
 }map_market_category_t;
 map_market_category_t category[] = {
   //foreign_exchange
-  {0xffff8100, FOREIGN_EXCHANGE}, 
+  {0xffff8100, FOREIGN_EXCHANGE},
   //no_foreign_exchange
-  {0x5b00, NO_FOREIGN_EXCHANGE}, 
+  {0x5b00, NO_FOREIGN_EXCHANGE},
   //exponent
-  {0x1200, EXPONENT}, 
+  {0x1200, EXPONENT},
   //stock
   {0x1101, STOCK}
 };
+
+//app request struct
+typedef struct
+{
+  bool is_create;
+  pid_t pid;
+  int app_fifo_fd;
+  int column;
+  int begin;
+  int size;
+}app_request_t;
 
 //entity
 typedef struct{
   unsigned short code_type;
   char code[6];
 }entity_t;
+typedef struct entity_s sort_entity_t;
+struct entity_s
+{
+  unsigned short type;
+  char code[7];
+  int  pre_close;  //close price of yestoday
+
+  int pre_price;  //prefix value,use to check is sort
+  int price;       //now price
+  int price_area[2]; //first is area, second is queue
+
+  float add;
+  float down;
+  float range;
+  int max;
+  int min;
+  int buy;
+  int sell;
+};
 
 //buff------------------------------------------------------------
 //result of back include infomation of package(direct parse not compress package)
@@ -98,16 +133,16 @@ struct response_meta_header{
 typedef struct response_meta_header * p_response_meta_header;
 
 typedef struct{
-  char buff[MAX_BUFF];  
-  unsigned int buff_len;  
-  unsigned int buff_off;        
+  char buff[MAX_BUFF];
+  unsigned int buff_len;
+  unsigned int buff_off;
 
-  unsigned int buff_parse_off;      
-  char unpack_buff[MAX_BUFF];  
-  unsigned int unpack_buff_len;     
+  unsigned int buff_parse_off;
+  char unpack_buff[MAX_BUFF];
+  unsigned int unpack_buff_len;
 
-  p_response_header p_res_h;  
-  p_response_meta_header p_res_media_h;  
+  p_response_header p_res_h;
+  p_response_meta_header p_res_media_h;
   unsigned int result_type;
 
   bool is_direct;
@@ -122,16 +157,16 @@ typedef struct{
   long max_price;    //最高价
   long min_price;    //最低价
   long new_price;    //最新价
-  
+
   unsigned long total;  //成交量
   long chi_cang_liang;    //持仓量
-  
+
   long buy_price_1;   //买一价
   long buy_count_1;   //买一量
   long sell_price_1;  //卖一价
   long sell_count_1;  //卖一量
   long pre_jie_suan_price;  //昨结算价
-  
+
   long buy_price_2;            //买二价
   unsigned short buy_count_2;  //买二量
   long buy_price_3;            //买三价
@@ -169,12 +204,12 @@ typedef struct{
   long max_price;       //最高价
   long min_price;       //最低价
   long new_price;       //最新价
-  unsigned short total;//成交量 
+  unsigned short total;//成交量
   float avg_price;      //成交金额
-  
+
   short rise_count;     //上涨家数
   short fall_count;     //下跌家数
-  short total_stock_1;   
+  short total_stock_1;
 
   unsigned long buy_count;  //委买数
   unsigned long sell_count; //委卖数
@@ -182,11 +217,11 @@ typedef struct{
   short lead;               //领先指标
   short rise_trend;         //上涨趋势
   short fall_trend;         //下跌趋势
-  short no2[5];            
-  short total_stock_2;             
+  short no2[5];
+  short total_stock_2;
 
   long adl;    //adl指标
-  long no3[3]; 
+  long no3[3];
   long hand;   //每手股数
 }response_realtime_price_exponent_t;
 //处理股票
@@ -241,7 +276,7 @@ typedef struct{
 typedef struct{
   short code_type;
   char code[6];
-  
+
   char oth_data[24];
   int now_data[1];
 }response_realtime_price_ex_t;
@@ -250,7 +285,7 @@ typedef struct{
   //body
   unsigned short type;//data type
   char index;
-  
+
   char not;
   long key;
   short code_type;
@@ -319,7 +354,7 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 }request_s_t;
@@ -328,7 +363,7 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 
@@ -348,7 +383,7 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 
@@ -361,17 +396,17 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 
-  char  index;   
-  char  no;   
+  char  index;
+  char  no;
   long  key;
   unsigned short code_type;
   char  code[6];
   short size;
-  unsigned short option; 
+  unsigned short option;
 }request_realtime_t;
 typedef struct{
   unsigned short type;
@@ -383,7 +418,7 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 
@@ -403,7 +438,7 @@ typedef struct{
   //header
   char header_name[4];
   int body_len;
-  
+
   //body
   unsigned short type;
 
@@ -434,5 +469,15 @@ request_s_t request_data[] = {
   //empty
   {}
 };
+
+//custom sort of request
+typedef struct{
+  char header_name[4];
+  int body_len;
+
+  int index;
+  int begin;
+  int size;
+}request_sort_t;
 //request-----------------------------------------------------------
 #endif

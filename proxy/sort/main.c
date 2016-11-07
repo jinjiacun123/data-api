@@ -352,7 +352,7 @@ void init_app(void *param)
   int app_request_len = sizeof(app_request_t);
   char app_request_buff[app_request_len];
   int app_fifo_fd = 0;
-  char *template = "./sort_%d";
+  char *template = PRIVATE_PIPE_TEMPLATE;
   char app_fifo_name[20];
   app_request_t * my_app = NULL;
 

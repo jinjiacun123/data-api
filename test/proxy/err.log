@@ -69256,3 +69256,642 @@ v· : accept client connection!
 [  3080] : 127.0.0.1	recive info from server!
 [  3080] : 127.0.0.1	send to client
 [  3080] : 127.0.0.1	client connection close
+[  3812] : SockRecvServer:Listening on port 8001.......
+[  3812] : accept client connection!
+[  3812] : create child process!
+[  3849] : connection to server!
+[  3849] : send login info!
+[  3849] : recive login info!
+[  3849] : recive login info check ok!
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	read client info!
+[  3849] : 127.0.0.1	recive client info complete!
+[  3849] : 127.0.0.1	recive info from server!
+[  3849] : 127.0.0.1	send to client
+[  3849] : 127.0.0.1	client connection close
+[  4303] : SockRecvServer:Listening on port 8001.......
+[  4303] : accept client connection!
+[  4303] : create child process!
+[  4359] : connection to server!
+[  4359] : send login info!
+[  4359] : recive login info!
+[  4359] : recive login info check ok!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4303]ò+a·p?ôx·ÐŠx· : accept client connection!
+[  4303]ò+127.0.0.1 : create child process!
+[  4369] : connection to server!
+[  4369] : send login info!
+[  4369] : recive login info!
+[  4369] : recive login info check ok!
+[  4369] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4303]ò+a·p?B : accept client connection!
+[  4303]ò+127.0.0.1 : create child process!
+[  4420] : connection to server!
+[  4420] : send login info!
+[  4420] : recive login info!
+[  4420] : recive login info check ok!
+[  4420] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4303]ò+a·p?B : accept client connection!
+[  4303]ò+127.0.0.1 : create child process!
+[  4445] : connection to server!
+[  4445] : send login info!
+[  4445] : recive login info!
+[  4445] : recive login info check ok!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4445] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	read client info!
+[  4359] : 127.0.0.1	recive client info complete!
+[  4359] : 127.0.0.1	recive info from server!
+[  4359] : 127.0.0.1	send to client
+[  4359] : 127.0.0.1	client connection close
+[  4303]ò+a·p?B : accept client connection!
+[  4303]ò+127.0.0.1 : create child process!
+[  4469] : connection to server!
+[  4469] : send login info!
+[  4469] : recive login info!
+[  4469] : recive login info check ok!
+[  4469] : 127.0.0.1	read client info!
+[  4303]ò+a·p?B : accept client connection!
+[  4303]ò+127.0.0.1 : create child process!
+[  4475] : connection to server!
+[  4475] : send login info!
+[  4475] : recive login info!
+[  4475] : recive login info check ok!
+[  4475] : 127.0.0.1	read client info!
+[  4475] : 127.0.0.1	recive client info complete!
+[  4475] : 127.0.0.1	recive info from server!
+[  4475] : 127.0.0.1	send to client
+[  4475] : 127.0.0.1	read client info!
+[  4475] : 127.0.0.1	recive client info complete!
+[  4475] : 127.0.0.1	recive info from server!
+[  4475] : 127.0.0.1	send to client
+[  4475] : 127.0.0.1	read client info!
+[  4475] : 127.0.0.1	recive client info complete!
+[  4475] : 127.0.0.1	read client info!
+[  4475] : 127.0.0.1	recive client info complete!
+[  4475] : 127.0.0.1	recive info from server!
+[  4475] : 127.0.0.1	send to client
+[  4475] : 127.0.0.1	read client info!
+[  4475] : 127.0.0.1	recive client info complete!
+[  4475] : 127.0.0.1	recive info from server!
+[  4475] : 127.0.0.1	send to client
+[  4475] : 127.0.0.1	client connection close
+[  4630] : SockRecvServer:Listening on port 8001.......
+[  4844] : SockRecvServer:Listening on port 8001.......
+[  4844] : accept client connection!
+[  4844] : create child process!
+[  4852] : connection to server!
+[  4852] : send login info!
+[  4852] : recive login info!
+[  4852] : recive login info check ok!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4844]òËY·Uôq·Ð*q· : accept client connection!
+[  4844]òË127.0.0.1 : create child process!
+[  4859] : connection to server!
+[  4859] : send login info!
+[  4859] : recive login info!
+[  4859] : recive login info check ok!
+[  4859] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4844]òËY·UB : accept client connection!
+[  4844]òË127.0.0.1 : create child process!
+[  5000] : connection to server!
+[  5000] : send login info!
+[  5000] : recive login info!
+[  5000] : recive login info check ok!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	read client info!
+[  4852] : 127.0.0.1	recive client info complete!
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	recive info from server!
+[  4852] : 127.0.0.1	send to client
+[  4852] : 127.0.0.1	client is die
+[  5000] : 127.0.0.1	client connection close
+[  4844]òËY·UB : accept client connection!
+[  4844]òË127.0.0.1 : create child process!
+[  5043] : connection to server!
+[  5043] : send login info!
+[  5043] : recive login info!
+[  5043] : recive login info check ok!
+[  5043] : 127.0.0.1	read client info!
+[  4844]òËY·UB : accept client connection!
+[  4844]òË127.0.0.1 : create child process!
+[  5088] : connection to server!
+[  5088] : send login info!
+[  5088] : recive login info!
+[  5088] : recive login info check ok!
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  4844]òËY·UB : accept client connection!
+[  4844]òË127.0.0.1 : create child process!
+[  5095] : connection to server!
+[  5095] : send login info!
+[  5095] : recive login info!
+[  5095] : recive login info check ok!
+[  5095] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	recive info from server!
+[  5088] : 127.0.0.1	send to client
+[  5088] : 127.0.0.1	read client info!
+[  5088] : 127.0.0.1	recive client info complete!
+[  5088] : 127.0.0.1	client connection close
+[  6246] : SockRecvServer:Listening on port 8001.......
+[  6246] : accept client connection!
+[  6246] : create child process!
+[  6376] : connection to server!
+[  6376] : send login info!
+[  6376] : recive login info!
+[  6376] : recive login info check ok!
+[  6376] : 127.0.0.1	read client info!
+[  6545] : SockRecvServer:Listening on port 8001.......
+[  6545] : accept client connection!
+[  6545] : create child process!
+[  6695] : connection to server!
+[  6695] : send login info!
+[  6695] : recive login info!
+[  6695] : recive login info check ok!
+[  6695] : 127.0.0.1	read client info!
+[  6931] : SockRecvServer:Listening on port 8001.......
+[  6931] : accept client connection!
+[  6931] : create child process!
+[  6967] : connection to server!
+[  6967] : send login info!
+[  6967] : recive login info!
+[  6967] : recive login info check ok!
+[  6967] : 127.0.0.1	read client info!
+[  6931]òëa·`ô?y·ÐJy· : accept client connection!
+[  6931]òë127.0.0.1 : create child process!
+[  6985] : connection to server!
+[  6985] : send login info!
+[  6985] : recive login info!
+[  6985] : recive login info check ok!
+[  6985] : 127.0.0.1	read client info!
+[  7147] : SockRecvServer:Listening on port 8001.......
+[  7147] : accept client connection!
+[  7147] : create child process!
+[  7173] : connection to server!
+[  7173] : send login info!
+[  7173] : recive login info!
+[  7173] : recive login info check ok!
+[  7173] : 127.0.0.1	read client info!
+[  7147]òë\·€ô?t·ÐJt· : accept client connection!
+[  7147]òë127.0.0.1 : create child process!
+[  7262] : connection to server!
+[  7262] : send login info!
+[  7262] : recive login info!
+[  7262] : recive login info check ok!
+[  7262] : 127.0.0.1	read client info!
+[  7423] : SockRecvServer:Listening on port 8001.......
+[  7423] : accept client connection!
+[  7423] : create child process!
+[  7866] : connection to server!
+[  7866] : send login info!
+[  7866] : recive login info!
+[  7866] : recive login info check ok!
+[  7866] : 127.0.0.1	read client info!

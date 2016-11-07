@@ -18,10 +18,9 @@ int
 main()
 {
   //	int client=0;
-
         signal(SIGUSR2, send_request);
 	struct sockaddr_in cli;
-	
+
 	cli.sin_family = AF_INET;
 	cli.sin_port = htons(SERVER_PORT);
 	cli.sin_addr.s_addr = inet_addr(SERVER_HOST);
@@ -30,28 +29,28 @@ main()
 	if(client < 0){
 		printf("socket() failrue!\n");
 		return -1;
-	}	
+	}
 
 	if(connect(client, (struct sockaddr*)&cli, sizeof(cli)) < 0){
         	printf("connect() failure!\n");
 		return -1;
 	}
 
-	
 
-	printf("connect success...\n");       	
+
+	printf("connect success...\n");
         //send_request(1);
-	 
+
 	//while(1){
 	  sleep(3);
 	  send_request(1);
 	  //}
-	
-	
-	
+
+
+
 //	close(client);
-	
-	return 0;
+
+	  return 0;
 }
 
 void send_request(int signal_number){

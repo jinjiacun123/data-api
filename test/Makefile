@@ -37,3 +37,6 @@ test_byte:byte.c
 
 test_point_param:test_point_param.c
 	$(CC) -g -o test_point_param test_point_param.c
+
+test_sort:test_sort.c
+	$(CC) -g -o test_sort test_sort.c -lpthread

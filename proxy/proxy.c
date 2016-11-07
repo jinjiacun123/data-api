@@ -57,6 +57,7 @@ static int deal_request_of_time_share(int proxy_client_socket_fd, const char * b
 static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of zib
 static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_sort(int proxy_client_socket_fd,const char * buff, unsigned int buff_len);
 
 //response of realtime
 static int deal_response_of_realtime();
@@ -230,7 +231,7 @@ void main(int argc,char *argv[])
 
     deal_proxy(proxyClientSocketId, clientSocketId);
   }
-} 
+}
 
 void WriteErrLog(const char *i_sFormat,...)
 {
@@ -261,7 +262,7 @@ void WriteErrLog(const char *i_sFormat,...)
 }
 
 /*        passivesock        allocate & bind a server socket using tcp or ucp */
-int 
+int
 PassiveSock()
 {
   struct servent *pse;
@@ -332,14 +333,14 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   int heart_times = 0;
   int length = 8;
   p_response_header p_header;
-
+  bool is_custom = false;
+  int ret = -1;
   int alive_times = 0;
 
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
   client[1].fd = clientSocketId;
   client[1].events = POLLIN;
-
 
   //init server's login
   assert(init_login(proxyClientSocketId) == 0);
@@ -350,6 +351,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 
   while(1){
     nready = poll(client, 2, -1);
+    is_custom = false;
 
     if((nready == -1) && (errno == EINTR))
       continue;
@@ -372,7 +374,6 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
       WriteErrLog("%s\tclient is die\n", client_ip);
       exit(-1);
     }
-
 
     //recive server info
     if(client[0].fd > 0){
@@ -463,42 +464,13 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	//	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
       }  
     }
-    
+
     //recive client info
     if(client[1].fd > 0){
+      is_custom = false;
       if(client[1].revents & (POLLIN|POLLERR)){
 	alive_times = 0;
-	/*
-	char tmp_buff[1024];
-	int rrr = read(client[1].fd, tmp_buff, 1024);
-	char request[1024];
-	TeachPack data;
-	memset(&data,0x00,sizeof(TeachPack));
-	memcpy(data.m_head, HEADER,4);
-	data.m_length =  sizeof(TeachPack) - 8;
-	data.m_nType = TYPE_HISTORY;
-	data.m_nSize =1;
-	data.m_nIndex= 0;
-	data.m_nOption= 0x0080;
-	memcpy(data.m_cCode, "600000", 6);
-	data.m_cCodeType = 0x1101;
-
-	//日线请求
-	data.m_cPeriod = PERIOD_TYPE_DAY;      //请求周期类型
-	data.m_lBeginPosition = 0; //请求开始位置
-	data.m_nPeriodNum = 7;
-	data.m_nDay = 100*data.m_nPeriodNum;//请求个数(500个)
-	data.m_nSize2 =0;
-	memcpy(data.m_cCode2,"600000", 6);
-	data.m_cCodeType2 = 0x1101;
-   
-
-	memset(request, 0, sizeof(data));
-	memcpy(request, &data, sizeof(data));
-	int rr = send(client[0].fd, request, sizeof(data), 0);
-	continue;
-	*/
-	//head of package	
+	//head of package
 	length = 8;
 	buff = (char *)malloc(length);
 	if(!buff){
@@ -506,16 +478,6 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  exit(-1);
 	}
 	memset(buff, 0x00, length);
-        /*
-	length = 1024;
-	buff = (char *)malloc(length+1);
-	if(buff){
-	  memset(buff, 0x00, length);
-	  n = read(client[1].fd, buff, 1024);
-	  write(client[0].fd, buff, n);
-	  continue;
-	}
-	*/
 	if((n = read(client[1].fd, buff, length))<0){
 	  if(errno == ECONNRESET){
 	    close(client[1].fd);
@@ -538,10 +500,13 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  //write(client[1].fd, cDataBuf, n);
 	  //recive head from server
 	  p_header = (p_response_header)buff;
-	  if(strncmp(p_header->str, HEADER, 4)){
+	  if(strncmp(p_header->str, HEADER_EX, 4) == 0){
+	    is_custom = true;
+	  }else if(strncmp(p_header->str, HEADER, 4)){
 	    WriteErrLog("%s\tcompare header err!\n", client_ip);
 	    exit(-1);
 	  }
+
 	  length = p_header->length;
 	  free(buff);
 	  buff = (char *)malloc(length+1);
@@ -580,25 +545,29 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      memcpy(send_buff, HEADER, 4);
 	      memcpy(send_buff+4, &length, 4);
 	      memcpy(send_buff+8, buff, length);
-	      if(write(client[0].fd, send_buff, length+8) == -1){
-		WriteErrLog("%s\twrite to server error!\n", client_ip);
-		exit(-1);
+	      if(!is_custom){
+		if(write(client[0].fd, send_buff, length+8) == -1){
+		  WriteErrLog("%s\twrite to server error!\n", client_ip);
+		  exit(-1);
+		}
+	      }else{
+		ret = deal_request_of_sort(client[1].fd, send_buff, length+8);
+		assert(ret == 0);
 	      }
 	      free(send_buff);
-	      break;	      
-	    }	  
+	      break;
+	    }
 	    else if(n < last_length){
 	      off += n;
 	      last_length -= n;
 	    }
-	  } 
+	  }
 	}
 	WriteErrLog("%s\trecive client info complete!\n", client_ip);
 	//body of package
 	//assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
-      }  
-    }  
-    
+      }
+    }
   }
 }
 
@@ -925,6 +894,107 @@ static int deal_request_of_history(int proxy_client_socket_fd, const char * buff
 //request of zib
 static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len)
 {
+  return 0;
+}
+
+//request of sort
+static int deal_request_of_sort(int proxy_client_socket_fd,
+				const char * buff,
+				unsigned int buff_len)
+{
+  int begin = 0;
+  int size = 0;
+  pid_t pid = getpid();
+  //begin = 0;
+  //size = 1;
+  char * sort_buff = NULL;
+  int entity_len = sizeof(entity_t);
+  int sort_buff_len = entity_len *size;
+  char cur_app_pipe[20];
+  const char *fifo_name = PUBLIC_PIPE;
+  char *template = PRIVATE_PIPE_TEMPLATE;
+  int pipe_read_fd = -1;
+  int pipe_write_fd = -1;
+  int app_request_len = sizeof(app_request_t);
+  int res = 0;
+  sort_entity_t * entity = NULL;
+  int i = 0;
+  app_request_t * my_request = NULL;
+
+  my_request = (app_request_t *)buff;
+  begin = my_request->begin;
+  size  = my_request->size;
+
+  sort_buff = (sort_entity_t *)malloc(sort_buff_len+1);
+  if(sort_buff == NULL){
+    printf("malloc error!\n");
+    exit(-1);
+  }
+  memset(sort_buff, 0x00, sort_buff_len);
+  memset(&cur_app_pipe, 0x00, 20);
+  sprintf(cur_app_pipe, template, getpid());
+  //create cur app pipe
+  if(access(cur_app_pipe, F_OK) == -1){
+    res = mkfifo(cur_app_pipe, 0777);
+    if(res != 0){
+      printf(stderr, "count not create fifo %s\n", cur_app_pipe);
+      exit(-1);
+    }
+  }
+
+  if(access(fifo_name, F_OK) == -1){
+    printf("fifo is not exists!\n");
+    exit(-1);
+  }
+  pipe_write_fd = open(fifo_name, O_WRONLY);
+  if(pipe_write_fd == -1){
+    printf("open pipe err!\n");
+    exit(-1);
+  }
+
+  printf("begin:%d,size:%d\n", begin, size);
+  app_request_t app_request;
+  memset(&app_request, 0x00, sizeof(app_request_t));
+  //request
+  app_request.pid = pid;
+  app_request.begin = begin;
+  app_request.size = size;
+  res = write(pipe_write_fd, &app_request, app_request_len);
+  close(pipe_write_fd);
+
+  pipe_read_fd = open(cur_app_pipe, O_RDONLY);
+  if(pipe_read_fd == -1){
+    printf("open pipe read fd error!\n");
+    exit(-1);
+  }
+
+  //read sort
+  while(true){
+    memset(sort_buff, 0x00, sort_buff_len+1);
+    res = read(pipe_read_fd, sort_buff, sort_buff_len);
+    if(res == -1){
+      printf("read error!\n");
+      exit(-1);
+    }else if(res == 0){
+      printf("read complete...\n");
+      sleep(3);
+      break;
+    }
+
+    //printf("price:%s\n", buff);
+    //display
+    entity = (entity_t *)sort_buff;
+    for(i = 0; i<size; i++){
+      WriteErrLog("code:%.6s,price:%d\n",
+	     entity->code,
+	     entity->price);
+      entity ++;
+    }
+    printf("------------------------------------\n");
+    sleep(1);
+  }
+  close(pipe_read_fd);
+
   return 0;
 }
 
