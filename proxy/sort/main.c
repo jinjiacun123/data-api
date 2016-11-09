@@ -13,6 +13,7 @@
 #include "cJSON.h"
 #include "comm.h"
 #include "market.h"
+#include "./../comm_pipe.h"
 #include <gperftools/profiler.h>
 
 int last_time_market;//effective time
@@ -357,7 +358,7 @@ void init_app(void *param)
   app_request_t * my_app = NULL;
 
   //open fifo
-  fifo_fd = open(PIPE_NAME, O_RDONLY|O_NONBLOCK);
+  fifo_fd = open(PUBLIC_PIPE, O_RDONLY|O_NONBLOCK);
   if(fifo_fd == -1){
     printf("open pipe error!\n");
     exit(-1);
@@ -425,7 +426,7 @@ void write_app(void *param)
        sleep(2);
        for(i = 0; i < APP_SIZE; i++){
 	 my_app = &app_list[i];
-	 if(my_app->app_fifo_fd >0 && may_show_sort){
+	 if(my_app->app_fifo_fd >0){
 	   //write app pipe
 	   my_market = &market_list[0];
 	   memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
@@ -529,8 +530,10 @@ int parse(char * buff, uLongf  buff_len)
     column_n sort_column = NEW_PRICE;
     //is_exit = true;
     //is_simulate = true;
+    /*
     res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
     assert(res == 0);
+    */
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
@@ -614,11 +617,13 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
+  /*
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
+  */
   entity->price = tmp->m_lNewPrice;
   if(is_simulate){
     srand(time(0));
