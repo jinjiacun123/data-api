@@ -238,7 +238,7 @@ void main(int argc,char *argv[])
 void WriteErrLog(const char *i_sFormat,...)
 {
   va_list args;
-  char  *sLogFile="/home/jim/source_code/data_api/test/proxy/err.log";
+  char  *sLogFile="/home/jim/source_code/data-api/test/proxy/err.log";
   FILE  *fLogFile;
   time_t tWriteTime;
   char  sWriteTime[20];
@@ -965,6 +965,7 @@ void * deal_request_of_sort(void * p_app_request_data)
   int res = 0;
   sort_entity_t * entity = NULL;
   int i = 0;
+  char head[9];
 
   sort_buff = (sort_entity_t *)malloc(sort_buff_len+1);
   if(sort_buff == NULL){
@@ -1036,6 +1037,12 @@ void * deal_request_of_sort(void * p_app_request_data)
     WriteErrLog("------------------------------------\n");
     */
     //write client
+    memcpy(head, HEADER_EX, 4);
+    memcpy(head+4, &sort_buff_len, 4);
+    head[8] = '\0';
+    res = write(my_app_request_data->socket_fd, head, 8);
+    WriteErrLog("write head res:%d\n", res);
+    assert(res >0);
     res = write(my_app_request_data->socket_fd, sort_buff, sort_buff_len);
     WriteErrLog("res=%d\n", res);
     assert(res > 0);

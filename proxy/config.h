@@ -480,6 +480,7 @@ typedef struct{
   int body_len;
 
   int index;
+  int column;
   int begin;
   int size;
 }request_sort_t;
