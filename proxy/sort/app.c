@@ -7,6 +7,7 @@
 #include<stdbool.h>
 #include "config.h"
 #include "market.h"
+#include "./../comm_pipe.h"
 
 #define MAX_BUFF_SIZE 4*1024
 
@@ -23,8 +24,8 @@ int main(int argc, char * argv[])
   int entity_len = sizeof(entity_t);
   int buff_len = entity_len *size;
   char cur_app_pipe[20];
-  const char *fifo_name = "./sort";
-  char *template = "./sort_%d";
+  const char *fifo_name = PUBLIC_PIPE;
+  char *template = PRIVATE_PIPE_TEMPLATE;
   int pipe_read_fd = -1;
   int pipe_write_fd = -1;
   int app_request_len = sizeof(app_request_t);

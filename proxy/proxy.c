@@ -1,4 +1,5 @@
 #include  "config.h"
+#include "comm_pipe.h"
 typedef struct
 {
   char m_head[4];
@@ -57,7 +58,7 @@ static int deal_request_of_time_share(int proxy_client_socket_fd, const char * b
 static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of zib
 static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
-static int deal_request_of_sort(int proxy_client_socket_fd,const char * buff, unsigned int buff_len);
+void * deal_request_of_sort(void * p_app_request_data);
 
 //response of realtime
 static int deal_response_of_realtime();
@@ -103,6 +104,7 @@ void catchcld(int sig)
         允许最大连接数
 */
 process_ip_t process_ip_list[MAX_CONNECTS]={};
+pthread_key_t key_sort;
 void main(int argc,char *argv[])
 {
   int proxyClientSocketId;
@@ -247,11 +249,10 @@ void WriteErrLog(const char *i_sFormat,...)
   //  cftime(sWriteTime,"%Y/%m/%d %H:%M:%S",&tWriteTime);
   //sLogFile=getenv("ERRFILE");
   // printf("log:%s\n", sLogFile);
-  
 
-  if(sLogFile != NULL) 
+  if(sLogFile != NULL)
     fLogFile=fopen(sLogFile,"a+");
-  
+
   if(sLogFile != NULL && fLogFile !=NULL)
     fprintf(fLogFile,"[%6d]%s : ",ThisPid,sWriteTime);
   va_start(args,i_sFormat);
@@ -336,6 +337,9 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   bool is_custom = false;
   int ret = -1;
   int alive_times = 0;
+  pthread_t sort_p_id = -1;
+  app_request_data *my_app_request_data = NULL;
+  int status = -1;
 
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
@@ -348,11 +352,20 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   char client_ip[15];
   memset(&client_ip, 0x00, 15);
   assert(get_client_ip(client[1].fd, &client_ip) == 0);
+  /*
+  //create key_sort
+  status = pthread_key_create(&key_sort, NULL);
+  if(status != 0){
+    WriteErrLog("create pthread key error!\n");
+    exit(-1);
+  }
+  */
 
   while(1){
     nready = poll(client, 2, -1);
     is_custom = false;
 
+    /*
     if((nready == -1) && (errno == EINTR))
       continue;
     else if(nready == -1){
@@ -374,6 +387,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
       WriteErrLog("%s\tclient is die\n", client_ip);
       exit(-1);
     }
+    */
 
     //recive server info
     if(client[0].fd > 0){
@@ -452,8 +466,8 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		exit(-1);
 	      }
 	      free(send_buff);
-	      break;	      
-	    }	  
+	      break;
+	    }
 	    else if(n < last_length){
 	      off += n;
 	      last_length -= n;
@@ -551,8 +565,30 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		  exit(-1);
 		}
 	      }else{
+		/*
 		ret = deal_request_of_sort(client[1].fd, send_buff, length+8);
 		assert(ret == 0);
+		*/
+		my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
+		if(my_app_request_data == NULL){
+		  WriteErrLog("malloc my_app_request_data error!\n");
+		  exit(-1);
+		}
+		memset(my_app_request_data, 0x00, sizeof(app_request_data));
+		my_app_request_data->socket_fd = client[1].fd;
+		my_app_request_data->buff = send_buff+8;
+		my_app_request_data->buff_len = length;
+		my_app_request_data->start = true;
+		status = pthread_setspecific(key_sort, my_app_request_data);
+		deal_request_of_sort(my_app_request_data);
+		/*
+		//create sort thread
+		ret = pthread_create(&sort_p_id, NULL, (void *)deal_request_of_sort, &my_app_request_data);
+		if(ret != 0){
+		  WriteErrLog("create pthread error!\n");
+		  exit(-1);
+		}
+		*/
 	      }
 	      free(send_buff);
 	      break;
@@ -603,7 +639,7 @@ int init_login(int proxy_client_fd)
   char * package;
   int request_len = sizeof(request_login_t);
   int package_len = request_len ;
-  package = (char *)malloc(package_len);  
+  package = (char *)malloc(package_len);
   memset(package, 0x00, package_len);
 
   //request login
@@ -612,7 +648,7 @@ int init_login(int proxy_client_fd)
   memcpy(data->header_name, HEADER, 4);
   data->body_len = package_len - 8;
   data->type = TYPE_LOGIN;
- 
+
   data->key = 3;
   data->index = 0;
   strncpy(data->username, USERNAME, 64);
@@ -770,23 +806,23 @@ static int deal_request_of_realtime(int proxy_client_socket_fd,
   data.body_len =  sizeof(request_realtime_t)
     - 8
     + sizeof(entity_t)*size;
-  
+
   data.type = TYPE_REALTIME;
   data.size = size;
-  data.option= 0x0080;  
+  data.option= 0x0080;
   /*
   entity_t l_entity[size];
   memset(l_entity, 0x00, sizeof(entity_t)*size);
   memncpy(l_entity[0].code, "XAU", 6);
   l_entity[0].code_type = 0x5b00;
   */
-  
+
   memset(request, 0, sizeof(data)
                      + sizeof(entity_t)*size);
   memcpy(request, &data, sizeof(data));
   memcpy(request+sizeof(data), &l_entity, sizeof(entity_t)*size);
-  write(proxy_client_socket_fd, 
-	request, 
+  write(proxy_client_socket_fd,
+	request,
 	sizeof(data)+sizeof(entity_t)*size, 0);
   return 0;
 }
@@ -800,7 +836,7 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * bu
   request_realtime_t data ;
   memset(&data,0x00,sizeof(request_realtime_t));
   memcpy(data.header_name, HEADER, 4);
-  data.body_len =  sizeof(request_s_t) 
+  data.body_len =  sizeof(request_s_t)
     + sizeof(request_realtime_t)
     - 8
     + sizeof(entity_t)*size;
@@ -808,7 +844,7 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * bu
 
   data.size = size;
   data.option= 0x0080;
-  
+
   entity_t l_entity[size];
   memset(l_entity, 0x00, sizeof(entity_t)*size);
   memcpy(l_entity[0].code, "XAU", 6);
@@ -816,9 +852,9 @@ static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * bu
   memset(request, 0, sizeof(data)+sizeof(entity_t)*size);
   memcpy(request, &data, sizeof(data));
   memcpy(request+sizeof(data), &l_entity, sizeof(entity_t)*size);
-  write(proxy_client_socket_fd, 
-	request, 
-	sizeof(data)+sizeof(entity_t)*size, 0); 
+  write(proxy_client_socket_fd,
+	request,
+	sizeof(data)+sizeof(entity_t)*size, 0);
 
   return 0;
 }
@@ -832,7 +868,7 @@ static int deal_request_of_time_share(int proxy_client_socket_fd, const char * b
   memset(&data,0x00,sizeof(request_s_t));
   memcpy(data.header_name ,HEADER, 4);
   data.body_len = sizeof(request_time_share_t) - 8;
-  data.type = TYPE_TIME_SHARE;  
+  data.type = TYPE_TIME_SHARE;
   data.size = 0;
   data.option = 0x0080;
   memcpy(data.code,"XAG",6);
@@ -855,7 +891,7 @@ static int deal_request_of_history(int proxy_client_socket_fd, const char * buff
   memset(&data,0x00,sizeof(request_s_t));
   memcpy(data.header_name, HEADER,4);
   data.body_len = sizeof(request_history_t) - 8;
-  data.type = TYPE_HISTORY;  
+  data.type = TYPE_HISTORY;
   data.size = 1;
   data.index = 0;
   data.option = 0x0080;
@@ -887,7 +923,7 @@ static int deal_request_of_history(int proxy_client_socket_fd, const char * buff
 
   memset(request, 0, sizeof(data));
   memcpy(request, &data, sizeof(data));
-  write(proxy_client_socket_fd, request, sizeof(data));  
+  write(proxy_client_socket_fd, request, sizeof(data));
   return 0;
 }
 
@@ -898,17 +934,27 @@ static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, u
 }
 
 //request of sort
-static int deal_request_of_sort(int proxy_client_socket_fd,
-				const char * buff,
-				unsigned int buff_len)
+void * deal_request_of_sort(void * p_app_request_data)
 {
   int begin = 0;
   int size = 0;
   pid_t pid = getpid();
   //begin = 0;
-  //size = 1;
+  //size = 10;
+  app_request_t * my_request = NULL;
+  app_request_data * my_app_request_data = (app_request_data  *)p_app_request_data;
+  //app_request_data * my_app_request_data = (app_request_data *)pthread_getspecific(key_sort);
+  while(!my_app_request_data->start){
+    sleep(2);
+    continue;
+  }
+
+  my_request = (app_request_t *)my_app_request_data->buff;
+  begin = my_request->begin;
+  size  = my_request->size;
+
   char * sort_buff = NULL;
-  int entity_len = sizeof(entity_t);
+  int entity_len = sizeof(sort_entity_t);
   int sort_buff_len = entity_len *size;
   char cur_app_pipe[20];
   const char *fifo_name = PUBLIC_PIPE;
@@ -919,15 +965,10 @@ static int deal_request_of_sort(int proxy_client_socket_fd,
   int res = 0;
   sort_entity_t * entity = NULL;
   int i = 0;
-  app_request_t * my_request = NULL;
-
-  my_request = (app_request_t *)buff;
-  begin = my_request->begin;
-  size  = my_request->size;
 
   sort_buff = (sort_entity_t *)malloc(sort_buff_len+1);
   if(sort_buff == NULL){
-    printf("malloc error!\n");
+    WriteErrLog("malloc error!\n");
     exit(-1);
   }
   memset(sort_buff, 0x00, sort_buff_len);
@@ -937,22 +978,22 @@ static int deal_request_of_sort(int proxy_client_socket_fd,
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
     if(res != 0){
-      printf(stderr, "count not create fifo %s\n", cur_app_pipe);
+      WriteErrLog("count not create fifo %s\n", cur_app_pipe);
       exit(-1);
     }
   }
 
   if(access(fifo_name, F_OK) == -1){
-    printf("fifo is not exists!\n");
+    WriteErrLog("fifo is not exists!\n");
     exit(-1);
   }
   pipe_write_fd = open(fifo_name, O_WRONLY);
   if(pipe_write_fd == -1){
-    printf("open pipe err!\n");
+    WriteErrLog("open pipe err!\n");
     exit(-1);
   }
 
-  printf("begin:%d,size:%d\n", begin, size);
+  WriteErrLog("begin:%d,size:%d\n", begin, size);
   app_request_t app_request;
   memset(&app_request, 0x00, sizeof(app_request_t));
   //request
@@ -961,37 +1002,43 @@ static int deal_request_of_sort(int proxy_client_socket_fd,
   app_request.size = size;
   res = write(pipe_write_fd, &app_request, app_request_len);
   close(pipe_write_fd);
+  WriteErrLog("send pipe request...\n");
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
   if(pipe_read_fd == -1){
-    printf("open pipe read fd error!\n");
+    WriteErrLog("open pipe read fd error!\n");
     exit(-1);
   }
-
+  WriteErrLog("read pipe...\n");
   //read sort
   while(true){
     memset(sort_buff, 0x00, sort_buff_len+1);
     res = read(pipe_read_fd, sort_buff, sort_buff_len);
     if(res == -1){
-      printf("read error!\n");
+      WriteErrLog("read error!\n");
       exit(-1);
     }else if(res == 0){
-      printf("read complete...\n");
-      sleep(3);
-      break;
+      WriteErrLog("read complete...\n");
+      sleep(2);
+      continue;
     }
 
+    /*
     //printf("price:%s\n", buff);
     //display
-    entity = (entity_t *)sort_buff;
+    entity = (sort_entity_t *)sort_buff;
     for(i = 0; i<size; i++){
       WriteErrLog("code:%.6s,price:%d\n",
-	     entity->code,
-	     entity->price);
+		  entity->code,
+		  entity->price);
       entity ++;
     }
-    printf("------------------------------------\n");
-    sleep(1);
+    WriteErrLog("------------------------------------\n");
+    */
+    //write client
+    res = write(my_app_request_data->socket_fd, sort_buff, sort_buff_len);
+    WriteErrLog("res=%d\n", res);
+    assert(res > 0);
   }
   close(pipe_read_fd);
 

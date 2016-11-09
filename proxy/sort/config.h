@@ -33,9 +33,9 @@
 
 #define system_32
 //#define system_64
-#define PIPE_NAME "./../jim_sort"
-#define PRIVATE_PIPE_TEMPLATE "./child_pipe/sort_%d"
-#define APP_SIZE  1024
+//#define PIPE_NAME "./../jim_sort"
+//#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
+#define APP_SIZE  5
 
 //basic type
 #ifdef system_32
@@ -81,7 +81,8 @@ typedef struct
   bool is_create;
   pid_t pid;
   int app_fifo_fd;
-int column;
+  int index;
+  int column;
   int begin;
   int size;
 }app_request_t;

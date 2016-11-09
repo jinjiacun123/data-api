@@ -32,12 +32,8 @@
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"
 #define HEADER   "ZJHR"
-#define HEADER_EX "SERV"
-#define MAX_BUFF 1024*1024
 
-//public pipe
-#define PUBLIC_PIPE "./jim_sort"
-#define PRIVATE_PIPE_TEMPLATE "./child_pipe/sort_%d"
+#define MAX_BUFF 1024*1024
 
 #define TYPE_EMPTY 0x0D03
 #define TYPE_INIT  0X0101
@@ -65,6 +61,13 @@
 
 #pragma pack (4)
 
+typedef struct{
+  int socket_fd;
+  char *buff;
+  int buff_len;
+  bool start;
+}app_request_data;
+
 //map category and market
 typedef struct{
   short market;
@@ -87,6 +90,7 @@ typedef struct
   bool is_create;
   pid_t pid;
   int app_fifo_fd;
+  int index;
   int column;
   int begin;
   int size;
