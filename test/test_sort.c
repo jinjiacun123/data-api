@@ -6,8 +6,8 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<assert.h>
-define SERVER_HOST "127.0.0.1"
-//#define SERVER_HOST "192.168.1.131"
+//#define SERVER_HOST "127.0.0.1"
+#define SERVER_HOST "192.168.1.131"
 #define SERVER_PORT 8001
 #define HEADER   "ZJHR"
 #define HEADER_EX "SERV"

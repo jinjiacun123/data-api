@@ -40,3 +40,6 @@ test_point_param:test_point_param.c
 
 test_sort:test_sort.c
 	$(CC) -g -o test_sort test_sort.c -lpthread
+
+test_libphenom:test_libphenom.c
+	gcc -g -o test_libphenom test_libphenom.c `pkg-config libphenom --cflags --libs`
