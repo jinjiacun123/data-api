@@ -43,3 +43,6 @@ test_sort:test_sort.c
 
 test_libphenom:test_libphenom.c
 	gcc -g -o test_libphenom test_libphenom.c `pkg-config libphenom --cflags --libs`
+
+test_pthread_cond:test_pthread_cond.c
+	gcc -g -o test_pthread_cond test_pthread_cond.c -lpthread

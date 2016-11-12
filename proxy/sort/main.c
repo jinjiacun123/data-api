@@ -1,15 +1,16 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include<fcntl.h>
-#include<sys/stat.h>
-#include<assert.h>
-#include<stdbool.h>
-#include<signal.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <assert.h>
+#include <stdbool.h>
+#include <signal.h>
+#include <pthread.h>
 #include "cJSON.h"
 #include "comm.h"
 #include "market.h"
@@ -22,6 +23,7 @@ int heart_times = 0;
 bool may_show_sort = false;
 app_request_t app_list[APP_SIZE] = {0};
 pthread_mutex_t work_mutex;
+pthread_cond_t allow_display_sort = PTHREAD_COND_INITIALIZER;
 
 //buff
 char * g_buff = NULL;
@@ -422,9 +424,9 @@ void write_app(void *param)
   char price[10];
 
    while(true){
-     if(may_show_sort){
-       sleep(2);
-       for(i = 0; i < APP_SIZE; i++){
+     pthread_mutex_lock(&work_mutex);
+     pthread_cond_wait(&allow_display_sort, &work_mutex);
+     for(i = 0; i < APP_SIZE; i++){
 	 my_app = &app_list[i];
 	 if(my_app->app_fifo_fd >0){
 	   //write app pipe
@@ -445,7 +447,7 @@ void write_app(void *param)
 	   }
 	 }
        }
-     }
+     pthread_mutex_lock(&work_mutex);
    }
     // else{
     //  pthread_exit("pthread close...\n");
@@ -519,12 +521,10 @@ int parse(char * buff, uLongf  buff_len)
   case TYPE_REALTIME:{
     //printf("realtime...\n");
     pthread_mutex_lock(&work_mutex);
-    may_show_sort = false;
-    pthread_mutex_unlock(&work_mutex);
     res = parse_realtime(buff, buff_len);
     assert( res == 0);
-    pthread_mutex_lock(&work_mutex);
-    may_show_sort = true;
+    //may display sort
+    pthread_cond_signal(&allow_display_sort);
     pthread_mutex_unlock(&work_mutex);
     //sort
     column_n sort_column = NEW_PRICE;
