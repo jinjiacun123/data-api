@@ -33,19 +33,16 @@
 
 #define system_32
 //#define system_64
+//#define system_64
 //#define PIPE_NAME "./../jim_sort"
 //#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
 #define APP_SIZE  5
 
 //basic type
-#ifdef system_32
-#define int_t int
-#define uint_t unsigned int
-#define long_t long
-#define short_t short
-#define ushort_t unsigned short
+#ifdef system_64
+#define long int
 #else
-
+#define long long
 #endif
 
 typedef enum option_s option_n;
@@ -94,7 +91,11 @@ typedef struct
   unsigned short m_nType;
   char  m_nIndex;
   char  m_Not;
+  #ifdef system_32
   long  m_lKey;
+  #else
+  int  m_lKey;
+  #endif
   short m_cCodeType;
   char  m_cCode[6];
   short m_nSize;
@@ -110,7 +111,11 @@ typedef struct
   unsigned short m_nType;
   char  m_nIndex;
   char  m_Not;
+  #ifdef system_32
   long  m_lKey;
+  #else
+  int m_lKey;
+  #endif
   short m_cCodeType;
   char  m_cCode[6];
   short m_nSize;
@@ -122,7 +127,11 @@ typedef struct
   unsigned short m_nType;
   char m_nIndex;
   char m_not;
+  #ifdef system_32
   long m_lKey;
+  #else
+  int m_lKey;
+  #endif
   short m_cCodeType;
   char m_cCode[6];
   short m_nSize;
@@ -147,24 +156,42 @@ typedef struct
   char m_cCode[6];         //品种
   unsigned short m_nTime;  //开盘到现在分钟数
   unsigned short m_nSecond;//开盘到先的秒数
+  #ifdef system_32
   unsigned long m_lCurrent;
 
   unsigned long m_lOutside;//外盘
   unsigned long m_lInside; //内盘
   unsigned long m_lPreClose; //对于外汇，昨收盘数据
   unsigned long m_rate_status; //对于外汇，报价状态
+  #else
+  unsigned int m_lCurrent;
+
+  unsigned int m_lOutside;//外盘
+  unsigned int m_lInside; //内盘
+  unsigned int m_lPreClose; //对于外汇，昨收盘数据
+  unsigned int m_rate_status; //对于外汇，报价状态
+  #endif
 }CommRealTimeData;
 
 //处理股票
 typedef struct
 {
+  #ifdef system_32
   long m_lOpen;            //今开盘
   long m_lMaxPrice;        //最高价
   long m_lMinPrice;        //最低价
   long m_lNewPrice;        //最新价
   unsigned long m_lTotal;  //成交量
+  #else
+  int m_lOpen;            //今开盘
+  int m_lMaxPrice;        //最高价
+  int m_lMinPrice;        //最低价
+  int m_lNewPrice;        //最新价
+  unsigned int m_lTotal;  //成交量
+  #endif
   float m_fAvgPrice;       //成交金额
 
+  #ifdef system_32
   long m_lBuyPrice1;       //买一价
   long m_lBuyCount1;       //买一量
   long m_lBuyPrice2;       //买二价
@@ -189,7 +216,32 @@ typedef struct
 
   long m_nHand;             //每手股数
   long m_lNationalDebtRatio;//国债利率，基金净值
+  #else
+  int m_lBuyPrice1;       //买一价
+  int m_lBuyCount1;       //买一量
+  int m_lBuyPrice2;       //买二价
+  int m_lBuyCount2;       //买二量
+  int m_lBuyPrice3;       //买三价
+  int m_lBuyCount3;       //买三量
+  int m_lBuyPrice4;       //买四价
+  int m_lBuyCount4;       //买四量
+  int m_lBuyPrice5;       //买五价
+  int m_lBuyCount5;       //买五量
 
+  int m_lSellPrice1;       //卖一价
+  int m_lSellCount1;       //卖一量
+  int m_lSellPrice2;       //卖二价
+  int m_lSellCount2;       //卖二量
+  int m_lSellPrice3;       //卖三价
+  int m_lSellCount3;       //卖三量
+  int m_lSellPrice4;       //卖四价
+  int m_lSellCount4;       //卖四量
+  int m_lSellPrice5;       //卖五价
+  int m_lSellCount5;       //卖五量
+
+  int m_nHand;             //每手股数
+  int m_lNationalDebtRatio;//国债利率，基金净值
+  #endif
 }HSStockRealTime;
 
 typedef struct
@@ -205,8 +257,13 @@ typedef struct
 {
   unsigned short m_nType;
   short m_nAlignment;
+  #ifdef system_32
   long m_lZipLen;
   long m_lOrigLen;
+  #else
+  int m_lZipLen;
+  int m_lOrigLen;
+  #endif
   char m_cData[1];
 }TransZipData2;
 

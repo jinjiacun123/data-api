@@ -354,7 +354,7 @@ void init_app(void *param)
   char app_request_buff[app_request_len];
   int app_fifo_fd = 0;
   char *template = PRIVATE_PIPE_TEMPLATE;
-  char app_fifo_name[20];
+  char app_fifo_name[50];
   app_request_t * my_app = NULL;
 
   //open fifo
@@ -392,7 +392,7 @@ void init_app(void *param)
 	  memset(&app_fifo_name, 0x00, 20);
 	  //get
 	  *my_app = *((app_request_t*)app_request_buff);
-	  sprintf(app_fifo_name, template, my_app->pid);
+	  snprintf(app_fifo_name,50, template, my_app->pid);
 	  //open fifo
 	  app_fifo_fd = open(app_fifo_name, O_WRONLY);
 	  if(app_fifo_fd == -1){

@@ -346,6 +346,8 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   client[1].fd = clientSocketId;
   client[1].events = POLLIN;
 
+  signal(SIGPIPE, SIG_IGN);
+
   //init server's login
   assert(init_login(proxyClientSocketId) == 0);
 
@@ -408,13 +410,18 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  }
 	  else{
 	    WriteErrLog("%s\tread client err!\n", client_ip);
+	    close(client[0].fd);
+	    client[0].fd = -1;
 	  }
 	}
 	else if(n == 0){
 	  WriteErrLog("%s\tserver connection close\n", client_ip);
 	  exit(-1);
 	}
-	else if(n == length){
+	else if(n < 0){
+	  WriteErrLog("%s\tserver read server error...\n", client_ip);
+	  exit(-1);
+	}else if(n == length){
 	  //send to client
 	  WriteErrLog("%s\tsend to client\n", client_ip);
 	  //write(client[1].fd, cDataBuf, n);
@@ -500,12 +507,13 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  else{
 	    WriteErrLog("%s\tread client err!\n", client_ip);
 	  }
-	}
-	else if(n == 0){
+	}else if(n == 0){
 	  WriteErrLog("%s\tclient connection close\n", client_ip);
 	  exit(-1);
-	}
-	else if(n == length){
+	}else if(n <0 ){
+	  WriteErrLog("client close...\n", client_ip);
+	  exit(-1);
+	}else if(n == length){
 	  //send to server
 	  //WriteErrLog("send to server\n");
 	  //write(client[0].fd, cDataBuf, n);
@@ -537,17 +545,17 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		close(client[1].fd);
 		client[1].fd = -1;
 		WriteErrLog("%s\tconnreset error!\n", client_ip);
-	      }
-	      else{
+	      }else{
 		WriteErrLog("%s\tread client err!\n", client_ip);
 		exit(-1);
 	      }
-	    }
-	    else if(n == 0){
+	    }else if(n == 0){
 	      WriteErrLog("%s\tserver connection close\n", client_ip);
 	      exit(-1);
-	    }
-	    else if(n == last_length){
+	    }else if(n <0){
+	      WriteErrLog("%sread client info err!\n", client_ip);
+	      exit(-1);
+	    }else if(n == last_length){
 	      //reccive complete and send to server
 	      char * send_buff;
 	      send_buff = (char *)malloc(8+length+1);
@@ -956,7 +964,7 @@ void * deal_request_of_sort(void * p_app_request_data)
   char * sort_buff = NULL;
   int entity_len = sizeof(sort_entity_t);
   int sort_buff_len = entity_len *size;
-  char cur_app_pipe[20];
+  char cur_app_pipe[50];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
   int pipe_read_fd = -1;
@@ -974,7 +982,7 @@ void * deal_request_of_sort(void * p_app_request_data)
   }
   memset(sort_buff, 0x00, sort_buff_len);
   memset(&cur_app_pipe, 0x00, 20);
-  sprintf(cur_app_pipe, template, getpid());
+  snprintf(cur_app_pipe, 50, template, getpid());
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);

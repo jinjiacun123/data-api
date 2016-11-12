@@ -33,7 +33,7 @@ int init_market()
   int index = 0;
   memset(buff, 0x00, 1024*100);
   memset(&cmd, 0x00, 50);
-  sprintf(cmd, template_str[2], market_list[index].file_name);
+  snprintf(cmd, 50, template_str[2], market_list[index].file_name);
   int length = get_content(cmd, buff, 1024*100);
   cJSON * root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
   if (NULL == root_json){
@@ -50,7 +50,7 @@ int init_market()
   index = 1;
   memset(buff, 0x00, 1024*100);
   memset(&cmd, 0x00, 50);
-  sprintf(cmd, template_str[2], market_list[index].file_name);
+  sprintf(cmd, 50, template_str[2], market_list[index].file_name);
   length = get_content(cmd, buff, 1024*100);
   root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
   if (NULL == root_json){
