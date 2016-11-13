@@ -435,7 +435,7 @@ void write_app(void *param)
 	 send_sort(my_app);
        }
      }
-     pthread_mutex_lock(&work_mutex);
+     pthread_mutex_unlock(&work_mutex);
    }
 }
 
