@@ -270,6 +270,7 @@ PassiveSock()
   struct protoent *ppe;
   struct sockaddr_in sin;
   int s,type,optval,optlen;
+  int opt = 1;
 
   memset(&sin,0,sizeof(sin));
   sin.sin_family = AF_INET;
@@ -282,6 +283,8 @@ PassiveSock()
 
   optval = 1;
   optlen = sizeof(optval);
+  if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(opt)) == -1)
+     WriteErrLog("Waring:setsockopt so_reuseaddr error:%s\n", strerror(errno));
   //  if(setsockopt(s,SOL_SOCKET,SO_REUSEPORT,(char *)&optval,optlen) == -1)
   //  WriteErrLog("Warning:setsockopt error:%s/n",strerror(errno));
 
@@ -483,7 +486,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	}
 	//deal_from_server_to_client
 	//	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
-      }  
+      }
     }
 
     //recive client info
@@ -506,12 +509,10 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	  }
 	  else{
 	    WriteErrLog("%s\tread client err!\n", client_ip);
+	    exit(-1);
 	  }
 	}else if(n == 0){
 	  WriteErrLog("%s\tclient connection close\n", client_ip);
-	  exit(-1);
-	}else if(n <0 ){
-	  WriteErrLog("client close...\n", client_ip);
 	  exit(-1);
 	}else if(n == length){
 	  //send to server
@@ -551,9 +552,6 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 	      }
 	    }else if(n == 0){
 	      WriteErrLog("%s\tserver connection close\n", client_ip);
-	      exit(-1);
-	    }else if(n <0){
-	      WriteErrLog("%sread client info err!\n", client_ip);
 	      exit(-1);
 	    }else if(n == last_length){
 	      //reccive complete and send to server
@@ -964,7 +962,7 @@ void * deal_request_of_sort(void * p_app_request_data)
   char * sort_buff = NULL;
   int entity_len = sizeof(sort_entity_t);
   int sort_buff_len = entity_len *size;
-  char cur_app_pipe[50];
+  char cur_app_pipe[100];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
   int pipe_read_fd = -1;
@@ -981,8 +979,8 @@ void * deal_request_of_sort(void * p_app_request_data)
     exit(-1);
   }
   memset(sort_buff, 0x00, sort_buff_len);
-  memset(&cur_app_pipe, 0x00, 20);
-  snprintf(cur_app_pipe, 50, template, getpid());
+  memset(&cur_app_pipe, 0x00, 100);
+  snprintf(cur_app_pipe, 100, template, getpid());
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);

@@ -94,20 +94,21 @@ int main()
     return -1;
   }
 
-/*	
+	
   //init receive
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
     perror("create thread err!\n");
     exit(-1);
   }
-*/  
 
   //send sort request
   ret = request_sort(client);
   assert(ret == 0);
+  /*
   ret = read(client, buff, 1024*1024);
   assert(ret >0);
+  */
   
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
@@ -155,17 +156,26 @@ static void *init_receive(void * param)
       pthread_exit("receive err!\n");
     }else if(ret == 8){
       //read content
-      length = (int *)(head_buff+4);
+      length = *(int *)(head_buff+4);
       body_buff = (char *)malloc(length +1);
       if(body_buff == NULL){
 	pthread_exit("malloc error!\n");
       }
-      for(i = 0; i<10; i++){
-	entity = (entity_t*)body_buff;
-	printf("code:%.6s,price:%d\n", entity->code, entity->price);
-	printf("--------------------------------\n");
-	sleep(2);
+      ret = read(client, body_buff, length);
+      if(ret <0){
+	printf("read body_buff error\n");
+	break;
+      }else if(ret == 0){
+	printf("close...\n");
+	break;
       }
+      body_buff[length] = '\0';		
+      entity = (entity_t*)body_buff;	
+      for(i = 0; i<10; i++){
+	printf("code:%.6s,price:%d\n", entity->code, entity->price);
+	entity++;
+      }
+      printf("----------------------------------\n");
     }
   }
 }
