@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<stdbool.h>
+#include<errno.h>
 #include "config.h"
 #include "market.h"
 #include "./../comm_pipe.h"
@@ -23,7 +24,7 @@ int main(int argc, char * argv[])
   char * buff = NULL;
   int entity_len = sizeof(entity_t);
   int buff_len = entity_len *size;
-  char cur_app_pipe[20];
+  char cur_app_pipe[100];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
   int pipe_read_fd = -1;
@@ -39,8 +40,8 @@ int main(int argc, char * argv[])
     exit(-1);
   }
   memset(buff, 0x00, buff_len);
-  memset(&cur_app_pipe, 0x00, 20);
-  sprintf(cur_app_pipe, template, getpid());
+  memset(&cur_app_pipe, 0x00, 100);
+  snprintf(cur_app_pipe, 100, template, getpid());
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
@@ -68,9 +69,9 @@ int main(int argc, char * argv[])
   app_request.begin = begin;
   app_request.size = size;
   res = write(pipe_write_fd, &app_request, app_request_len);
-  close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
+  close(pipe_write_fd);
   if(pipe_read_fd == -1){
     printf("open pipe read fd error!\n");
     exit(-1);
@@ -80,7 +81,11 @@ int main(int argc, char * argv[])
   while(true){
     memset(buff, 0x00, buff_len+1);
     res = read(pipe_read_fd, buff, buff_len);
-    if(res == -1){
+    if(res < 0){
+      if(errno == EAGAIN){
+	sleep(1);
+	continue;
+      }
       printf("read error!\n");
       exit(-1);
     }else if(res == 0){

@@ -1,9 +1,10 @@
 b main
+b init_app
 #b send_realtime
 #b send_auto_push
 #b 414
 #b 427
-#b parse
+b parse
 #b parse_auto_push
 #b parse_realtime
 #b init_sort_display
