@@ -1,5 +1,5 @@
 b main
-b init_app
+#b init_app
 #b send_realtime
 #b send_auto_push
 #b 414

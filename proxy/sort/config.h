@@ -5,8 +5,8 @@
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 //#define SERVER_MARKET "221.6.167.245"
 //#define SERVER_MARKET_PORT 8881
-//#define SERVER_MARKET "192.168.1.131"
-#define SERVER_MARKET "127.0.0.1"
+#define SERVER_MARKET "192.168.1.131"
+//#define SERVER_MARKET "127.0.0.1"
 #define SERVER_MARKET_PORT 8001
 
 #define USERNAME "jrjvip_android"
@@ -35,14 +35,16 @@
 //#define system_64
 //#define PIPE_NAME "./../jim_sort"
 //#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
-#define APP_SIZE  1024
+#define APP_SIZE  10
 
 //basic type
+/*
 #ifdef system_64
 #define long int
 #else
 #define long long
 #endif
+*/
 
 typedef enum option_s option_n;
 typedef enum column_s column_n;

@@ -58,8 +58,8 @@ static int deal_request_of_time_share(int proxy_client_socket_fd, const char * b
 static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
 //request of zib
 static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
-static int init_request_sort(pid_t p_id, int * pipe_read_fd, int * pipe_write_fd);
-void * deal_request_of_sort(pid_t p_id,void * p_app_request_data, int pipe_read_fd, int pipe_write_fd);
+static int init_request_sort(pid_t p_id, int * pipe_write_fd);
+void * deal_request_of_sort(pid_t p_id,void * p_app_request_data, int pipe_write_fd);
 
 //response of realtime
 static int deal_response_of_realtime();
@@ -349,15 +349,12 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
   int pipe_read_fd = -1;
   int pipe_write_fd = -1;
 
-  //init sort of request
-  sort_fd = init_request_sort(p_id, &pipe_read_fd, &pipe_write_fd);
-
   client[0].fd = proxyClientSocketId;
   client[0].events = POLLIN;
   client[1].fd = clientSocketId;
   client[1].events = POLLIN;
-  client[2].fd = sort_fd;
-  client[2].events = POLLIN;
+  //client[2].fd = pipe_read_fd;
+  //client[2].events = POLLIN;
 
   signal(SIGPIPE, SIG_IGN);
 
@@ -585,6 +582,9 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		ret = deal_request_of_sort(client[1].fd, send_buff, length+8);
 		assert(ret == 0);
 		*/
+		//init sort of request
+		ret = init_request_sort(p_id, &pipe_write_fd);
+		assert(ret == 0);
 		my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
 		if(my_app_request_data == NULL){
 		  WriteErrLog("malloc my_app_request_data error!\n");
@@ -596,7 +596,7 @@ void deal_proxy(int proxyClientSocketId, int clientSocketId)
 		my_app_request_data->buff_len = length;
 		my_app_request_data->start = true;
 		status = pthread_setspecific(key_sort, my_app_request_data);
-		deal_request_of_sort(p_id, my_app_request_data, pipe_read_fd, pipe_write_fd);
+		deal_request_of_sort(p_id, my_app_request_data, pipe_write_fd);
 		/*
 		//create sort thread
 		ret = pthread_create(&sort_p_id, NULL, (void *)deal_request_of_sort, &my_app_request_data);
@@ -949,16 +949,15 @@ static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, u
   return 0;
 }
 
-static int init_request_sort(pid_t p_id, int *pipe_read_fd, int *pipe_write_fd)
+static int init_request_sort(pid_t p_id, int *pipe_write_fd)
 {
   const char *fifo_name = PUBLIC_PIPE;
+  int res = 0;
   char cur_app_pipe[100];
   char *template = PRIVATE_PIPE_TEMPLATE;
-  int res = 0;
 
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
-
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
@@ -972,37 +971,38 @@ static int init_request_sort(pid_t p_id, int *pipe_read_fd, int *pipe_write_fd)
     WriteErrLog("fifo is not exists!\n");
     exit(-1);
   }
-  pipe_write_fd = open(fifo_name, O_WRONLY);
-  if(pipe_write_fd == -1){
+  *pipe_write_fd = open(fifo_name, O_WRONLY);
+  if(*pipe_write_fd == -1){
     WriteErrLog("open pipe err!\n");
     exit(-1);
   }
-  
-  pipe_read_fd = open(cur_app_pipe, O_RDONLY);
-  if(pipe_read_fd == -1){
-    WriteErrLog("open pipe read fd error!\n");
-    exit(-1);
-  }
+
   return 0;
 }
 
 //request of sort
-void * deal_request_of_sort(pid, p_app_request_data, pipe_read_fd, pipe_write_fd)
+void * deal_request_of_sort(pid, p_app_request_data, pipe_write_fd)
   pid_t pid;
   void * p_app_request_data;
-  int pipe_read_fd;
   int pipe_write_fd;
 {
+  char cur_app_pipe[100];
+  char *template = PRIVATE_PIPE_TEMPLATE;
   int begin = 0;
   int size = 0;
   app_request_t * my_request = NULL;
   app_request_data * my_app_request_data = (app_request_data  *)p_app_request_data;
+  int pipe_read_fd = -1;
   //app_request_data * my_app_request_data = (app_request_data *)pthread_getspecific(key_sort);
+  /*
   while(!my_app_request_data->start){
     sleep(2);
     continue;
   }
+  */
 
+  memset(&cur_app_pipe, 0x00, 100);
+  snprintf(cur_app_pipe, 100, template, getpid());
   my_request = (app_request_t *)my_app_request_data->buff;
   begin = my_request->begin;
   size  = my_request->size;
@@ -1034,7 +1034,11 @@ void * deal_request_of_sort(pid, p_app_request_data, pipe_read_fd, pipe_write_fd
   res = write(pipe_write_fd, &app_request, app_request_len);
   close(pipe_write_fd);
   WriteErrLog("send pipe request...\n");
-
+  pipe_read_fd = open(cur_app_pipe, O_RDONLY);
+  if(pipe_read_fd == -1){
+    WriteErrLog("open pipe read fd error!\n");
+    exit(-1);
+  }
   WriteErrLog("read pipe...\n");
   //read sort
   while(true){

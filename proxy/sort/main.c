@@ -106,14 +106,16 @@ int main()
   //assert(ret == 0);
   //send_auto_push(socket_fd, 0, 20, 0);
 
-  sleep(3);
   int menu = 1;
   while(true){
-    send_heart(socket_fd);
     sleep(3);
+    ret = send_heart(socket_fd);
+    assert(ret == 0);
+    /*
     ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
     assert(ret == 0);
     sleep(8);
+    */
     heart_times++;
     test_times++;
     //if(is_exit) break;
@@ -549,22 +551,20 @@ int parse(char * buff, uLongf  buff_len)
     }
     option_times ++;
     printf("option_times:%d\n", option_times);
-    is_simulate = true;
-    /*
+    sleep(3);
+    //is_simulate = true;
     res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
     assert(res == 0);
-    */
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
-    pthread_mutex_lock(&work_mutex);
-    may_show_sort = false;
-    pthread_mutex_unlock(&work_mutex);
     res = parse_auto_push(buff, buff_len);
     assert( res == 0);
     pthread_mutex_lock(&work_mutex);
-    may_show_sort = true;
+    pthread_cond_signal(&allow_display_sort);
     pthread_mutex_unlock(&work_mutex);
+    option_times ++;
+    printf("option_times:%d\n", option_times);
   }break;
   case TYPE_HEART:{
     //printf("heart...\n");

@@ -64,7 +64,7 @@ struct entity_s
 
 static int request_sort(int socket_fd);
 static void * init_receive(void * param);
-static void stop(int signo);
+void stop(int signo);
 static int send_heart(int socket_fd);
 int client;
 char buff[1024*1024];
@@ -116,6 +116,8 @@ int main()
     sleep(3);
     send_heart(client);
   }
+  pthread_join(t_id, NULL);
+
   return 0;
 }
 
@@ -128,7 +130,7 @@ static int request_sort(int socket_fd)
   my_request_sort.body_len = sizeof(request_sort_t)-8;
   my_request_sort.app_request.column = 0;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = 0;
+  my_request_sort.app_request.begin = 100;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
@@ -180,8 +182,10 @@ static void *init_receive(void * param)
   }
 }
 
-static void stop(int signo)
+void stop(int signo)
 {
+  printf("sigint close...\n");
+  //shutdown(client, 2);	
   close(client);
   exit(-1);
 }

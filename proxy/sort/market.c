@@ -18,7 +18,6 @@ int init_market()
   char cmd[100];
   sort_area_queue_t * area_queue_item = NULL; 
 
-  /*
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
   system(cmd);
@@ -29,7 +28,6 @@ int init_market()
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[1].file_name);
   system(cmd);
-  */
 
   //parse
   int index = 0;
