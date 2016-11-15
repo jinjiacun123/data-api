@@ -6,6 +6,9 @@ v1.0<br/>
 2.实时数据请求模式的，单品种请求；<br/>
 3.请求与接受包头json长度暂定为50个字节；<br/>
 4.历史数据多条请求;<br/>
+5.use poll deal data;<br/>
+6.use pthread condition controll auto_push data<br/>
+7.sort data by pipe<br/>
 <br/>
 <br/>
 <br/>
