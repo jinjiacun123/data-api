@@ -1,4 +1,4 @@
-CC = gcc-4.4
+c1Ccc1 = gcc-4.4
 libmyadd.so:so.c
 	$(CC) -shared -o libmyadd.so so.c
 test_so:test_so.c
@@ -46,3 +46,5 @@ test_libphenom:test_libphenom.c
 
 test_pthread_cond:test_pthread_cond.c
 	gcc -g -o test_pthread_cond test_pthread_cond.c -lpthread
+test_epoll:test_epoll.c
+	g++ -g -o test_epoll test_epoll.c

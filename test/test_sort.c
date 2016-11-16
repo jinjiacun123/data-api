@@ -14,8 +14,7 @@
 #define TYPE_HEART      0x0905 //heart tick
 #pragma pack (4)
 
-typedef struct
-{
+typedef struct{
   bool is_create;
   pid_t pid;
   int app_fifo_fd;
@@ -33,8 +32,7 @@ typedef struct{
   app_request_t app_request;
 }request_sort_t;
 
-typedef struct
-{
+typedef struct{
   char head[4];
   int  length;
   unsigned short m_nType;
@@ -43,8 +41,7 @@ typedef struct
 }TestSrvData2;
 typedef struct entity_s entity_t;
 
-struct entity_s
-{
+struct entity_s{
   unsigned short type;
   char code[7];
   int  pre_close;  //close price of yestoday
@@ -61,6 +58,30 @@ struct entity_s
   int buy;
   int sell;
 };
+#define TYPE_REALTIME 0X0201
+#define system_32
+typedef struct{
+  char m_head[4];
+  int  m_length;
+  unsigned short m_nType;
+  char  m_nIndex;
+  char  m_Not;
+  #ifdef system_32
+  long  m_lKey;
+  #else
+  int  m_lKey;
+  #endif
+  short m_cCodeType;
+  char  m_cCode[6];
+  short m_nSize;
+  unsigned short m_nOption;
+  unsigned short code_type;
+  char code[6];
+}RealPack;
+typedef struct{
+  unsigned short code_type;
+  char code[6];
+}CodeInfo;
 
 static int request_sort(int socket_fd);
 static void * init_receive(void * param);
@@ -68,6 +89,7 @@ void stop(int signo);
 static int send_heart(int socket_fd);
 int client;
 char buff[1024*1024];
+int send_realtime(int socket_fd);
 
 int main()
 {
@@ -94,7 +116,6 @@ int main()
     return -1;
   }
 
-	
   //init receive
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
@@ -109,7 +130,9 @@ int main()
   ret = read(client, buff, 1024*1024);
   assert(ret >0);
   */
-  
+  sleep(3);
+  ret = send_realtime(client);
+  assert(ret == 0);
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
   while(true){
@@ -119,6 +142,50 @@ int main()
   pthread_join(t_id, NULL);
 
   return 0;
+}
+
+int send_realtime(int socket_fd)
+{
+  int size = 1;
+  char * request;
+  int off = sizeof(RealPack);
+  int codeinfo_length = sizeof(CodeInfo);
+  CodeInfo * codeinfo;
+  entity_t * entity;
+  int entity_length = sizeof(entity_t);
+
+  request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
+  if(request == NULL){
+    printf("malloc err!\n");
+    exit(-1);
+  }
+  int request_length = sizeof(RealPack)+ codeinfo_length * size;
+
+  if(request == NULL){
+    printf("malloc err!\n");
+    exit(-1);
+  }
+  memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
+
+  RealPack * data = (RealPack*)request;
+  memcpy(data->m_head, HEADER, 4);
+  data->m_length =  request_length - 8;
+  data->m_nType = TYPE_REALTIME;
+  data->m_nSize = size;
+  data->m_nOption= 0x0080;
+
+  //股票:pass
+  int i = 0;
+  codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
+  codeinfo->code_type = 0x1101;
+  strncpy(codeinfo->code, "600000", 6);
+
+  if(send(socket_fd, request, request_length, 0)){
+    printf("send success!\n");
+    return 0;
+  }
+
+  return -1;
 }
 
 static int request_sort(int socket_fd)
