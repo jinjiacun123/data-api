@@ -40,6 +40,7 @@ bool is_simulate = false;
 
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 static int send_sort(app_request_t * my_app);
+static int init_login(int socket_fd);
 
 bool is_exit = false;
 int socket_fd = 0;
@@ -82,8 +83,13 @@ int main()
   assert (ret == 0);
   //printf("init app ret:%d\n", ret);
   //--receive both shanghhai and shenzhen market stock
-  init_market();
-  init_socket(&socket_fd);
+  ret = init_market();
+  assert(ret == 0);
+  ret = init_socket(&socket_fd);
+  assert(ret == 0);
+  //init server's login
+  ret = init_login(socket_fd);
+  assert( ret == 0);
   //init mutext
   ret = pthread_mutex_init(&work_mutex, NULL);
   assert( ret == 0);
@@ -182,6 +188,74 @@ int init_socket(int * socket_fd)
   }
   printf("connect() success\n");
   return 0;
+}
+
+//init login
+int init_login(int proxy_client_fd)
+{
+  char * package;
+  int request_len = sizeof(request_login_t);
+  int package_len = request_len ;
+  package = (char *)malloc(package_len);
+  memset(package, 0x00, package_len);
+
+  //request login
+  request_login_t * data;
+  data = (request_login_t *)package;
+  memcpy(data->header_name, HEADER, 4);
+  data->body_len = package_len - 8;
+  data->type = TYPE_LOGIN;
+
+  data->key = 3;
+  data->index = 0;
+  strncpy(data->username, USERNAME, 64);
+  strncpy(data->password, PASSWORD, 64);
+
+  write(proxy_client_fd, package, package_len);
+  free(package);
+  printf("send login info!\n");
+
+  //response login
+  p_response_s_t  p_response_s;
+  char * buff;
+  int buff_len = 8;
+  unsigned short type;
+  assert(buff = (char *)malloc(buff_len+1));
+  memset(buff, 0x00, buff_len);
+  int n = read(proxy_client_fd, buff, buff_len);
+  printf("recive login info!\n");
+  if(n == 8){
+    p_response_s = (p_response_s_t)buff;
+    //parse head
+    if(strncmp(p_response_s->header_name, HEADER, 4)){
+      printf("recive login head of info err!\n");
+      exit(-1);
+    }
+    buff_len = p_response_s->body_len;
+    free(buff);
+    assert(buff = (char *)malloc(buff_len+1));
+
+    memset(buff, 0x00, buff_len+1);
+    n = read(proxy_client_fd, buff, buff_len);
+    if(n != buff_len){
+      printf("recive login body's length of info err!\n");
+      exit(-1);
+    }
+
+    type = *((unsigned short *)buff);
+    if(type != TYPE_LOGIN){
+      printf("recive login body's type of info err!\n");
+      exit(-1);
+    }
+
+    printf("recive login info check ok!\n");
+    return 0;
+  }
+  else{
+    printf("recive login info err!\n");
+    exit(-1);
+  }
+  return -1;
 }
 
 void reset_socket(int * sock_fd)
@@ -714,6 +788,7 @@ int unpack(char * des_buff, uLongf des_buff_len)
     g_zib_buff_len = src_length;
     g_zib_buff_max_len= src_length;
     g_zib_buff = (char *)malloc(g_zib_buff_len);
+    assert(g_zib_buff != NULL);
     if(g_zib_buff == NULL){
       printf("malloc err!\n");
       return -1;
@@ -725,6 +800,7 @@ int unpack(char * des_buff, uLongf des_buff_len)
       g_zib_buff_len = src_length;
       g_zib_buff_max_len = src_length;
       g_zib_buff = (char *)malloc(g_zib_buff_len);
+      assert(g_zib_buff != NULL);
       if(g_zib_buff == NULL){
 	printf("malloc err!\n");
 	return -1;

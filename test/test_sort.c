@@ -7,7 +7,7 @@
 #include<stdbool.h>
 #include<assert.h>
 #define SERVER_HOST "127.0.0.1"
-#define SERVER_HOST "192.168.1.131"
+//#define SERVER_HOST "192.168.1.131"
 //#define SERVER_HOST "122.144.139.237"
 #define SERVER_PORT 8001
 #define HEADER   "ZJHR"
@@ -124,14 +124,17 @@ int main()
     exit(-1);
   }
 
+  
   //send sort request
   ret = request_sort(client);
   assert(ret == 0);
+  
+
   /*
   ret = read(client, buff, 1024*1024);
   assert(ret >0);
   */
-  sleep(3);
+  //sleep(3);
   ret = send_realtime(client);
   assert(ret == 0);
   printf("connect success...\n");
@@ -221,7 +224,7 @@ static void *init_receive(void * param)
     ret = read(client, head_buff, 8);
     if(ret == 0){
       //printf("close continue\n");
-      continue;
+      break;
     }else if(ret == -1){
       pthread_exit("receive err!\n");
     }else if(ret == 8){

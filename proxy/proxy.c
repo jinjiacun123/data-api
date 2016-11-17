@@ -83,7 +83,7 @@ static int deal_server_info(int clientSocketId,
 			    char * client_ip,
 			    char * header_buff,
 			    int * header_buff_len,
-			    char * my_buff,
+			    char ** my_buff,
 			    int * my_buff_len,
 			    int * last_my_buff_len);
 static int deal_client_info(int clientSocketId,
@@ -95,7 +95,7 @@ static int deal_client_info(int clientSocketId,
 			    int * pipe_read_fd,
 			    char * header_buff,
 			    int * header_buff_len,
-			    char * my_buff,
+			    char ** my_buff,
 			    int * my_buff_len,
 			    int * last_my_buff_len);
 static int deal_sort_info(int clientSocketId,
@@ -350,24 +350,16 @@ ConnectSock()
   return proxy_client_fd;
 }
 
-  char header_buff[9];
-  int header_buff_len = 9;
-  char * my_buff;
-  int my_buff_len = 0;
-  int last_my_buff_len = 0;
-  char * send_buff;
-  int send_buff_len = 0;
-  int last_send_buff_len = 0;
+
 
 void deal_proxy(proxyClientSocketId, clientSocketId)
   int proxyClientSocketId;
   int clientSocketId;
 {
-  char * buff;
   int n;
   fd_set rset;
-  int iRet=0;
-  int maxi=0;
+  int iRet = 0;
+  int maxi = 0;
   int i;
   int heart_times = 0;
   int length = 8;
@@ -385,6 +377,15 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   int epfd, nfds;
   struct epoll_event ev, events[10];
   epfd = epoll_create(256);
+
+  char header_buff[8];
+  int header_buff_len = 9;
+  char * my_buff = NULL;
+  int my_buff_len = 0;
+  int last_my_buff_len = 0;
+  char * send_buff = NULL;
+  int send_buff_len = 0;
+  int last_send_buff_len = 0;
 
   ev.data.fd = proxyClientSocketId;
   ev.events = EPOLLIN | EPOLLET;
@@ -441,7 +442,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 &pipe_read_fd,
 				 &header_buff,
 				 &header_buff_len,
-				 my_buff,
+				 &my_buff,
 				 &my_buff_len,
 				 &last_my_buff_len);
 	  assert(ret == 0);
@@ -456,9 +457,9 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 proxyClientSocketId,
 				 &alive_times,
 				 client_ip,
-				 header_buff,
+				 &header_buff,
 				 &header_buff_len,
-				 my_buff,
+				 &my_buff,
 				 &my_buff_len,
 				 &last_my_buff_len);
 	  assert(ret == 0);
@@ -499,7 +500,7 @@ static int deal_server_info(client_socket_fd,
   char * client_ip;
   char * header_buff;
   int * header_buff_len;
-  char * my_buff;
+  char ** my_buff;
   int * my_buff_len;
   int * last_my_buff_len;
 {
@@ -543,36 +544,36 @@ static int deal_server_info(client_socket_fd,
     }
     length = p_header->length;
     if(*my_buff_len == 0){
-      my_buff = (char *)malloc(length);
-      if(my_buff == NULL){
+      *my_buff = (char *)malloc(length);
+      if(*my_buff == NULL){
 	WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	exit(-1);
       }
-      memset(my_buff, 0x00, length);
+      memset(*my_buff, 0x00, length);
       *my_buff_len = length;
       *last_my_buff_len = length;
     }
     else{
       if(*my_buff_len < length){
-	free(my_buff);
-	my_buff = (char *)malloc(length);
-	if(my_buff == NULL){
+	free(*my_buff);
+	*my_buff = (char *)malloc(length);
+	if(*my_buff == NULL){
 	  WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	  exit(-1);
 	}
-	memset(my_buff, 0x00, length);
+	memset(*my_buff, 0x00, length);
 	*my_buff_len = length;
 	*last_my_buff_len = length;
       }
       else{
-	memset(my_buff, 0x00, *last_my_buff_len);
+	memset(*my_buff, 0x00, *last_my_buff_len);
 	*last_my_buff_len = length;
       }
     }
     int off = 0;
     int last_length = length;
-    
-    while(n = read(proxy_client_socket_fd, my_buff+off, last_length)){
+
+    while(n = read(proxy_client_socket_fd, *my_buff+off, last_length)){
       if(n<0){
 	if(errno == ECONNRESET){
 	  close(proxy_client_socket_fd);
@@ -597,7 +598,7 @@ static int deal_server_info(client_socket_fd,
 	  WriteErrLog("%s\tWrite to client error!\n", client_ip);
 	  exit(-1);
 	}
-	if(write(client_socket_fd, my_buff, length) == -1){
+	if(write(client_socket_fd, *my_buff, length) == -1){
 	  WriteErrLog("%s\tWrite to client error!\n", client_ip);
 	  exit(-1);
 	}
@@ -637,7 +638,7 @@ static int deal_client_info(client_socket_fd,
      int * pipe_read_fd;
      char * header_buff;
      int * header_buff_len;
-     char * my_buff;
+     char ** my_buff;
      int * my_buff_len;
      int * last_my_buff_len;
 {
@@ -685,34 +686,34 @@ static int deal_client_info(client_socket_fd,
 
     length = p_header->length;
     if(*my_buff_len == 0){
-      my_buff = (char *)malloc(length);
-      if(my_buff == NULL){
+      *my_buff = (char *)malloc(length);
+      if(*my_buff == NULL){
 	WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	exit(-1);
       }
-      memset(my_buff, 0x00, length);
+      memset(*my_buff, 0x00, length);
       *my_buff_len = length;
       *last_my_buff_len = length;
     }
     else{
       if(length > *my_buff_len){
-	free(my_buff);
-	my_buff = (char *)malloc(length);
-	if(my_buff == NULL){
+	free(*my_buff);
+	*my_buff = (char *)malloc(length);
+	if(*my_buff == NULL){
 	  WriteErrLog("%s\tmalloc momory err!\n", client_ip);
 	  exit(-1);
 	}
-	memset(my_buff, 0x00, length);
+	memset(*my_buff, 0x00, length);
 	*my_buff_len = length;
 	*last_my_buff_len = length;
       }else{
-	memset(my_buff, 0x00, *last_my_buff_len);
+	memset(*my_buff, 0x00, *last_my_buff_len);
 	*last_my_buff_len = length;
       }
     }
     int off = 0;
     int last_length = length;
-    while(n = read(client_socket_fd, my_buff+off, last_length)){
+    while(n = read(client_socket_fd, *my_buff+off, last_length)){
       if(n<0){
 	if(errno == ECONNRESET){
 	  //close(client_socket_fd);
@@ -734,7 +735,7 @@ static int deal_client_info(client_socket_fd,
 	    WriteErrLog("%s\twrite to server error!\n", client_ip);
 	    exit(-1);
 	  }
-	  if(write(proxy_client_socket_fd, my_buff, length) == -1){
+	  if(write(proxy_client_socket_fd, *my_buff, length) == -1){
 	    WriteErrLog("%s\twrite to server error!\n", client_ip);
 	    exit(-1);
 	  }
@@ -757,7 +758,7 @@ static int deal_client_info(client_socket_fd,
 	  }
 	  memset(my_app_request_data, 0x00, sizeof(app_request_data));
 	  my_app_request_data->socket_fd = client_socket_fd;
-	  my_app_request_data->buff = my_buff;
+	  my_app_request_data->buff = *my_buff;
 	  my_app_request_data->buff_len = length;
 	  my_app_request_data->start = true;
 	  deal_request_of_sort(getpid(), my_app_request_data, *pipe_write_fd, pipe_read_fd, epfd);
@@ -910,7 +911,7 @@ int init_login(int proxy_client_fd)
       WriteErrLog("recive login body's type of info err!\n");
       exit(-1);
     }
-    
+
     WriteErrLog("recive login info check ok!\n");
     return 0;
   }
@@ -936,7 +937,7 @@ int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
   if(type == TYPE_ZIB){
     REQUEST_DEAL(zlib)(proxy_client_fd,buff, buff_len);
   }
-  switch(type){    
+  switch(type){
   case TYPE_REALTIME:
     REQUEST_DEAL(realtime)(proxy_client_fd,buff, buff_len);
     break;

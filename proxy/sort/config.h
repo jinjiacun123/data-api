@@ -3,11 +3,12 @@
 #include<zlib.h>
 #include<stdbool.h>
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
-//#define SERVER_MARKET "221.6.167.245"
-//#define SERVER_MARKET_PORT 8881
+#define SERVER_MARKET_DEMAIN "dsapp.yz.zjwtj.com"
+#define SERVER_MARKET "221.6.167.245"
+#define SERVER_MARKET_PORT 8881
 //#define SERVER_MARKET "192.168.1.131"
-#define SERVER_MARKET "127.0.0.1"
-#define SERVER_MARKET_PORT 8001
+//#define SERVER_MARKET "127.0.0.1"
+//#define SERVER_MARKET_PORT 8001
 
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"
@@ -84,6 +85,38 @@ typedef struct
   int begin;
   int size;
 }app_request_t;
+
+typedef struct{
+  //  request_s_t pre;
+  //header
+  char header_name[4];
+  int body_len;
+
+  //body
+  unsigned short type;
+
+  char index;
+  char no;
+#ifdef system_32
+  long key;
+#else
+  int key;
+#endif
+  unsigned short code_type;
+  char  code[6];
+  short size;
+  unsigned short option;
+  char username[64];
+  char password[64];
+}request_login_t;
+
+//response of server
+typedef struct{
+  //header
+  char header_name[4];
+  int  body_len;
+}response_s_t;
+typedef response_s_t * p_response_s_t;
 
 typedef struct
 {
