@@ -1218,12 +1218,14 @@ void * deal_request_of_sort(pid,
   sort_entity_t * entity = NULL;
   int i = 0;
 
+  /*
   sort_buff = (sort_entity_t *)malloc(sort_buff_len+1);
   if(sort_buff == NULL){
     WriteErrLog("malloc error!\n");
     exit(-1);
   }
   memset(sort_buff, 0x00, sort_buff_len);
+  */
 
   WriteErrLog("begin:%d,size:%d\n", begin, size);
   app_request_t app_request;
@@ -1235,7 +1237,7 @@ void * deal_request_of_sort(pid,
   res = write(pipe_write_fd, &app_request, app_request_len);
   assert(res >0);
   WriteErrLog("send pipe request...\n");
-  *pipe_read_fd = open(cur_app_pipe, O_RDONLY);
+  *pipe_read_fd = open(cur_app_pipe, O_RDWR);
   if(*pipe_read_fd == -1){
     WriteErrLog("open pipe read fd error!\n");
     exit(-1);
