@@ -123,29 +123,29 @@ int main()
     perror("create thread err!\n");
     exit(-1);
   }
-  
+
   //send sort request
   ret = request_sort(client);
   assert(ret == 0);
-  
+
   sleep(3);
- 
   ret = send_realtime(client);
   assert(ret == 0);
-	 
-  /*  
+  /*
   ret = read(client, buff, 1024*1024);
   assert(ret >0);
   */
-	
+
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
   while(true){
     sleep(3);
     send_heart(client);
+    sleep(1);
+    ret = request_sort(client);
+    assert(ret == 0);
   }
   pthread_join(t_id, NULL);
-
   return 0;
 }
 
@@ -193,6 +193,7 @@ int send_realtime(int socket_fd)
   return -1;
 }
 
+int option = 0;
 static int request_sort(int socket_fd)
 {
   request_sort_t my_request_sort;
@@ -202,7 +203,7 @@ static int request_sort(int socket_fd)
   my_request_sort.body_len = sizeof(request_sort_t)-8;
   my_request_sort.app_request.column = 0;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = 100;
+  my_request_sort.app_request.begin = option++;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
@@ -244,6 +245,7 @@ static void *init_receive(void * param)
 	break;
       }
       body_buff[length] = '\0';		
+      printf("option times:%d\n", option);
       printf("body_buff:%s\n", body_buff);
       entity = (entity_t*)body_buff;	
       for(i = 0; i<10; i++){

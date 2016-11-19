@@ -441,7 +441,8 @@ void init_app(void *param)
   int app_fifo_fd = 0;
   char *template = PRIVATE_PIPE_TEMPLATE;
   char app_fifo_name[100];
-  app_request_t * my_app = NULL;
+  app_request_t * my_app = NULL, *tmp_app = NULL;
+  bool is_exists = false;
 
   //open fifo
   fifo_fd = open(PUBLIC_PIPE, O_RDONLY|O_NONBLOCK);
@@ -451,40 +452,55 @@ void init_app(void *param)
   }
 
   while(true){
+    is_exists = false;
     res = read(fifo_fd, app_request_buff, app_request_len);
     if(res < 0){
       if(errno == EAGAIN){
-	sleep(1);
 	continue;
       }
       printf("receive client app request error!\nx");
       exit(-1);
       //continue;
     }else if(res == 0){
-      sleep(1);
       continue;
     }else{
+      //check is exists
+      tmp_app = (app_request_t*)app_request_buff;
       for(i = 0; i< APP_SIZE; i++){
-	my_app = &app_list[i];
-	//i = i % APP_SIZE;
-	if(my_app->pid == 0){
-	  memset(&app_fifo_name, 0x00, 100);
-	  //get
-	  *my_app = *((app_request_t*)app_request_buff);
-	  snprintf(app_fifo_name, 100, template, my_app->pid);
-	  //open fifo
-	  app_fifo_fd = open(app_fifo_name, O_WRONLY);
-	  if(app_fifo_fd == -1){
-	    // printf("open %s error!\n");
-	    app_list[i].pid = 0;
-	    app_list[i].app_fifo_fd = 0;
-	    app_list[i].is_create = false;
-	    continue;
-	  }
-	  my_app->app_fifo_fd = app_fifo_fd;
+	if(tmp_app->pid == app_list[i].pid){
+	  is_exists = true;
+	  app_list[i].begin = tmp_app->begin;
+	  app_list[i].size  = tmp_app->size;
+	  my_app = &app_list[i];
 	  res = send_sort(my_app);
 	  assert(res == 0);
 	  break;
+	}
+      }
+      if(!is_exists){
+	//not exists
+	for(i = 0; i< APP_SIZE; i++){
+	  my_app = &app_list[i];
+	  //i = i % APP_SIZE;
+	  if(my_app->pid == 0){
+	    memset(&app_fifo_name, 0x00, 100);
+	    //get
+	    *my_app = *((app_request_t*)app_request_buff);
+	    snprintf(app_fifo_name, 100, template, my_app->pid);
+	    //open fifo
+	    app_fifo_fd = open(app_fifo_name, O_WRONLY);
+	    if(app_fifo_fd == -1){
+	      // printf("open %s error!\n");
+	      app_list[i].pid = 0;
+	      app_list[i].app_fifo_fd = 0;
+	      app_list[i].is_create = false;
+	      continue;
+	    }
+	    my_app->app_fifo_fd = app_fifo_fd;
+	    res = send_sort(my_app);
+	    assert(res == 0);
+	    break;
+	  }
 	}
       }
     }
