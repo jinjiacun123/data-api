@@ -47,7 +47,7 @@ int init_market()
   return 0;
 
   //parse 1201
-  index = 1;
+  index = 0;
   memset(buff, 0x00, 1024*100);
   memset(&cmd, 0x00, 50);
   sprintf(cmd, 50, template_str[2], market_list[index].file_name);
