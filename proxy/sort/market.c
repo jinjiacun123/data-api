@@ -7,7 +7,7 @@ extern market_t market_list[];
 //get code for both market
 int init_market()
 {
-  char buff[100*1024];
+  char buff[1024*1024*2];
   //get both txt
 
   char template_str[][100] =  {
@@ -17,7 +17,7 @@ int init_market()
   };
   char cmd[100];
   sort_area_queue_t * area_queue_item = NULL; 
-
+  /*
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
   system(cmd);
@@ -28,10 +28,11 @@ int init_market()
   memset(&cmd, 0x00, 100);
   sprintf(cmd, template_str[1], market_list[1].file_name);
   system(cmd);
+  */
 
   //parse
   int index = 0;
-  memset(buff, 0x00, 1024*100);
+  memset(buff, 0x00, 1024*1024*2);
   memset(&cmd, 0x00, 50);
   snprintf(cmd, 50, template_str[2], market_list[index].file_name);
   int length = get_content(cmd, buff, 1024*100);
@@ -48,7 +49,7 @@ int init_market()
 
   //parse 1201
   index = 0;
-  memset(buff, 0x00, 1024*100);
+  memset(buff, 0x00, 1024*1024*2);
   memset(&cmd, 0x00, 50);
   sprintf(cmd, 50, template_str[2], market_list[index].file_name);
   length = get_content(cmd, buff, 1024*100);
@@ -83,6 +84,7 @@ int get_market(cJSON * root_json, int index)
   entity_t * entity;
   cJSON * obj;
   int entity_list_len = 0;
+  /*
   obj = cJSON_GetObjectItem(root_json, "date");
   if(obj == NULL){
     printf("get object of date err!\n");
@@ -105,6 +107,7 @@ int get_market(cJSON * root_json, int index)
     printf("get object of date err!\n");
     exit(-1);
   }
+  
   market_list[index].unit = atoi(obj->valuestring);
   obj = cJSON_GetObjectItem(root_json, "open_close_time");
   if(obj == NULL){
@@ -112,6 +115,7 @@ int get_market(cJSON * root_json, int index)
     exit(-1);
   }
   strcpy(market_list[index].open_close_time, obj->valuestring);
+  */
   obj = cJSON_GetObjectItem(root_json, "list");
   if(obj == NULL){
     printf("get object of date err!\n");
@@ -142,11 +146,13 @@ int get_market(cJSON * root_json, int index)
   int * yestoday_min_price = &market_list[index].yestoday_min;
   *yestoday_min_price = 100000;
   char * code = NULL;
+  unsigned short code_type = 0;
   int max = 0;
   for(; i< market_list[index].entity_list_size; i++){
     //if(max >12) break;
     item = cJSON_GetArrayItem(obj, i);
     //printf("code:%s\n", cJSON_GetObjectItem(item, "code")->valuestring);
+    code_type = cJSON_GetObjectItem(item, "code_type")->valueint;
     code = cJSON_GetObjectItem(item, "code")->valuestring;
     //strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
     strncpy(entity->code, code, 6);

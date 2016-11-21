@@ -84,6 +84,7 @@ int main()
   //printf("init app ret:%d\n", ret);
   //--receive both shanghhai and shenzhen market stock
   ret = init_market();
+  printf("ret:%d\n", ret);
   assert(ret == 0);
   ret = init_socket(&socket_fd);
   assert(ret == 0);

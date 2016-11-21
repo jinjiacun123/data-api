@@ -6,9 +6,9 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<assert.h>
-#define SERVER_HOST "127.0.0.1"
+//#define SERVER_HOST "127.0.0.1"
 //#define SERVER_HOST "192.168.1.131"
-//#define SERVER_HOST "122.144.139.237"
+#define SERVER_HOST "122.144.139.237"
 #define SERVER_PORT 8001
 #define HEADER   "ZJHR"
 #define HEADER_EX "SERV"
@@ -193,7 +193,7 @@ int send_realtime(int socket_fd)
   return -1;
 }
 
-int option = 0;
+int option = 100;
 static int request_sort(int socket_fd)
 {
   request_sort_t my_request_sort;

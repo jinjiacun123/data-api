@@ -521,7 +521,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 }
 
 //deal server info with proxy
-static int deal_server_info(client_socket_fd,
+ 3static int deal_server_info(client_socket_fd,
 			    proxy_client_socket_fd,
 			    alive_times,
 			    client_ip,
@@ -843,6 +843,7 @@ static int deal_sort_info(clientSocketId,
   }
 
   //write client
+  memset(head, 0x00, 8);
   memcpy(head, HEADER_EX, 4);
   memcpy(head+4, &sort_buff_len, 4);
   head[8] = '\0';
