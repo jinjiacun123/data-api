@@ -32,7 +32,7 @@ struct entity_s
 typedef struct
 {
   int floor;
-  unsigned int childs[MAX_CHILDS];
+  void * childs[MAX_CHILDS];
 }my_key_t;
 //first floor
 

@@ -29,8 +29,13 @@ pthread_cond_t allow_display_sort = PTHREAD_COND_INITIALIZER;
 
 //buff
 char * g_buff = NULL;
+#ifdef system_32
 unsigned long g_buff_max_len = 0;
 unsigned long g_buff_len = 0;
+#else
+unsigned int g_buff_max_len = 0;
+unsigned int g_buff_len = 0;
+#endif
 char * g_zib_buff = NULL;
 uLong g_zib_buff_max_len = 0;
 uLong g_zib_buff_len = 0;
@@ -725,7 +730,7 @@ do_stock(my_market, code_type, code, buff, i, option)
      int i;
      option_n option;
 {
-  int address = 0;
+  void * address = NULL;
   unsigned int code_type_index = 0;
   entity_t * entity;
   column_n column = NEW_PRICE;
@@ -743,7 +748,6 @@ do_stock(my_market, code_type, code, buff, i, option)
     code_type_index = 3;
   }break;
   }
-  printf("type:%d, code:%s\n", code_type_index, code);
   address = find_entity_by_key(code, 6, code_type_index);
   assert(address != NULL);
   entity = (entity_t *)address;
