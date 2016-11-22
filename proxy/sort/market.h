@@ -3,6 +3,9 @@
 #include "config.h"
 #include "sort.h"
 #include "cJSON.h"
+#include<string.h>
+#include<stdlib.h>
+#include<stdio.h>
 
 struct entity_s
 {
@@ -92,6 +95,6 @@ struct market_s
 };
 
 int init_market();
-int get_market(cJSON * root_json, int index);
+int get_market(int index, FILE * fp, int size);
 int out_market(int code_type_index);
 #endif

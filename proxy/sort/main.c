@@ -305,7 +305,7 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
   entity = (entity_t *)(market_list[0].list+i*entity_length);
   for(i=index; i<(index+1)*size; i++){
     codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
-    codeinfo->code_type = market_list[0].code_type;
+    codeinfo->code_type = entity->type;
     strncpy(codeinfo->code, entity->code, 6);
     entity ++;
   }
@@ -582,7 +582,7 @@ int send_auto_push(int socket_fd, int index, int size, int code_type_index)
   entity = (entity_t *)(market_list[code_type_index].list+i*entity_length);
   for(i = index; i<(index+1)*size; i++){
     codeinfo = (CodeInfo *)(request + off + i * codeinfo_length);
-    codeinfo->code_type = market_list[code_type_index].code_type;
+    codeinfo->code_type = entity->type;
     strncpy(codeinfo->code, entity->code, 6);
     entity ++;
   }
@@ -702,6 +702,14 @@ int parse_realtime(char * buff, uLongf buff_len)
       my_market = &market_list[index];
       do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
     }break;
+    case 0x1206:{
+      my_market = &market_list[index];
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+    }break;
+    case 0x120b:{
+      my_market = &market_list[index];
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+    }break;
     }
   }
   return 0;
@@ -721,23 +729,36 @@ do_stock(my_market, code_type, code, buff, i, option)
   unsigned int code_type_index = 0;
   entity_t * entity;
   column_n column = NEW_PRICE;
-  if(code_type == 0x1201){
+  switch(code_type){
+  case 0x110:{
+    code_type_index = 0;
+  }break;
+  case 0x1201:{
     code_type_index = 1;
+  }break;
+  case 0x1206:{
+    code_type_index = 2;
+  }break;
+  case 0x120b:{
+    code_type_index = 3;
+  }break;
   }
-  assert((address = find_entity_by_key(code, 6, code_type_index)) > 0);
+  printf("type:%d, code:%s\n", code_type_index, code);
+  address = find_entity_by_key(code, 6, code_type_index);
+  assert(address != NULL);
   entity = (entity_t *)address;
 
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-  
+
   printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
-  
+
   entity->price = tmp->m_lNewPrice;
   if(is_simulate){
     srand(time(0));
@@ -780,11 +801,28 @@ int parse_auto_push(char * buff, uLong   buff_len)
 							+ 20
 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
     memcpy(code, data_type->m_cCode, 6);
-    if(data_type->m_cCodeType == 0x1101){//股票
+    switch(data_type->m_cCodeType){
+    case 0x1101:{
       my_market = &market_list[index];
       //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
       do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
     }
+    case 0x1201:{
+      my_market = &market_list[index];
+      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+    }
+    case 0x1206:{
+      my_market = &market_list[index];
+      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+    }
+    case 0x120b:{
+      my_market = &market_list[index];
+      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+    }
+  }
   }
 
   return 0;
@@ -877,5 +915,5 @@ void sig_stop(int signo)
   exit(-1);
 }
 
-void sig_pipe(int signo){ 
+void sig_pipe(int signo){
 }

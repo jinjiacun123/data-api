@@ -3,9 +3,9 @@
 #include<stdlib.h>
 
 typedef struct {
-	int code_type;
-	char code[6];
-	int preclose
+  int code_type;
+  int preclose;
+  char code[6];
 }my_t;
 #define BUFF_LEN 14
 

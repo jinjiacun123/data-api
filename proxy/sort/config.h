@@ -2,6 +2,8 @@
 #define __CONFIG_H__
 #include<zlib.h>
 #include<stdbool.h>
+#include<string.h>
+#include<stdlib.h>
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 #define SERVER_MARKET_DEMAIN "dsapp.yz.zjwtj.com"
 #define SERVER_MARKET "221.6.167.245"
@@ -324,7 +326,7 @@ int parse_realtime(char * buff, uLongf buff_len);
 int parse_auto_push(char * buff, uLongf buff_len);
 int unpack(char * des_buff, uLongf des_buff_len);
 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity);
-int find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
+void * find_entity_by_key(char * code, unsigned int code_len, int code_type_index);
 int get_index_by_code_ascii(char ascii);
 int get_quick_image(int code_type_index, int begin, int end); 
 int display_sort(market_t * my_market);

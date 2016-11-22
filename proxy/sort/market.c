@@ -1,5 +1,8 @@
 #include "market.h"
 #include "assert.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 my_key_t key_root = {0};
 extern market_t market_list[];
@@ -7,60 +10,25 @@ extern market_t market_list[];
 //get code for both market
 int init_market()
 {
-  char buff[1024*1024*2];
-  //get both txt
+  char * data_file_name = "./txt/my_data";
+  FILE * fp = fopen(data_file_name, "r");
 
-  char template_str[][100] =  {
-    "rm -f ./txt/%s* ./txt/%s*",
-    "wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/%s",
-    "./txt/%s"
-  };
-  char cmd[100];
-  sort_area_queue_t * area_queue_item = NULL; 
-  /*
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
-  system(cmd);
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[1], market_list[0].file_name);
-  system(cmd);
-  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");
-  memset(&cmd, 0x00, 100);
-  sprintf(cmd, template_str[1], market_list[1].file_name);
-  system(cmd);
-  */
-
-  //parse
+  int size = 0;
   int index = 0;
-  memset(buff, 0x00, 1024*1024*2);
-  memset(&cmd, 0x00, 50);
-  snprintf(cmd, 50, template_str[2], market_list[index].file_name);
-  int length = get_content(cmd, buff, 1024*100);
-  cJSON * root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-  if (NULL == root_json){
-      printf("error:%s\n", cJSON_GetErrorPtr());
-      cJSON_Delete(root_json);
-      return -1;
+  if(fp == 0){
+    printf("read my_data err!\n");
+    return -1;
   }
-  //parse 1101
-  get_market(root_json, index);
-  free(root_json);
-  return 0;
-
-  //parse 1201
-  index = 0;
-  memset(buff, 0x00, 1024*1024*2);
-  memset(&cmd, 0x00, 50);
-  sprintf(cmd, 50, template_str[2], market_list[index].file_name);
-  length = get_content(cmd, buff, 1024*100);
-  root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-  if (NULL == root_json){
-      printf("error:%s\n", cJSON_GetErrorPtr());
-      cJSON_Delete(root_json);
-      return;
+  fseek(fp, 0L, SEEK_END);
+  size = ftell(fp)/14;
+  if(size == 0){
+    printf("get file size err!\n");
+    return -1;
   }
-  get_market(root_json, index);
-
+  fseek(fp, 0L, SEEK_SET);
+  //stock
+  get_market(index, fp, size);
+  close(fp);
   return 0;
 }
 
@@ -79,49 +47,13 @@ int out_market(int code_type_index)
   return 0;
 }
 
-int get_market(cJSON * root_json, int index)
+int get_market(int index, FILE * fp, int size)
 {
   entity_t * entity;
-  cJSON * obj;
   int entity_list_len = 0;
-  /*
-  obj = cJSON_GetObjectItem(root_json, "date");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  strncpy(market_list[index].date, obj->valuestring, 6);
-  obj = cJSON_GetObjectItem(root_json, "codetype");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  market_list[index].code_type = strtol(obj->valuestring, NULL, 16);
-  obj = cJSON_GetObjectItem(root_json, "szname");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  obj = cJSON_GetObjectItem(root_json, "priceunit");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  
-  market_list[index].unit = atoi(obj->valuestring);
-  obj = cJSON_GetObjectItem(root_json, "open_close_time");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  strcpy(market_list[index].open_close_time, obj->valuestring);
-  */
-  obj = cJSON_GetObjectItem(root_json, "list");
-  if(obj == NULL){
-    printf("get object of date err!\n");
-    exit(-1);
-  }
-  market_list[index].entity_list_size = cJSON_GetArraySize(obj);
+  char buff[14];
+
+  market_list[index].entity_list_size = size;
   //market_list[index].entity_list_size = 12;
   if(market_list[index].list != NULL){free(market_list[index].list);}
   //init list
@@ -137,27 +69,31 @@ int get_market(cJSON * root_json, int index)
   assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_down_list) == 0);
 
   int i = 0;
-  cJSON * item;
   entity = market_list[index].list;
-  int * item_sort_price = market_list[index].sort_price_list;
-  int * item_sort_up    = market_list[index].sort_up_list;
-  int * item_sort_down  = market_list[index].sort_down_list;
+  int * item_sort_price    = market_list[index].sort_price_list;
+  int * item_sort_up       = market_list[index].sort_up_list;
+  int * item_sort_down     = market_list[index].sort_down_list;
   int * yestoday_max_price = &market_list[index].yestoday_max;
   int * yestoday_min_price = &market_list[index].yestoday_min;
-  *yestoday_min_price = 100000;
+  *yestoday_min_price      = 100000;
   char * code = NULL;
   unsigned short code_type = 0;
   int max = 0;
+  char *c = NULL;
   for(; i< market_list[index].entity_list_size; i++){
+    memset(&buff, 0x00, 14);
     //if(max >12) break;
-    item = cJSON_GetArrayItem(obj, i);
+    c = fread(buff, sizeof(unsigned char), 14, fp);
+    if(c == 0){
+      printf("read err!\n");
+      return -1;
+    }
     //printf("code:%s\n", cJSON_GetObjectItem(item, "code")->valuestring);
-    code_type = cJSON_GetObjectItem(item, "code_type")->valueint;
-    code = cJSON_GetObjectItem(item, "code")->valuestring;
+    entity->type = *(int*)buff;
     //strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
-    strncpy(entity->code, code, 6);
+    strncpy(entity->code, buff+8, 6);
     entity->code[6] = '\0';
-    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
+    entity->pre_close = *(int*)(buff+4);
     *item_sort_price = entity;
     *item_sort_up    = entity;
     *item_sort_down  = entity;
@@ -171,9 +107,21 @@ int get_market(cJSON * root_json, int index)
 	   i,
 	   entity->code,
 	   entity->pre_close);
-
     //save to key
-    assert(save_key(entity->code, 6, index, entity) == 0);
+    switch(entity->type){
+    case 0x1101:{
+      assert(save_key(entity->code, 6, 0, entity) == 0);
+    }break;
+    case 0x1201:{
+      assert(save_key(entity->code, 6, 1, entity) == 0);
+    }break;
+    case 0x1206:{
+      assert(save_key(entity->code, 6, 2, entity) == 0);
+    }break;
+    case 0x120b:{
+      assert(save_key(entity->code, 6, 3, entity) == 0);
+    }break;
+    }
 
     entity ++;
     item_sort_price ++;
@@ -243,12 +191,12 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
   return 0;
 }
 
-int find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
+void * find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
 {
   int location = 0;
   char ascii   = 0;
   int i        = 0;
-  int address  = 0;
+  void * address  = NULL;
   my_key_t * cur_key = &key_root;
 
   //from first to sixth bit
