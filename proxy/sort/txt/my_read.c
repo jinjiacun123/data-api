@@ -7,7 +7,7 @@ typedef struct {
 	char code[6];
 	int preclose
 }my_t;
-#define BUFF_LEN 16
+#define BUFF_LEN 14
 
 int main()
 {
