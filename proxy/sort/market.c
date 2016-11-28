@@ -52,27 +52,28 @@ int get_market(int index, FILE * fp, int size)
   entity_t * entity;
   int entity_list_len = 0;
   char buff[14];
+  int ret = -1;
 
   market_list[index].entity_list_size = size;
   //market_list[index].entity_list_size = 12;
   if(market_list[index].list != NULL){free(market_list[index].list);}
   //init list
   assert(jim_malloc(market_list[index].entity_list_size*sizeof(entity_t), &market_list[index].list) == 0);
+
   if(market_list[index].sort_price_list != NULL){free(market_list[index].sort_price_list);}
   //init sort_price_list
-  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_price_list) == 0);
-  if(market_list[index].sort_up_list != NULL){free(market_list[index].sort_up_list);}
+  ret = jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_price_list);
+  assert( ret == 0);
+
+  if(market_list[index].sort_raise_list != NULL){free(market_list[index].sort_raise_list);}
   //init sort_up_list
-  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_up_list) == 0);
-  if(market_list[index].sort_down_list != NULL){free(market_list[index].sort_down_list);}
-  //init sort_down_list
-  assert(jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_down_list) == 0);
+  ret = jim_malloc(market_list[index].entity_list_size*sizeof(int *), &market_list[index].sort_raise_list);
+  assert(ret == 0);
 
   int i = 0;
   entity = market_list[index].list;
   int * item_sort_price    = market_list[index].sort_price_list;
-  int * item_sort_up       = market_list[index].sort_up_list;
-  int * item_sort_down     = market_list[index].sort_down_list;
+  int * item_sort_raise    = market_list[index].sort_raise_list;
   int * yestoday_max_price = &market_list[index].yestoday_max;
   int * yestoday_min_price = &market_list[index].yestoday_min;
   *yestoday_min_price      = 100000;
@@ -94,9 +95,8 @@ int get_market(int index, FILE * fp, int size)
     strncpy(entity->code, buff+8, 6);
     entity->code[6] = '\0';
     entity->pre_close = *(int*)(buff+4);
-    *item_sort_price = entity;
-    *item_sort_up    = entity;
-    *item_sort_down  = entity;
+    *item_sort_price  = entity;
+    *item_sort_raise  = entity;
     //find max and min of price
     if(entity->pre_close != 0){
       if(*yestoday_max_price < entity->pre_close){ *yestoday_max_price = entity->pre_close;}
@@ -125,8 +125,7 @@ int get_market(int index, FILE * fp, int size)
 
     entity ++;
     item_sort_price ++;
-    item_sort_up ++;
-    item_sort_down ++;
+    item_sort_raise ++;
     max ++;
   }
 

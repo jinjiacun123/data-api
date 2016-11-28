@@ -774,11 +774,13 @@ do_stock(my_market, code_type, code, buff, i, option)
   switch(option){
   case ADD:{
     //add to sort
-    sort_add(my_market, entity, column);
+    sort_add(my_market, entity, NEW_PRICE);
+    sort_add(my_market, entity, RAISE);
   }break;
   case UPDATE:{
     //update
-    sort_update(my_market, entity, column);
+    //sort_update(my_market, entity, NEW_PRICE);
+    sort_update(my_market, entity, RAISE);
   }break;
   default:{
 

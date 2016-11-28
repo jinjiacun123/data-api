@@ -81,20 +81,16 @@ static int deal_response_of_heart();
 static int deal_server_info(int clientSocketId,
 			    int proxyClientSocketId,
 			    int * alive_times,
-			    char * client_ip,
-			    char ** my_buff,
-			    int * my_buff_len,
-			    int * last_my_buff_len);
+			    char * client_ip 
+			    );
 static int deal_client_info(int clientSocketId,
 			    int proxyClientSocketId,
 			    int * alive_times,
 			    char * client_ip,
 			    int epfd,
 			    int * pipe_write_fd,
-			    int * pipe_read_fd,
-			    char ** my_buff,
-			    int * my_buff_len,
-			    int * last_my_buff_len);
+			    int * pipe_read_fd 
+			    );
 static int deal_sort_info(int clientSocketId,
 			  int pipe_read_fd,
 			  int * alive_times,
@@ -395,13 +391,6 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   struct epoll_event ev, events[10];
   epfd = epoll_create(256);
 
-  char * my_buff = NULL;
-  int my_buff_len = 0;
-  int last_my_buff_len = 0;
-  char * send_buff = NULL;
-  int send_buff_len = 0;
-  int last_send_buff_len = 0;
-
   //init server's login
   ret = init_login(proxyClientSocketId);
   assert(ret == 0);
@@ -470,10 +459,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 client_ip,
 				 epfd,
 				 &pipe_write_fd,
-				 &pipe_read_fd,
-				 &my_buff,
-				 &my_buff_len,
-				 &last_my_buff_len);
+				 &pipe_read_fd);
 	  assert(ret == 0);
 	  if(ret != 0){
 	    WriteErrLog("%s\tdeal client info err!\n", client_ip);
@@ -485,10 +471,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	  ret = deal_server_info(clientSocketId,
 				 proxyClientSocketId,
 				 &alive_times,
-				 client_ip,
-				 &my_buff,
-				 &my_buff_len,
-				 &last_my_buff_len);
+				 client_ip);
 	  assert(ret == 0);
 	  if(ret != 0){
 	    WriteErrLog("%s\tdeal server info err!\n", client_ip);
@@ -515,17 +498,11 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 static int deal_server_info(client_socket_fd,
 			    proxy_client_socket_fd,
 			    alive_times,
-			    client_ip,
-			    my_buff,
-			    my_buff_len,
-			    last_my_buff_len)
+			    client_ip)
   int client_socket_fd;
   int proxy_client_socket_fd;
   int * alive_times;
   char * client_ip;
-  char ** my_buff;
-  int * my_buff_len;
-  int * last_my_buff_len;
 {
   char header_buff[8];
   int length, len, n;
@@ -594,6 +571,7 @@ static int deal_server_info(client_socket_fd,
 	  if(n == -1 && errno == EAGAIN){}
 	  else{
 	    WriteErrLog("%s\tWrite to client error!\n", client_ip);
+	    free(tmp_buff);
 	    return 0;
 	  }
       }
@@ -617,10 +595,7 @@ static int deal_client_info(client_socket_fd,
 			    client_ip,
 			    epfd,
 			    pipe_write_fd,
-			    pipe_read_fd,
-			    my_buff,
-			    my_buff_len,
-			    last_my_buff_len)
+			    pipe_read_fd)
      int client_socket_fd;
      int proxy_client_socket_fd;
      int * alive_times;
@@ -628,9 +603,6 @@ static int deal_client_info(client_socket_fd,
      int epfd;
      int * pipe_write_fd;
      int * pipe_read_fd;
-     char ** my_buff;
-     int * my_buff_len;
-     int * last_my_buff_len;
 {
   bool is_custom = false;
   int length, n;
@@ -639,6 +611,7 @@ static int deal_client_info(client_socket_fd,
   app_request_data * my_app_request_data = NULL;
   int status = -1;
   char header_buff[8];
+  char *tmp_buff = NULL;
 
   while(true){
     is_custom = false;
@@ -670,40 +643,15 @@ static int deal_client_info(client_socket_fd,
       if(strncmp(p_header->str, HEADER_EX, 4) == 0){
 	is_custom = true;
       }else if(strncmp(p_header->str, HEADER, 4)){
-	WriteErrLog("%s\t%s\t%s\t%s\tcompare header err!\n", client_ip, __FILE__,__FUNCTION__,__LINE__);
+	WriteErrLog("%s\tcompare header err!\n", client_ip);
 	exit(-1);
       }
 
       length = p_header->length;
-      if(*my_buff_len == 0){
-	*my_buff = (char *)malloc(length+8);
-	if(*my_buff == NULL){
-	  WriteErrLog("%s\tmalloc momory err!\n", client_ip);
-	  exit(-1);
-	}
-	memset(*my_buff, 0x00, length+8);
-	*my_buff_len = length + 8;
-	*last_my_buff_len = length + 8;
-      }
-      else{
-	if(length+8 > *my_buff_len){
-	  free(*my_buff);
-	  *my_buff = (char *)malloc(length+8);
-	  if(*my_buff == NULL){
-	    WriteErrLog("%s\tmalloc momory err!\n", client_ip);
-	    exit(-1);
-	  }
-	  memset(*my_buff, 0x00, length+8);
-	  *my_buff_len = length + 8;
-	  *last_my_buff_len = length + 8;
-	}else{
-	  memset(*my_buff, 0x00, *last_my_buff_len);
-	  *last_my_buff_len = length + 8;
-	}
-      }
+      tmp_buff = (char *)malloc(length+8);
       int off = 0;
       int last_length = length;
-      while(n = read(client_socket_fd, *my_buff+off+8, last_length)){
+      while(n = read(client_socket_fd, tmp_buff+off+8, last_length)){
 	if(n<0){
 	  if(n == -1 && errno == EAGAIN){
 	    //close(client_socket_fd);
@@ -717,10 +665,10 @@ static int deal_client_info(client_socket_fd,
 	  return 0;
 	}else if(n == last_length){
 	  if(!is_custom){
-	    memcpy(*my_buff, HEADER, 4);
-	    memcpy(*my_buff+4, &length, 4);
+	    memcpy(tmp_buff, HEADER, 4);
+	    memcpy(tmp_buff+4, &length, 4);
 	    while(1){
-	      n = write(proxy_client_socket_fd, *my_buff, length+8);
+	      n = write(proxy_client_socket_fd, tmp_buff, length+8);
 	      if(n < 0){
 		if(errno == EINTR)
 		  return -1;
@@ -731,7 +679,8 @@ static int deal_client_info(client_socket_fd,
 		}
 	      }
 	      if(n == length+8){
-		return 0;
+		free(tmp_buff);
+		break;
 	      }
 	    }
 	  }else{
@@ -752,11 +701,12 @@ static int deal_client_info(client_socket_fd,
 	    }
 	    memset(my_app_request_data, 0x00, sizeof(app_request_data));
 	    my_app_request_data->socket_fd = client_socket_fd;
-	    my_app_request_data->buff = *my_buff;
+	    my_app_request_data->buff = tmp_buff;
 	    my_app_request_data->buff_len = length;
 	    my_app_request_data->start = true;
 	    deal_request_of_sort(getpid(), my_app_request_data, *pipe_write_fd, pipe_read_fd, epfd);
 	    free(my_app_request_data);
+	    free(tmp_buff);
 	    break;
 	  }
 	}
