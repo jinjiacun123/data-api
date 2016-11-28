@@ -29,7 +29,7 @@
 #define SERVER       "221.6.167.245"
 //#define SERVER "127.0.0.1"
 #define SERVER_PORT  8881
-//#define SERVER_PORT 8000
+//#define SERVER_PORT 8800
 #define USERNAME "jrjvip_android"
 #define PASSWORD "zjw_android"
 #define HEADER   "ZJHR"

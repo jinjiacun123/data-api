@@ -93,9 +93,11 @@ int main()
   assert(ret == 0);
   ret = init_socket(&socket_fd);
   assert(ret == 0);
+
   //init server's login
   ret = init_login(socket_fd);
   assert( ret == 0);
+
   //init mutext
   ret = pthread_mutex_init(&work_mutex, NULL);
   assert( ret == 0);

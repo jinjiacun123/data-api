@@ -5,9 +5,9 @@ test_so:test_so.c
 	$(CC) -ldl -o test_so test_so.c
 
 test_json:test_json.c
-	$(CC) -g -o test_json test_json.c  -ljim -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient -lm     
+	$(CC) -g -o test_json test_json.c  -ljim -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient -lm
 test_realtime:test_realtime.c
-	$(CC) -g -o test_realtime test_realtime.c -ljim  -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient -lm     
+	$(CC) -g -o test_realtime test_realtime.c -ljim  -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient -lm
 test_history:test_history.c
 	$(CC) -g -o test_history test_history.c -ljim -I /usr/include/mysql -L /usr/lib/i386-linux-gnu/ -l mysqlclient -lm
 
@@ -48,3 +48,6 @@ test_pthread_cond:test_pthread_cond.c
 	gcc -g -o test_pthread_cond test_pthread_cond.c -lpthread
 test_epoll:test_epoll.c
 	g++ -g -o test_epoll test_epoll.c
+
+test_simulate_server:test_simulate_server.c
+	gcc -g -w test_simulate_server.c -o test_simulate_server

@@ -10,6 +10,7 @@
 //#define SERVER_HOST "192.168.1.131"
 //#define SERVER_HOST "122.144.139.237"
 #define SERVER_PORT 8001
+//#define SERVER_PORT 8800
 #define HEADER   "ZJHR"
 #define HEADER_EX "SERV"
 #define TYPE_HEART      0x0905 //heart tick
@@ -118,7 +119,6 @@ int main()
     return -1;
   }
 
-  /*
   //init receive
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
@@ -129,27 +129,33 @@ int main()
   //send sort request
   ret = request_sort(client);
   assert(ret == 0);
-
+ 
   sleep(3);
   ret = send_realtime(client);
   assert(ret == 0);
-  */
+  
+/*
   ret = send_test(client);
   assert(ret == 0);
 
-  ret = read(client, buff, 1024*1024);
+  while((ret = read(client, buff, 1024*1024)) == 0){
+    sleep(2);
+  }
   printf("ret:%d\n", ret);
   assert(ret >0);
   printf("buff:%s\n", buff);
+*/
 
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
   while(true){
     sleep(3);
     send_heart(client);
+    /*
     sleep(1);
     ret = request_sort(client);
     assert(ret == 0);
+    */
   }
   pthread_join(t_id, NULL);
   return 0;
@@ -252,7 +258,8 @@ static void *init_receive(void * param)
       }
       body_buff[length] = '\0';		
       printf("option times:%d\n", option);
-      printf("body_buff:%s\n", body_buff);
+      printf("type:%x\n", *(int*)body_buff);
+      //printf("body_buff:%s\n", body_buff);
       entity = (entity_t*)body_buff;	
       for(i = 0; i<10; i++){
 	printf("code:%.6s,price:%d\n", entity->code, entity->price);
@@ -327,6 +334,6 @@ static int send_test(int socket_fd)
   assert(ret >0);
   if(ret <=0){
 	return -1;
-  }	
+  }
 	return 0;
 }
