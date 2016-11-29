@@ -388,7 +388,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   int pipe_read_fd = -1;
   int pipe_write_fd = -1;
   int epfd, nfds;
-  struct epoll_event ev, events[10];
+  struct epoll_event ev, events[3]={0};
   epfd = epoll_create(256);
 
   //init server's login
@@ -414,7 +414,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   assert(get_client_ip(clientSocketId, &client_ip) == 0);
 
   while(1){
-    nfds = epoll_wait(epfd, events, 20, -1);
+    nfds = epoll_wait(epfd, events, 3, -1);
     is_custom = false;
 
     /*
@@ -441,6 +441,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
     }
     */
     for(i = 0; i< nfds; i++){
+	/*
       if((events[i].events & EPOLLERR) ||
 	 (events[i].events & EPOLLHUP) ||
 	 (events[i].events & EPOLLRDHUP) ||
@@ -449,7 +450,9 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	close(clientSocketId);
 	close(proxyClientSocketId);
 	exit(-1);
+	continue;
       }
+	*/
       if(events[i].events & EPOLLIN){
 	//check is client info
 	if(events[i].data.fd == clientSocketId){
@@ -507,20 +510,37 @@ static int deal_server_info(client_socket_fd,
   char header_buff[8];
   int length, len, n;
   p_response_header p_header;
-  char *tmp_buff;
+  char tmp_buff[BUFSIZ];
   int ret = -1;
+  int nread = -1;
+
   //recive server info
   *alive_times++;
   WriteErrLog("%s:recive info from server!\n", client_ip);
-  length = 8;
+L1:  length = 8;
   while(true){
-      n = read(proxy_client_socket_fd, header_buff, 8);
+    n = 0;
+    while((nread = read(proxy_client_socket_fd, tmp_buff, BUFSIZ-1))>0){
+      n += nread;
+      ret = write(client_socket_fd, tmp_buff, nread);
+      if(ret <= 0){
+	WriteErrLog("%s write to proxy err!\n", client_ip);
+	exit(-1);
+      }
+      if(nread < BUFSIZ -1)
+	return 0;
+    }
+    if(nread == -1 && errno != EAGAIN){
+      return 0;
+    }
+    if(nread == 0){ break;}
+      /*
       if(n == -1){
 	if(errno != EAGAIN){
 	  WriteErrLog("%s\ttread server err!\n", client_ip);
 	  return 0;
 	}
-	break;
+	continue;
       }
       if(n == 0){
 	WriteErrLog("%s\tserver deal finish!\n", client_ip);
@@ -537,15 +557,8 @@ static int deal_server_info(client_socket_fd,
 	exit(-1);
       }
       length = p_header->length;
-      tmp_buff = (char *)malloc(sizeof(length+8));
-      if(tmp_buff == NULL){
-	WriteErrLog("%s\t malloc err!\n", client_ip);
-	exit(-1);
-      }
-      memset(tmp_buff, 0x00, length+8);
       int off = 0;
       int last_length = length;
-
       while(n = read(proxy_client_socket_fd, tmp_buff+off+8, last_length)){
 	if(n<0){
 	  if(errno == EAGAIN && n == -1){
@@ -565,14 +578,15 @@ static int deal_server_info(client_socket_fd,
 	  memcpy(tmp_buff+4, &length, 4);
 	  while((n = write(client_socket_fd, tmp_buff, length+8))>0){
 	    if(n == length+8){
+	      goto L1;
 	      return 0;
 	    }
 	  }
 	  if(n == -1 && errno == EAGAIN){}
 	  else{
-	    WriteErrLog("%s\tWrite to client error!\n", client_ip);
-	    free(tmp_buff);
-	    return 0;
+	    WriteErrLog("%s\tWrite to client error!errno:%d\n", client_ip, errno);
+	    exit(-1);
+	    //return 0;
 	  }
       }
       else if(n < last_length){
@@ -581,7 +595,7 @@ static int deal_server_info(client_socket_fd,
       }
     }
   }
-
+      */
     }
   //deal_from_server_to_client
   //	assert(deal_from_server_to_client(client[1].fd, buff, length) == 0);
@@ -611,21 +625,37 @@ static int deal_client_info(client_socket_fd,
   app_request_data * my_app_request_data = NULL;
   int status = -1;
   char header_buff[8];
-  char *tmp_buff = NULL;
+  char tmp_buff[BUFSIZ];
+  int nread = -1;
 
   while(true){
     is_custom = false;
     //recive client info
     *alive_times = 0;
     //head of package
-    length = 8;
-    memset(&header_buff, 0x00, length);
+L:    length = 8;
+    n = 0;
+    while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
+	n  += nread;
+	ret = write(proxy_client_socket_fd, tmp_buff, nread);
+	if(ret <= 0){
+		WriteErrLog("%s write to proxy err!\n", client_ip);
+		exit(-1);
+	}
+	if(nread < BUFSIZ -1)
+	  return 0;
+    }
+    if(nread == -1 && errno != EAGAIN){
+      return 0;
+    }
+    if(nread == 0){ break;}
+    /*
     if((n = read(client_socket_fd, header_buff, length))<0){
       if(n == -1 && errno == EAGAIN){
-	WriteErrLog("%s\tread client err!\n", client_ip);
+	WriteErrLog("%s\tread client head err!\n", client_ip);
 	return 0;
       }
-      continue;
+      exit(-1);
     }
     else if(n == 0){
       WriteErrLog("%s\tclient deal finish!\n", client_ip);
@@ -648,15 +678,14 @@ static int deal_client_info(client_socket_fd,
       }
 
       length = p_header->length;
-      tmp_buff = (char *)malloc(length+8);
       int off = 0;
       int last_length = length;
-      while(n = read(client_socket_fd, tmp_buff+off+8, last_length)){
+      while(n = read(client_socket_fd, tmp_buff+off+8, BUFSIZ)){
 	if(n<0){
 	  if(n == -1 && errno == EAGAIN){
 	    //close(client_socket_fd);
 	    //client_socket_fd = -1;
-	    WriteErrLog("%s\tclient read error!\n", client_ip);
+	    WriteErrLog("%s\tclient read body error!\n", client_ip);
 	    return 0;
 	  }
 	  continue;
@@ -674,20 +703,17 @@ static int deal_client_info(client_socket_fd,
 		  return -1;
 
 		if(errno == EAGAIN){
-		  usleep(1000);
-		  continue;
+		 return 0;
 		}
 	      }
 	      if(n == length+8){
-		free(tmp_buff);
-		break;
+	 	//return 0;
+		goto L;
 	      }
 	    }
 	  }else{
-	    /*
-	      ret = deal_request_of_sort(client[1].fd, send_buff, length+8);
-	      assert(ret == 0);
-	    */
+	      //ret = deal_request_of_sort(client[1].fd, send_buff, length+8);
+	      //assert(ret == 0);
 	    if(-1 == * pipe_write_fd){
 	      //open sort pipe
 	      ret = init_request_sort(getpid(), pipe_write_fd);
@@ -716,6 +742,7 @@ static int deal_client_info(client_socket_fd,
 	}
       }
     }
+    */
   }
   WriteErrLog("%s\trecive client info complete!\n", client_ip);
   //body of package
