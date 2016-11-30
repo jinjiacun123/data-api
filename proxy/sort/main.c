@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -16,7 +16,7 @@
 #include "comm.h"
 #include "market.h"
 #include "./../comm_pipe.h"
-#include <gperftools/profiler.h>
+
 
 int last_time_market;//effective time
 int cur_time;        //current time
@@ -774,13 +774,11 @@ do_stock(my_market, code_type, code, buff, i, option)
   switch(option){
   case ADD:{
     //add to sort
-    sort_add(my_market, entity, NEW_PRICE);
-    sort_add(my_market, entity, RAISE);
+    sort_add(my_market, entity, column);
   }break;
   case UPDATE:{
     //update
-    //sort_update(my_market, entity, NEW_PRICE);
-    sort_update(my_market, entity, RAISE);
+    sort_update(my_market, entity, column);
   }break;
   default:{
 

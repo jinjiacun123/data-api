@@ -5,7 +5,6 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<stdbool.h>
-#include<errno.h>
 #include "config.h"
 #include "market.h"
 #include "./../comm_pipe.h"
@@ -14,16 +13,16 @@
 
 int main(int argc, char * argv[])
 {
-  int begin = 0;
-  int size = 0;
+  int my_begin = 0;
+  int my_size = 0;
   pid_t pid = getpid();
-  begin = atoi(argv[1]);
-  size = atoi(argv[2]);
-  //begin = 0;
-  //size = 1;
+  my_begin = atoi(argv[1]);
+  my_size = atoi(argv[2]);
+  //my_begin = 0;
+  //my_size = 10;
   char * buff = NULL;
   int entity_len = sizeof(entity_t);
-  int buff_len = entity_len *size;
+  int buff_len = entity_len *my_size;
   char cur_app_pipe[100];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
@@ -61,31 +60,29 @@ int main(int argc, char * argv[])
     exit(-1);
   }
 
-  printf("begin:%d,size:%d\n", begin, size);
+  printf("begin:%d,size:%d\n", my_begin, my_size);
   app_request_t app_request;
   memset(&app_request, 0x00, sizeof(app_request_t));
   //request
   app_request.pid = pid;
-  app_request.begin = begin;
-  app_request.size = size;
+  app_request.begin = my_begin;
+  app_request.size = my_size;
   res = write(pipe_write_fd, &app_request, app_request_len);
+  close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
-  close(pipe_write_fd);
   if(pipe_read_fd == -1){
     printf("open pipe read fd error!\n");
     exit(-1);
   }
-
+ 
+  printf("wait read ...\n");
   //read sort
   while(true){
     memset(buff, 0x00, buff_len+1);
     res = read(pipe_read_fd, buff, buff_len);
-    if(res < 0){
-      if(errno == EAGAIN){
-	sleep(1);
-	continue;
-      }
+    printf("read ...\n");
+    if(res == -1){
       printf("read error!\n");
       exit(-1);
     }else if(res == 0){
@@ -97,7 +94,7 @@ int main(int argc, char * argv[])
     //printf("price:%s\n", buff);
     //display
     entity = (entity_t *)buff;
-    for(i = 0; i<size; i++){
+    for(i = 0; i<my_size; i++){
       printf("code:%.6s,price:%d\n",
 	     entity->code,
 	     entity->price);

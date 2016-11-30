@@ -119,8 +119,8 @@ int main()
     return -1;
   }
 
-  /*
   //init receive
+  /*
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
     perror("create thread err!\n");
@@ -129,19 +129,19 @@ int main()
   */
 
   //send sort request
-  //ret = request_sort(client);
-  //assert(ret == 0);
+  ret = request_sort(client);
+  assert(ret == 0);
+
   /*
   sleep(3);
   ret = send_realtime(client);
   assert(ret == 0);
   */
-
-
+  /*
   ret = send_test(client);
   assert(ret == 0);
-
-  while((ret = read(client, buff, 1024*1024)) == 0){
+  */
+  if((ret = read(client, buff, 1024*1024)) == 0){
     sleep(2);
   }
   printf("ret:%d\n", ret);
@@ -151,7 +151,7 @@ int main()
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
   while(true){
-    sleep(3);
+    sleep(8);
     send_heart(client);
     /*
     sleep(1);

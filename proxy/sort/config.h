@@ -6,10 +6,10 @@
 #include<stdlib.h>
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 #define SERVER_MARKET_DEMAIN "dsapp.yz.zjwtj.com"
+//#define SERVER_MARKET "127.0.0.1"
+//#define SERVER_MARKET_PORT 8001
 #define SERVER_MARKET "221.6.167.245"
 #define SERVER_MARKET_PORT 8881
-//#define SERVER_MARKET "122.144.139.237"
-//#define SERVER_MARKET_PORT 8001
 //#define SERVER_MARKET "192.168.1.131"
 //#define SERVER_MARKET "127.0.0.1"
 //#define SERVER_MARKET_PORT 8001
@@ -36,7 +36,8 @@
 #define AREA_QUEUE_DEFAULT_LEN 100
 #define SORT_SHOW_MAX_NUM 10
 
-#define system_32
+//#define system_32
+#define system_64
 //#define system_64
 //#define PIPE_NAME "./../jim_sort"
 //#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
@@ -67,7 +68,8 @@ typedef union
 enum column_s
 {
   NEW_PRICE,
-  RAISE
+  UP_RANGE,
+  DOWN_RANGE
 };
 
 //option type

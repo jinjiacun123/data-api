@@ -14,13 +14,11 @@ struct entity_s
   int  pre_close;  //close price of yestoday
 
   int pre_price;  //prefix value,use to check is sort
-
   int price;       //now price
   int price_area[2]; //first is area, second is queue
 
-  int raise;
-  int raise_area[2];
-
+  float add;
+  float down;
   float range;
   int max;
   int min;
@@ -62,15 +60,38 @@ struct market_s
   /*--sort--*/
   sort_area_t sort_area_price_zero;
   sort_area_t sort_area_price[AREA_NUMBER];
-  sort_area_t sort_area_raise[AREA_NUMBER];
 
   int * sort_price_list; //sort by price
   int max_price;
   int min_price;
 
-  int * sort_raise_list;    //sort up range
-  int max_raise;
-  int min_raise;
+  int * sort_up_list;    //sort up range
+  int max_up;
+  int min_up;
+
+  int * sort_down_list;  //sort down range
+  int max_down;
+  int min_down;
+
+  int * sort_range_list; //sort range
+  int max_range;
+  int min_range;
+
+  int * sort_max_list; //sort max price
+  int max_max;
+  int min_max;
+
+  int * sort_min_list; //sort min price
+  int max_min;
+  int min_min;
+
+  int * sort_buy_list; //sort buy price
+  int max_buy;
+  int min_buy;
+
+  int * sort_sell_list; //sort sell price
+  int max_sell;
+  int min_sell;
 };
 
 int init_market();

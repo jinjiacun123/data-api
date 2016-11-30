@@ -1,4 +1,3 @@
-
 #include "config.h"
 #include "cJSON.h"
 #include "sort.h"
@@ -18,45 +17,39 @@ int init_sort_area(my_market)
      market_t * my_market;
 {
   int i = 0;
-  sort_area_t * sort_area_price = NULL;
-  sort_area_t * sort_area_raise = NULL;
+  sort_area_t * sort_area = NULL;
   sort_area_t * sort_area_zero = NULL;
   int step_len = (my_market->setting_max - my_market->setting_min)/AREA_NUMBER;
-  int max_raise = my_market->yestoday_max*0.1;//min is nagative number
-  int raise_step_len = (2*max_raise)/AREA_NUMBER;
   int area_queue_len = 0;
-  int raise_area_queue_len = 0;
   int default_area_queue_len = AREA_NUMBER*AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
   int page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
   area_queue_len = page_size * PAGE_SIZE;
-
-  sort_area_queue_t * price_base_queue = (char *)malloc(area_queue_len);
-  if(price_base_queue == NULL){
+  sort_area_queue_t * base_queue = (char *)malloc(area_queue_len);
+  if(base_queue == NULL){
     printf("malloc error!\n");
     return -1;
   }
-  memset(price_base_queue, 0x00, area_queue_len);
-  sort_area_queue_t * raise_base_queue = (char *)malloc(area_queue_len);
-  if(raise_base_queue == NULL){
-    printf("malloc error!\n");
+  memset(base_queue, 0x00, area_queue_len);
+
+  /*
+  //deal zero
+  sort_area_zero = &my_market->sort_area_price_zero;
+  sort_area_zero->cur = (sort_area_queue_t *)malloc(area_queue_len);
+  if(sort_area_zero->cur == NULL){
+    printf("malloc err!\n");
     return -1;
   }
-  memset(raise_base_queue, 0x00, area_queue_len);
+  memset(sort_area_zero->cur, 0x00, default_area_queue_len+1);
+  */
 
-  sort_area_price = &my_market->sort_area_price;
-  sort_area_raise = &my_market->sort_area_raise;
+  sort_area = &my_market->sort_area_price;
   for(; i< AREA_NUMBER; i++){
-    sort_area_price->cur  = price_base_queue + AREA_QUEUE_DEFAULT_LEN * i;
-    sort_area_raise->cur  = raise_base_queue + AREA_QUEUE_DEFAULT_LEN * i;
-    sort_area_price->min_value.ivalue  = my_market->setting_min + step_len * i;
-    sort_area_raise->min_value.ivalue = max_raise*(-1) + raise_step_len * i;
-    sort_area_price->max_value.ivalue = sort_area_price->min_value.ivalue + step_len +1;
-    sort_area_raise->max_value.ivalue = sort_area_raise->min_value.ivalue + raise_step_len + 1;
-    sort_area_price->allow_size = AREA_QUEUE_DEFAULT_LEN;
-    sort_area_raise->allow_size = AREA_QUEUE_DEFAULT_LEN;
+    sort_area->cur = base_queue +AREA_QUEUE_DEFAULT_LEN * i;
+    sort_area->min_value.ivalue = my_market->setting_min + step_len * i;
+    sort_area->max_value.ivalue = sort_area->min_value.ivalue + step_len +1;
+    sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
 
-    sort_area_price ++;
-    sort_area_raise ++;
+    sort_area ++;
   }
 
   return 0;
@@ -85,16 +78,14 @@ int sort_add(my_market, entity, column)
   float pre_fvalue = 0;
   sort_area_t * cur_area = NULL;
   sort_area_queue_t * cur_queue = NULL, * pre_queue = NULL;
-  int ret = -1;
 
+  //find entity from area
+  assert(find_location(my_market, entity, column, &area_index, &queue_index) == 0);
+  entity->price_area[0] = area_index;
+  entity->price_area[1] = queue_index;
   //check is exits,by pre_*
   switch(column){
   case NEW_PRICE:{
-    //find entity from area
-    ret = find_location(my_market, entity, column, &area_index, &queue_index);
-    assert(ret == 0);
-    entity->price_area[0] = area_index;
-    entity->price_area[1] = queue_index;
     cur_area = &my_market->sort_area_price[area_index];
 
     if(queue_index == 0){//first
@@ -153,70 +144,6 @@ int sort_add(my_market, entity, column)
 
     cur_area->real_size ++;
   }break;
-  case RAISE:{
-    //find entity from area
-    ret = find_location(my_market, entity, column, &area_index, &queue_index);
-    assert(ret == 0);
-    entity->raise_area[0] = area_index;
-    entity->raise_area[1] = queue_index;
-    cur_area = &my_market->sort_area_raise[area_index];
-
-    if(queue_index == 0){//first
-      if(cur_area->real_size == 0){
-	cur_queue = cur_area->cur;
-	cur_queue->index = 0;
-	cur_queue->entity = entity;
-	cur_queue->entity->raise_area[1] = cur_queue->index;
-      }
-      else{
-	i = cur_area->real_size;
-	pre_queue = cur_area->cur + i -1;
-	cur_queue = cur_area->cur + i;
-	for(; i>queue_index; i--){
-	  cur_queue->index = pre_queue->index+1;
-	  cur_queue->entity = pre_queue->entity;
-	  cur_queue->entity->raise_area[1] = cur_queue->index;
-	  cur_queue --;
-	  pre_queue --;
-	}
-	cur_queue = cur_area->cur + queue_index;
-	cur_queue->entity = entity;
-	cur_queue->index = queue_index;
-	cur_queue->entity->raise_area[1] = cur_queue->index;
-      }
-    }
-    else if(queue_index == cur_area->real_size){//last
-      cur_queue = cur_area->cur + queue_index;
-      cur_queue->entity = entity;
-      cur_queue->index = queue_index;
-      cur_queue->entity->raise_area[1] = queue_index;
-    }
-    else if(queue_index < cur_area->real_size){//in btween real_size
-      //move
-      i = cur_area->real_size;
-      pre_queue = cur_area->cur + i -1;
-      cur_queue = cur_area->cur + i;
-      for(; i>queue_index; i--){
-	cur_queue->index = pre_queue->index+1;
-	cur_queue->entity = pre_queue->entity;
-	cur_queue->entity->raise_area[1] = cur_queue->index;
-	cur_queue --;
-	pre_queue --;
-      }
-      cur_queue = cur_area->cur + queue_index;
-      cur_queue->entity = entity;
-      cur_queue->index = queue_index;
-      cur_queue->entity->raise_area[1] = cur_queue->index;
-    }
-    else{//not enough and remalloc
-      cur_queue = cur_area->cur + queue_index;
-      cur_queue->index = queue_index;
-      cur_queue->entity = entity;
-      cur_queue->entity->raise_area[1] = cur_queue->index;
-    }
-
-    cur_area->real_size ++;
-  }break;
   default:{
 
   }break;
@@ -247,7 +174,7 @@ static int find_location(my_market, entity, column, area_index, queue_index)
      int * queue_index;
 {
   int i = 0;
-  sort_area_t * area = NULL;
+  sort_area_t * area = &my_market->sort_area_price;
   sort_area_queue_t * queue = NULL;
   int real_size = 0;
   value_t value;
@@ -256,13 +183,8 @@ static int find_location(my_market, entity, column, area_index, queue_index)
 
   switch(column){
   case NEW_PRICE:{
-    area = &my_market->sort_area_price;
     value.ivalue = entity->price;
   }break;
-  case RAISE:{
-    area = &my_market->sort_area_raise;
-    value.ivalue = entity->raise;
-  };
   default:{
 
   }break;
@@ -292,33 +214,16 @@ static int find_location(my_market, entity, column, area_index, queue_index)
       //      *queue_index = search_queue_index(value.ivalue, 0, real_size, queue, column);
       for(i=0; i < real_size; i++){
 	item = queue->entity;
-        switch(column){
-	case NEW_PRICE:{
-	  if(value.ivalue > item->price){
-	    queue++;
-	    continue;
-	  }
-	  else{
-	    *queue_index = i;
-	    break;
-	  }
-	}break;
-	case RAISE:{
-	  if(value.ivalue > item->raise){
-	    queue++;
-	    continue;
-	  }
-	  else{
-	    *queue_index = i;
-	    break;
-	  }
-	}break;
-	default:{
-
-	}break;
+	if(value.ivalue > item->price){
+	  queue++;
+	  continue;
+	}
+	else{
+	  *queue_index = i;
+	  break;
 	}
       }
-      
+
       if(i == real_size){
 	*queue_index = i;
       }
@@ -356,10 +261,11 @@ static int remove_entity(my_market, entity, column)
   sort_area_queue_t * cur_queue = NULL;
   sort_area_queue_t * after_queue = NULL;
 
+  area_index = entity->price_area[0];
+  queue_index = entity->price_area[1];
+
   switch(column){
   case NEW_PRICE:{
-    area_index = entity->price_area[0];
-    queue_index = entity->price_area[1];
     cur_area = &my_market->sort_area_price[area_index];
     if(queue_index != cur_area->real_size-1){//not last
       i = queue_index;
@@ -387,41 +293,6 @@ static int remove_entity(my_market, entity, column)
       cur_queue = cur_area->cur+cur_area->real_size-1;
       cur_queue->entity->price_area[0] = -1;
       cur_queue->entity->price_area[1] = -1;
-      cur_queue->index = -1;
-      cur_queue->entity = NULL;
-    }
-    cur_area->real_size --;
-  }break;
-  case RAISE:{
-    area_index = entity->raise_area[0];
-    queue_index = entity->raise_area[1];
-    cur_area = &my_market->sort_area_raise[area_index];
-    if(queue_index != cur_area->real_size-1){//not last
-      i = queue_index;
-      cur_queue = cur_area->cur+i;
-      after_queue = cur_area->cur +i + 1;
-      for(; i < cur_area->real_size-1 ; i++){
-	cur_queue->entity = after_queue->entity;
-	cur_queue->entity->raise_area[1] --;
-	cur_queue ++;
-	after_queue ++;
-      }
-      /*
-      after_queue = cur_area->cur + cur_area->real_size -1;
-      after_queue->index = -1;
-      after_queue->entity = NULL;
-      */
-      /*
-      cur_queue->entity->price_area[0] = -1;
-      cur_queue->entity->price_area[1] = -1;
-      cur_queue->index = -1;
-      cur_queue->entity = NULL;
-      */
-    }
-    else if(queue_index == cur_area->real_size-1){//last
-      cur_queue = cur_area->cur+cur_area->real_size-1;
-      cur_queue->entity->raise_area[0] = -1;
-      cur_queue->entity->raise_area[1] = -1;
       cur_queue->index = -1;
       cur_queue->entity = NULL;
     }

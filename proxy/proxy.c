@@ -624,9 +624,10 @@ static int deal_client_info(client_socket_fd,
   int ret;
   app_request_data * my_app_request_data = NULL;
   int status = -1;
-  char header_buff[8];
   char tmp_buff[BUFSIZ];
+  char sort_buff[1024];
   int nread = -1;
+  int package_length = 0;
 
   while(true){
     is_custom = false;
@@ -635,15 +636,42 @@ static int deal_client_info(client_socket_fd,
     //head of package
 L:    length = 8;
     n = 0;
+    package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
-	n  += nread;
-	ret = write(proxy_client_socket_fd, tmp_buff, nread);
-	if(ret <= 0){
-		WriteErrLog("%s write to proxy err!\n", client_ip);
-		exit(-1);
+      //check is request of sort
+      if(strncmp(tmp_buff, HEADER_EX, 4) == 0){
+	package_length = *(int*)(tmp_buff+4) + 8;
+	memcpy(sort_buff, tmp_buff+8, package_length -8);
+	if(-1 == * pipe_write_fd){
+	      //open sort pipe
+	  ret = init_request_sort(getpid(), pipe_write_fd);
+	  assert(ret == 0);
 	}
-	if(nread < BUFSIZ -1)
-	  return 0;
+	//init sort of request
+	my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
+	if(my_app_request_data == NULL){
+	  WriteErrLog("malloc my_app_request_data error!\n");
+	  exit(-1);
+	}
+	memset(my_app_request_data, 0x00, sizeof(app_request_data));
+	my_app_request_data->socket_fd = client_socket_fd;
+	my_app_request_data->buff      = sort_buff;
+	my_app_request_data->buff_len  = package_length-8;
+	my_app_request_data->start     = true;
+	deal_request_of_sort(getpid(), my_app_request_data, *pipe_write_fd, pipe_read_fd, epfd);
+	free(my_app_request_data);
+      }
+      n  += nread;
+      if((nread - package_length) == 0)return 0;
+      ret = write(proxy_client_socket_fd,
+		  tmp_buff + package_length,
+		  nread - package_length);
+      if(ret <= 0){
+	WriteErrLog("%s write to proxy err!\n", client_ip);
+	exit(-1);
+      }
+      if(nread < BUFSIZ -1)
+	return 0;
     }
     if(nread == -1 && errno != EAGAIN){
       return 0;
