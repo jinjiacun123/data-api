@@ -22,7 +22,7 @@ int main(int argc, char * argv[])
   //my_size = 10;
   char * buff = NULL;
   int entity_len = sizeof(entity_t);
-  int buff_len = entity_len *my_size;
+  int buff_len = entity_len *my_size + sizeof(int);
   char cur_app_pipe[100];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
@@ -68,6 +68,9 @@ int main(int argc, char * argv[])
   app_request.begin = my_begin;
   app_request.size = my_size;
   res = write(pipe_write_fd, &app_request, app_request_len);
+  app_request.option = 1;
+  app_request.begin = my_begin+10;
+  res = write(pipe_write_fd, &app_request, app_request_len);
   close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
@@ -90,10 +93,11 @@ int main(int argc, char * argv[])
       sleep(3);
       break;
     }
+    printf("option:%d\n", *(int*)buff);
 
     //printf("price:%s\n", buff);
     //display
-    entity = (entity_t *)buff;
+    entity = (entity_t *)(buff + sizeof(int));
     for(i = 0; i<my_size; i++){
       printf("code:%.6s,price:%d\n",
 	     entity->code,

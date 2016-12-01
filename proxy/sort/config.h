@@ -80,16 +80,19 @@ enum option_s
 };
 
 //app request struct
+/*
 typedef struct
 {
   bool is_create;
   pid_t pid;
   int app_fifo_fd;
+  int option;//sequence number
   int index;
   int column;
   int begin;
   int size;
 }app_request_t;
+*/
 
 typedef struct{
   //  request_s_t pre;

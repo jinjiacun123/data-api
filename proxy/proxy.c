@@ -417,42 +417,41 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
     nfds = epoll_wait(epfd, events, 3, -1);
     is_custom = false;
 
-    /*
-    if((nready == -1) && (errno == EINTR))
+    
+    if((nfds == -1) && (errno == EINTR))
       continue;
-    else if(nready == -1){
+    else if(nfds == -1){
       break;
     }
 
-    if(nready == 0){//timeout
+    if(nfds == 0){//timeout
       WriteErrLog("%s\tprocess timeout\n", client_ip);
-      close(client[0].fd);
-      shutdown(client[0].fd,2);
-      close(client[1].fd);
-      shutdown(client[1].fd,2);
+      close(proxyClientSocketId);
+      shutdown(proxyClientSocketId,2);
+      close(clientSocketId);
+      shutdown(clientSocketId,2);
       exit(-1);
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
-
+/*
     if(alive_times>20){
       WriteErrLog("%s\tclient is die\n", client_ip);
       exit(-1);
     }
     */
     for(i = 0; i< nfds; i++){
-	/*
-      if((events[i].events & EPOLLERR) ||
-	 (events[i].events & EPOLLHUP) ||
-	 (events[i].events & EPOLLRDHUP) ||
-	 (!(events[i].events & EPOLLIN))){
-	WriteErrLog("%s\tepoll err!\n", client_ip);
-	close(clientSocketId);
-	close(proxyClientSocketId);
-	exit(-1);
-	continue;
-      }
-	*/
+      //if(!(events[i].events & EPOLLIN)){
+	if((events[i].events & EPOLLERR) ||
+	   // (events[i].events & EPOLLHUP) ||
+	   (events[i].events & EPOLLRDHUP) ||
+	   (!(events[i].events & EPOLLIN))){
+	  WriteErrLog("%s\tepoll err!\n", client_ip);
+	  close(clientSocketId);
+	  close(proxyClientSocketId);
+	  exit(-1);
+	}
+	//}
       if(events[i].events & EPOLLIN){
 	//check is client info
 	if(events[i].data.fd == clientSocketId){
@@ -524,7 +523,7 @@ L1:  length = 8;
       n += nread;
       ret = write(client_socket_fd, tmp_buff, nread);
       if(ret <= 0){
-	WriteErrLog("%s write to proxy err!\n", client_ip);
+	WriteErrLog("%s write to client err!errno:%d\n", client_ip, errno);
 	exit(-1);
       }
       if(nread < BUFSIZ -1)
@@ -638,6 +637,7 @@ L:    length = 8;
     n = 0;
     package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
+      WriteErrLog("%s read client info!\n", client_ip);
       //check is request of sort
       if(strncmp(tmp_buff, HEADER_EX, 4) == 0){
 	package_length = *(int*)(tmp_buff+4) + 8;
@@ -794,7 +794,7 @@ static int deal_sort_info(clientSocketId,
   char head[9];
   char * sort_buff = NULL;
   int entity_len = sizeof(sort_entity_t);
-  int sort_buff_len = entity_len *size;
+  int sort_buff_len = entity_len *size+ sizeof(int);
 
   WriteErrLog("read pipe...\n");
   //read sort
@@ -1207,12 +1207,14 @@ void * deal_request_of_sort(pid,
   app_request_data * my_app_request_data = (app_request_data  *)p_app_request_data;
   char * sort_buff;
   int sort_buff_len;
+  int option = -1;
 
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
   my_request = (app_request_t *)my_app_request_data->buff;
   begin = my_request->begin;
   size  = my_request->size;
+  option = my_request->option;
 
   int app_request_len = sizeof(app_request_t);
   int res = 0;
@@ -1235,6 +1237,7 @@ void * deal_request_of_sort(pid,
   app_request.pid = pid;
   app_request.begin = begin;
   app_request.size = size;
+  app_request.option = option;
   res = write(pipe_write_fd, &app_request, app_request_len);
   assert(res >0);
   WriteErrLog("send pipe request...\n");

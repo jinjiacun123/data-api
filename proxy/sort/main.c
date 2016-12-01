@@ -475,7 +475,8 @@ void init_app(void *param)
       //check is exists
       tmp_app = (app_request_t*)app_request_buff;
       for(i = 0; i< APP_SIZE; i++){
-	if(tmp_app->pid == app_list[i].pid){
+	if((tmp_app->pid == app_list[i].pid)
+	   && (tmp_app->option == app_list[i].option)){
 	  is_exists = true;
 	  app_list[i].begin = tmp_app->begin;
 	  app_list[i].size  = tmp_app->size;
@@ -551,6 +552,17 @@ static int send_sort(app_request_t * my_app)
     memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
     res = sort_get(my_market, my_app->begin, my_app->size, entity_list);
     assert(res == 0);
+    res = write(my_app->app_fifo_fd, &my_app->option, sizeof(int));
+    if(res == -1){
+      printf("write app fifo err!\n");
+      //close pipe
+      close(my_app->app_fifo_fd);
+      my_app->app_fifo_fd = 0;
+      my_app->pid = 0;
+      my_app->begin = 0;
+      my_app->size = 0;
+      my_app->is_create = false;
+    }
     res = write(my_app->app_fifo_fd, &entity_list, my_app->size*sizeof(entity_t));
     if(res == -1){
       printf("write app fifo err!\n");
@@ -765,7 +777,11 @@ do_stock(my_market, code_type, code, buff, i, option)
 	 code,
 	 tmp->m_lNewPrice);
 
-  entity->price = tmp->m_lNewPrice;
+  entity->price       = tmp->m_lNewPrice;
+  entity->max         = tmp->m_lMaxPrice;
+  entity->min         = tmp->m_lMinPrice;
+  entity->total       = tmp->m_lTotal;
+  entity->money       = tmp->m_fAvgPrice;
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);

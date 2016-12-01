@@ -22,8 +22,8 @@ struct entity_s
   float range;
   int max;
   int min;
-  int buy;
-  int sell;
+  int total;
+  int money;
 };
 
 //from first floor to sixth floor

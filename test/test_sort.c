@@ -6,20 +6,21 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<assert.h>
-#define SERVER_HOST "127.0.0.1"
+//#define SERVER_HOST "127.0.0.1"
 //#define SERVER_HOST "192.168.1.131"
-//#define SERVER_HOST "122.144.139.237"
+#define SERVER_HOST "122.144.139.237"
 #define SERVER_PORT 8001
 //#define SERVER_PORT 8800
 #define HEADER   "ZJHR"
 #define HEADER_EX "SERV"
 #define TYPE_HEART      0x0905 //heart tick
 #pragma pack (4)
-
+int option = 0;
 typedef struct{
   bool is_create;
   pid_t pid;
   int app_fifo_fd;
+  int option;
   int index;
   int column;
   int begin;
@@ -120,33 +121,43 @@ int main()
   }
 
   //init receive
-  /*
+  
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
     perror("create thread err!\n");
     exit(-1);
   }
-  */
 
   //send sort request
+  /*
   ret = request_sort(client);
   assert(ret == 0);
-
+  */
   /*
+  sleep(3);
+  option = 1;
+  ret = request_sort(client);
+  assert(ret == 0);
+  */
+
+  
   sleep(3);
   ret = send_realtime(client);
   assert(ret == 0);
-  */
+ 
   /*
   ret = send_test(client);
   assert(ret == 0);
   */
+   
+  /*
   if((ret = read(client, buff, 1024*1024)) == 0){
     sleep(2);
   }
   printf("ret:%d\n", ret);
   assert(ret >0);
   printf("buff:%s\n", buff);
+  */
 
   printf("connect success...\n");
   //pthread_join(t_id, &thread_result);
@@ -207,7 +218,6 @@ int send_realtime(int socket_fd)
   return -1;
 }
 
-int option = 0;
 static int request_sort(int socket_fd)
 {
   request_sort_t my_request_sort;
@@ -216,10 +226,16 @@ static int request_sort(int socket_fd)
   memcpy(my_request_sort.header_name, HEADER_EX, 4);
   my_request_sort.body_len = sizeof(request_sort_t)-8;
   my_request_sort.app_request.column = 0;
+  my_request_sort.app_request.option = option;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = option++;
+  my_request_sort.app_request.begin = 500+option;
   my_request_sort.app_request.size = 10;
 
+  ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
+  assert(ret >0);
+  sleep(5);
+  my_request_sort.app_request.begin = 600;
+  my_request_sort.app_request.option = 1;
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
   return 0;
@@ -239,7 +255,7 @@ static void *init_receive(void * param)
     //read head
     ret = read(client, head_buff, 8);
     if(ret == 0){
-      //printf("close continue\n");
+      printf("close continue\n");
       break;
     }else if(ret == -1){
       pthread_exit("receive err!\n");
@@ -262,12 +278,13 @@ static void *init_receive(void * param)
       printf("option times:%d\n", option);
       printf("type:%x\n", *(int*)body_buff);
       //printf("body_buff:%s\n", body_buff);
-      entity = (entity_t*)body_buff;	
+      entity = (entity_t*)(body_buff+4);	
       for(i = 0; i<10; i++){
 	printf("code:%.6s,price:%d\n", entity->code, entity->price);
 	entity++;
       }
       printf("----------------------------------\n");
+      //ret = request_sort(client);
     }
   }
 }
