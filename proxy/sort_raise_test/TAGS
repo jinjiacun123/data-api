@@ -1,0 +1,900 @@
+
+cJSON.c,3162
+static const char *ep;ep35,1286
+const char *cJSON_GetErrorPtr(cJSON_GetErrorPtr37,1310
+static int cJSON_strcasecmp(39,1360
+static char* cJSON_strdup(49,1724
+void cJSON_InitHooks(60,1941
+static cJSON *cJSON_New_Item(cJSON_New_Item73,2245
+void cJSON_Delete(81,2424
+static const char *parse_number(parse_number96,2843
+static int pow2gt 117,3725
+typedef struct {char *buffer;buffer119,3819
+typedef struct {char *buffer; int length;119,3819
+typedef struct {char *buffer; int length; int offset;119,3819
+typedef struct {char *buffer; int length; int offset; } printbuffer;119,3819
+static char* ensure(121,3889
+static int update(138,4368
+static char *print_number(print_number147,4575
+static unsigned parse_hex4(177,5377
+static const unsigned char firstByteMark[firstByteMark191,6214
+static const char *parse_string(parse_string192,6306
+static char *print_string_ptr(print_string_ptr252,8137
+static char *print_string(print_string309,9548
+static const char *skip(skip320,10137
+cJSON *cJSON_ParseWithOpts(cJSON_ParseWithOpts323,10298
+cJSON *cJSON_Parse(cJSON_Parse339,10906
+char *cJSON_Print(cJSON_Print342,11038
+char *cJSON_PrintUnformatted(cJSON_PrintUnformatted343,11106
+char *cJSON_PrintBuffered(cJSON_PrintBuffered345,11183
+static const char *parse_value(parse_value357,11463
+static char *print_value(print_value372,12148
+static const char *parse_array(parse_array406,13264
+static char *print_array(print_array434,14083
+static const char *parse_object(parse_object514,16101
+static char *print_object(print_object550,17289
+int    cJSON_GetArraySize(667,20451
+cJSON *cJSON_GetArrayItem(cJSON_GetArrayItem668,20561
+cJSON *cJSON_GetObjectItem(cJSON_GetObjectItem669,20687
+static void suffix_object(672,20883
+static cJSON *create_reference(create_reference674,21008
+void   cJSON_AddItemToArray(677,21242
+void   cJSON_AddItemToObject(678,21436
+void   cJSON_AddItemToObjectCS(679,21644
+void	cJSON_AddItemReferenceToArray(680,21916
+void	cJSON_AddItemReferenceToObject(681,22037
+cJSON *cJSON_DetachItemFromArray(cJSON_DetachItemFromArray683,22183
+void   cJSON_DeleteItemFromArray(685,22464
+cJSON *cJSON_DetachItemFromObject(cJSON_DetachItemFromObject686,22579
+void   cJSON_DeleteItemFromObject(687,22802
+void   cJSON_InsertItemInArray(690,22978
+void   cJSON_ReplaceItemInArray(692,23298
+void   cJSON_ReplaceItemInObject(695,23654
+cJSON *cJSON_CreateNull(cJSON_CreateNull698,23943
+cJSON *cJSON_CreateTrue(cJSON_CreateTrue699,24051
+cJSON *cJSON_CreateFalse(cJSON_CreateFalse700,24159
+cJSON *cJSON_CreateBool(cJSON_CreateBool701,24269
+cJSON *cJSON_CreateNumber(cJSON_CreateNumber702,24392
+cJSON *cJSON_CreateString(cJSON_CreateString703,24556
+cJSON *cJSON_CreateArray(cJSON_CreateArray704,24719
+cJSON *cJSON_CreateObject(cJSON_CreateObject705,24829
+cJSON *cJSON_CreateIntArray(cJSON_CreateIntArray708,24963
+cJSON *cJSON_CreateFloatArray(cJSON_CreateFloatArray709,25184
+cJSON *cJSON_CreateDoubleArray(cJSON_CreateDoubleArray710,25408
+cJSON *cJSON_CreateStringArray(cJSON_CreateStringArray711,25634
+cJSON *cJSON_Duplicate(cJSON_Duplicate714,25878
+void cJSON_Minify(741,27089
+
+main.c,1644
+#define SERVER_MARKET_PRE 13,227
+#define SERVER_MARKET 14,302
+#define SERVER_MARKET_PORT 15,340
+#define USERNAME 17,373
+#define PASSWORD 18,407
+#define HEADER 19,438
+#define TYPE_EMPTY 22,497
+#define TYPE_INIT 23,536
+#define TYPE_LOGIN 24,574
+#define TYPE_HEART 25,613
+#define TYPE_ZIB 26,657
+#define TYPE_REALTIME 27,691
+#define TYPE_HISTORY 28,725
+#define TYPE_TIME_SHARE 29,759
+#define TYPE_AUTO_PUSH 30,793
+#define TYPE_SERVERINFO 31,827
+#define TYPE_DAY_CURPOS 32,861
+char buff[buff34,896
+  char m_head[m_head38,935
+  int  m_length;39,954
+  unsigned short m_nType;40,973
+  char  m_nIndex;41,999
+  char  m_Not;42,1020
+  long  m_lKey;43,1038
+  short m_cCodeType;44,1054
+  char  m_cCode[m_cCode45,1075
+  short m_nSize;46,1095
+  unsigned short m_nOption;47,1112
+}RealPack;RealPack48,1141
+  unsigned short code_type;52,1170
+  char code[code53,1198
+}CodeInfo;CodeInfo54,1214
+  char code[code58,1243
+  char name[name59,1259
+  int  pre_close;60,1276
+  int price;61,1321
+}entity_t;entity_t62,1352
+  char file_name[file_name66,1381
+  char date[date67,1403
+  short code_type;68,1435
+  char name[name69,1454
+  short unit;70,1471
+  char open_close_time[open_close_time71,1485
+  entity_t * list;72,1513
+  int entity_list_size;73,1532
+}market_t;market_t74,1556
+market_t market_list[market_list76,1568
+entity_t * entity_list;82,1801
+int last_time_market;84,1844
+int cur_time;85,1882
+int main(93,2184
+int init_market(116,2668
+int get_content(169,4204
+int get_market(197,4656
+int init_socket(271,7007
+void send_realtime(294,7505
+void init_receive(339,8769
+int send_auto_push(388,9835
+
+lib/http_get.c,84
+#define IPSTR 15,288
+#define PORT 16,320
+#define BUFSIZE 17,337
+int main(19,360
+
+lib/http_post.c,84
+#define IPSTR 15,291
+#define PORT 16,322
+#define BUFSIZE 17,339
+int main(19,362
+
+cJSON.h,1059
+#define cJSON__h24,1114
+#define cJSON_False 32,1191
+#define cJSON_True 33,1213
+#define cJSON_NULL 34,1234
+#define cJSON_Number 35,1255
+#define cJSON_String 36,1278
+#define cJSON_Array 37,1301
+#define cJSON_Object 38,1323
+#define cJSON_IsReference 40,1348
+#define cJSON_StringIsConst 41,1378
+typedef struct cJSON 44,1438
+	struct cJSON *next,next45,1461
+	struct cJSON *next,*prev;prev45,1461
+	struct cJSON *child;child46,1602
+	int type;48,1736
+	char *valuestring;valuestring50,1790
+	int valueint;51,1859
+	double valuedouble;52,1924
+	char *string;string54,1995
+} cJSON;55,2117
+typedef struct cJSON_Hooks 57,2127
+      void *(*malloc_fn)malloc_fn58,2156
+      void (*free_fn)free_fn59,2193
+} cJSON_Hooks;60,2227
+#define cJSON_AddNullToObject(134,6577
+#define cJSON_AddTrueToObject(135,6677
+#define cJSON_AddFalseToObject(136,6777
+#define cJSON_AddBoolToObject(137,6879
+#define cJSON_AddNumberToObject(138,6981
+#define cJSON_AddStringToObject(139,7087
+#define cJSON_SetIntValue(142,7279
+#define cJSON_SetNumberValue(143,7383
+
+cJSON.c,3162
+static const char *ep;ep35,1286
+const char *cJSON_GetErrorPtr(cJSON_GetErrorPtr37,1310
+static int cJSON_strcasecmp(39,1360
+static char* cJSON_strdup(49,1724
+void cJSON_InitHooks(60,1941
+static cJSON *cJSON_New_Item(cJSON_New_Item73,2245
+void cJSON_Delete(81,2424
+static const char *parse_number(parse_number96,2843
+static int pow2gt 117,3725
+typedef struct {char *buffer;buffer119,3819
+typedef struct {char *buffer; int length;119,3819
+typedef struct {char *buffer; int length; int offset;119,3819
+typedef struct {char *buffer; int length; int offset; } printbuffer;119,3819
+static char* ensure(121,3889
+static int update(138,4368
+static char *print_number(print_number147,4575
+static unsigned parse_hex4(177,5377
+static const unsigned char firstByteMark[firstByteMark191,6214
+static const char *parse_string(parse_string192,6306
+static char *print_string_ptr(print_string_ptr252,8137
+static char *print_string(print_string309,9548
+static const char *skip(skip320,10137
+cJSON *cJSON_ParseWithOpts(cJSON_ParseWithOpts323,10298
+cJSON *cJSON_Parse(cJSON_Parse339,10906
+char *cJSON_Print(cJSON_Print342,11038
+char *cJSON_PrintUnformatted(cJSON_PrintUnformatted343,11106
+char *cJSON_PrintBuffered(cJSON_PrintBuffered345,11183
+static const char *parse_value(parse_value357,11463
+static char *print_value(print_value372,12148
+static const char *parse_array(parse_array406,13264
+static char *print_array(print_array434,14083
+static const char *parse_object(parse_object514,16101
+static char *print_object(print_object550,17289
+int    cJSON_GetArraySize(667,20451
+cJSON *cJSON_GetArrayItem(cJSON_GetArrayItem668,20561
+cJSON *cJSON_GetObjectItem(cJSON_GetObjectItem669,20687
+static void suffix_object(672,20883
+static cJSON *create_reference(create_reference674,21008
+void   cJSON_AddItemToArray(677,21242
+void   cJSON_AddItemToObject(678,21436
+void   cJSON_AddItemToObjectCS(679,21644
+void	cJSON_AddItemReferenceToArray(680,21916
+void	cJSON_AddItemReferenceToObject(681,22037
+cJSON *cJSON_DetachItemFromArray(cJSON_DetachItemFromArray683,22183
+void   cJSON_DeleteItemFromArray(685,22464
+cJSON *cJSON_DetachItemFromObject(cJSON_DetachItemFromObject686,22579
+void   cJSON_DeleteItemFromObject(687,22802
+void   cJSON_InsertItemInArray(690,22978
+void   cJSON_ReplaceItemInArray(692,23298
+void   cJSON_ReplaceItemInObject(695,23654
+cJSON *cJSON_CreateNull(cJSON_CreateNull698,23943
+cJSON *cJSON_CreateTrue(cJSON_CreateTrue699,24051
+cJSON *cJSON_CreateFalse(cJSON_CreateFalse700,24159
+cJSON *cJSON_CreateBool(cJSON_CreateBool701,24269
+cJSON *cJSON_CreateNumber(cJSON_CreateNumber702,24392
+cJSON *cJSON_CreateString(cJSON_CreateString703,24556
+cJSON *cJSON_CreateArray(cJSON_CreateArray704,24719
+cJSON *cJSON_CreateObject(cJSON_CreateObject705,24829
+cJSON *cJSON_CreateIntArray(cJSON_CreateIntArray708,24963
+cJSON *cJSON_CreateFloatArray(cJSON_CreateFloatArray709,25184
+cJSON *cJSON_CreateDoubleArray(cJSON_CreateDoubleArray710,25408
+cJSON *cJSON_CreateStringArray(cJSON_CreateStringArray711,25634
+cJSON *cJSON_Duplicate(cJSON_Duplicate714,25878
+void cJSON_Minify(741,27089
+
+test_sort.c,27
+#define N 2,18
+main(5,35
+
+main.c,627
+bool is_exit 17,345
+int socket_fd 18,367
+int main(20,387
+int init_market(52,1135
+int get_content(112,2768
+int get_market(140,3218
+int init_socket(259,7454
+int send_realtime(282,7952
+void init_receive(330,9222
+int init_sort_area(391,10557
+int send_auto_push(408,11051
+int send_heart(449,12175
+int parse(466,12593
+int parse_realtime(516,13602
+do_stock(536,14105
+int parse_auto_push(570,14886
+int unpack(575,14954
+int my_sort(617,16037
+int save_key(659,16919
+int find_entity_by_key(697,17888
+int get_index_by_code_ascii(719,18354
+int out_market(736,18623
+int display_sort(751,18981
+void sig_stop(767,19362
+
+lib/http_get.c,84
+#define IPSTR 15,288
+#define PORT 16,320
+#define BUFSIZE 17,337
+int main(19,360
+
+lib/http_post.c,84
+#define IPSTR 15,291
+#define PORT 16,322
+#define BUFSIZE 17,339
+int main(19,362
+
+config.h,5279
+#define __CONFIG_H__2,21
+#define SERVER_MARKET_PRE 4,59
+#define SERVER_MARKET 8,248
+#define SERVER_MARKET_PORT 9,282
+#define USERNAME 11,315
+#define PASSWORD 12,349
+#define HEADER 13,380
+#define TYPE_EMPTY 16,439
+#define TYPE_INIT 17,478
+#define TYPE_LOGIN 18,516
+#define TYPE_HEART 19,555
+#define TYPE_ZIB 20,599
+#define TYPE_REALTIME 21,633
+#define TYPE_HISTORY 22,667
+#define TYPE_TIME_SHARE 23,701
+#define TYPE_AUTO_PUSH 24,735
+#define TYPE_SERVERINFO 25,769
+#define TYPE_DAY_CURPOS 26,803
+  NEW_PRICE,31,870
+  UP_RANGE,32,883
+  DOWN_RANGE33,895
+}column_n;column_n34,908
+char buff[buff36,920
+  char m_head[m_head40,959
+  int  m_length;41,978
+  unsigned short m_nType;42,997
+  char  m_nIndex;43,1023
+  char  m_Not;44,1044
+  long  m_lKey;45,1062
+  short m_cCodeType;46,1078
+  char  m_cCode[m_cCode47,1099
+  short m_nSize;48,1119
+  unsigned short m_nOption;49,1136
+  unsigned short code_type;50,1164
+  char code[code51,1192
+}RealPack;RealPack52,1208
+  unsigned short m_nType;56,1237
+  char m_nIndex;57,1263
+  char m_not;58,1280
+  long m_lKey;59,1294
+  short m_cCodeType;60,1309
+  char m_cCode[m_cCode61,1330
+  short m_nSize;62,1349
+  unsigned short m_nOption;63,1366
+  short m_cCodeType2;64,1394
+  char m_cCode2[m_cCode265,1416
+}AskData2;AskData266,1436
+  short m_cCodeType;70,1465
+  char m_cCode[m_cCode71,1486
+  char m_othData[m_othData73,1506
+  int m_cNowData[m_cNowData74,1528
+}CommRealTimeData2;CommRealTimeData276,1550
+  short m_cCodeType;80,1588
+  char m_cCode[m_cCode81,1630
+  unsigned short m_nTime;82,1666
+  unsigned short m_nSecond;83,1720
+  unsigned long m_lCurrent;84,1771
+  unsigned long m_lOutside;86,1800
+  unsigned long m_lInside;87,1836
+  unsigned long m_lPreClose;88,1872
+  unsigned long m_rate_status;89,1934
+}CommRealTimeData;CommRealTimeData90,1995
+  long m_lOpen;95,2047
+  long m_lMaxPrice;96,2086
+  long m_lMinPrice;97,2125
+  long m_lNewPrice;98,2164
+  unsigned long m_lTotal;99,2203
+  float m_fAvgPrice;100,2242
+  long m_lBuyPrice1;102,2285
+  long m_lBuyCount1;103,2324
+  long m_lBuyPrice2;104,2363
+  long m_lBuyCount2;105,2402
+  long m_lBuyPrice3;106,2441
+  long m_lBuyCount3;107,2480
+  long m_lBuyPrice4;108,2519
+  long m_lBuyCount4;109,2558
+  long m_lBuyPrice5;110,2597
+  long m_lBuyCount5;111,2636
+  long m_lSellPrice1;113,2676
+  long m_lSellCount1;114,2716
+  long m_lSellPrice2;115,2756
+  long m_lSellCount2;116,2796
+  long m_lSellPrice3;117,2836
+  long m_lSellCount3;118,2876
+  long m_lSellPrice4;119,2916
+  long m_lSellCount4;120,2956
+  long m_lSellPrice5;121,2996
+  long m_lSellCount5;122,3036
+  long m_nHand;124,3077
+  long m_lNationalDebtRatio;125,3120
+}HSStockRealTime;HSStockRealTime127,3179
+  char head[head131,3215
+  int  length;132,3231
+  unsigned short m_nType;133,3246
+  char   m_nIndex;134,3272
+  char   m_cOperator;135,3291
+}TestSrvData2;TestSrvData2136,3313
+  unsigned short m_nType;140,3347
+  short m_nAlignment;141,3373
+  long m_lZipLen;142,3395
+  long m_lOrigLen;143,3413
+  char m_cData[m_cData144,3432
+}TransZipData2;TransZipData2145,3451
+  unsigned short code_type;149,3485
+  char code[code150,3513
+}CodeInfo;CodeInfo151,3529
+typedef struct entity_s entity_t;153,3541
+#define AREA_NUMBER 155,3576
+#define AREA_QUEUE_DEFAULT_LEN 156,3599
+  int index;160,3666
+  entity_t * entity;161,3679
+}sort_area_queue_t;sort_area_queue_t162,3700
+  int area_index;167,3766
+  int min_value;169,3785
+  int max_value;170,3802
+  sort_area_queue_t * pre;172,3820
+  sort_area_queue_t * next;173,3847
+  sort_area_queue_t * cur;174,3875
+  int effect_min_value;176,3905
+  int effect_max_value;177,3929
+  int allow_size;179,3954
+  int real_size;180,3972
+}sort_area_t;sort_area_t181,3989
+struct entity_s183,4004
+  char code[code185,4022
+  int  pre_close;186,4038
+  int price;187,4083
+  float add;188,4114
+  float down;189,4127
+  float range;190,4141
+  int max;191,4162
+  int min;192,4173
+  int buy;193,4184
+  int sell;194,4195
+#define MAX_CHILDS 199,4292
+  int floor;202,4341
+  unsigned int childs[childs203,4354
+}my_key_t;my_key_t204,4389
+my_key_t key_root 206,4414
+  char file_name[file_name214,4597
+  char date[date215,4619
+  short code_type;216,4659
+  short unit;217,4678
+  char open_close_time[open_close_time218,4692
+  entity_t * list;220,4722
+  int entity_list_size;221,4741
+  sort_area_t sort_area_price[sort_area_price224,4783
+  int * sort_price_list;226,4831
+  int max_price;227,4872
+  int min_price;228,4889
+  int * sort_up_list;230,4907
+  int max_up;231,4948
+  int min_up;232,4962
+  int * sort_down_list;234,4977
+  int max_down;235,5020
+  int min_down;236,5036
+  int * sort_range_list;238,5053
+  int max_range;239,5091
+  int min_range;240,5108
+  int * sort_max_list;242,5128
+  int max_max;243,5168
+  int min_max;244,5183
+  int * sort_min_list;246,5201
+  int max_min;247,5241
+  int min_min;248,5256
+  int * sort_buy_list;250,5272
+  int max_buy;251,5312
+  int min_buy;252,5327
+  int * sort_sell_list;254,5343
+  int max_sell;255,5385
+  int min_sell;256,5401
+}market_t;market_t257,5417
+market_t market_list[market_list259,5429
+entity_t * entity_list;265,5636
+int last_time_market;267,5679
+int cur_time;268,5717
+int heart_times 269,5753
+
+cJSON.h,1059
+#define cJSON__h24,1114
+#define cJSON_False 32,1191
+#define cJSON_True 33,1213
+#define cJSON_NULL 34,1234
+#define cJSON_Number 35,1255
+#define cJSON_String 36,1278
+#define cJSON_Array 37,1301
+#define cJSON_Object 38,1323
+#define cJSON_IsReference 40,1348
+#define cJSON_StringIsConst 41,1378
+typedef struct cJSON 44,1438
+	struct cJSON *next,next45,1461
+	struct cJSON *next,*prev;prev45,1461
+	struct cJSON *child;child46,1602
+	int type;48,1736
+	char *valuestring;valuestring50,1790
+	int valueint;51,1859
+	double valuedouble;52,1924
+	char *string;string54,1995
+} cJSON;55,2117
+typedef struct cJSON_Hooks 57,2127
+      void *(*malloc_fn)malloc_fn58,2156
+      void (*free_fn)free_fn59,2193
+} cJSON_Hooks;60,2227
+#define cJSON_AddNullToObject(134,6577
+#define cJSON_AddTrueToObject(135,6677
+#define cJSON_AddFalseToObject(136,6777
+#define cJSON_AddBoolToObject(137,6879
+#define cJSON_AddNumberToObject(138,6981
+#define cJSON_AddStringToObject(139,7087
+#define cJSON_SetIntValue(142,7279
+#define cJSON_SetNumberValue(143,7383
+
+cJSON.c,3162
+static const char *ep;ep35,1286
+const char *cJSON_GetErrorPtr(cJSON_GetErrorPtr37,1310
+static int cJSON_strcasecmp(39,1360
+static char* cJSON_strdup(49,1724
+void cJSON_InitHooks(60,1941
+static cJSON *cJSON_New_Item(cJSON_New_Item73,2245
+void cJSON_Delete(81,2424
+static const char *parse_number(parse_number96,2843
+static int pow2gt 117,3725
+typedef struct {char *buffer;buffer119,3819
+typedef struct {char *buffer; int length;119,3819
+typedef struct {char *buffer; int length; int offset;119,3819
+typedef struct {char *buffer; int length; int offset; } printbuffer;119,3819
+static char* ensure(121,3889
+static int update(138,4368
+static char *print_number(print_number147,4575
+static unsigned parse_hex4(177,5377
+static const unsigned char firstByteMark[firstByteMark191,6214
+static const char *parse_string(parse_string192,6306
+static char *print_string_ptr(print_string_ptr252,8134
+static char *print_string(print_string309,9545
+static const char *skip(skip320,10134
+cJSON *cJSON_ParseWithOpts(cJSON_ParseWithOpts323,10295
+cJSON *cJSON_Parse(cJSON_Parse339,10903
+char *cJSON_Print(cJSON_Print342,11035
+char *cJSON_PrintUnformatted(cJSON_PrintUnformatted343,11103
+char *cJSON_PrintBuffered(cJSON_PrintBuffered345,11180
+static const char *parse_value(parse_value357,11460
+static char *print_value(print_value372,12145
+static const char *parse_array(parse_array406,13261
+static char *print_array(print_array434,14080
+static const char *parse_object(parse_object514,16098
+static char *print_object(print_object550,17286
+int    cJSON_GetArraySize(667,20448
+cJSON *cJSON_GetArrayItem(cJSON_GetArrayItem668,20558
+cJSON *cJSON_GetObjectItem(cJSON_GetObjectItem669,20684
+static void suffix_object(672,20880
+static cJSON *create_reference(create_reference674,21005
+void   cJSON_AddItemToArray(677,21239
+void   cJSON_AddItemToObject(678,21433
+void   cJSON_AddItemToObjectCS(679,21641
+void	cJSON_AddItemReferenceToArray(680,21913
+void	cJSON_AddItemReferenceToObject(681,22034
+cJSON *cJSON_DetachItemFromArray(cJSON_DetachItemFromArray683,22180
+void   cJSON_DeleteItemFromArray(685,22461
+cJSON *cJSON_DetachItemFromObject(cJSON_DetachItemFromObject686,22576
+void   cJSON_DeleteItemFromObject(687,22799
+void   cJSON_InsertItemInArray(690,22975
+void   cJSON_ReplaceItemInArray(692,23295
+void   cJSON_ReplaceItemInObject(695,23651
+cJSON *cJSON_CreateNull(cJSON_CreateNull698,23940
+cJSON *cJSON_CreateTrue(cJSON_CreateTrue699,24048
+cJSON *cJSON_CreateFalse(cJSON_CreateFalse700,24156
+cJSON *cJSON_CreateBool(cJSON_CreateBool701,24266
+cJSON *cJSON_CreateNumber(cJSON_CreateNumber702,24389
+cJSON *cJSON_CreateString(cJSON_CreateString703,24553
+cJSON *cJSON_CreateArray(cJSON_CreateArray704,24716
+cJSON *cJSON_CreateObject(cJSON_CreateObject705,24826
+cJSON *cJSON_CreateIntArray(cJSON_CreateIntArray708,24960
+cJSON *cJSON_CreateFloatArray(cJSON_CreateFloatArray709,25181
+cJSON *cJSON_CreateDoubleArray(cJSON_CreateDoubleArray710,25405
+cJSON *cJSON_CreateStringArray(cJSON_CreateStringArray711,25631
+cJSON *cJSON_Duplicate(cJSON_Duplicate714,25875
+void cJSON_Minify(741,27086
+
+market.c,151
+my_key_t key_root 4,41
+int init_market(8,125
+int out_market(66,1745
+int get_market(81,2103
+int save_key(202,6402
+int find_entity_by_key(240,7371
+
+sort.c,319
+int init_sort_area(16,593
+int my_sort(59,1917
+int sort_add(69,2081
+int sort_update(148,4120
+static int find_location(162,4388
+static int remove_entity(245,6287
+static int sort_area(296,7541
+static int sort_list(304,7648
+int display_sort(334,8330
+int sort_get(350,8681
+static int search_queue_index(438,10622
+
+test_sort.c,27
+#define N 2,18
+main(5,35
+
+market.h,1526
+#define __MARKET_H__2,21
+struct entity_s7,100
+  unsigned short type;9,118
+  char code[code10,141
+  int  pre_close;11,157
+  int pre_price;13,203
+  int price;14,257
+  int price_area[price_area15,288
+  float add;17,343
+  float down;18,356
+  float range;19,370
+  int max;20,385
+  int min;21,396
+  int buy;22,407
+  int sell;23,418
+#define MAX_CHILDS 28,515
+  int floor;31,564
+  unsigned int childs[childs32,577
+}my_key_t;my_key_t33,612
+struct market_s40,778
+  char file_name[file_name42,796
+  char date[date43,818
+  short code_type;44,858
+  short unit;45,877
+  char open_close_time[open_close_time46,891
+  entity_t * list;48,920
+  int entity_list_size;49,939
+  int yestoday_max;51,964
+  int yestoday_min;52,984
+  int setting_max;54,1005
+  int setting_min;55,1024
+  sort_area_t sort_area_price_zero;58,1059
+  sort_area_t sort_area_price[sort_area_price59,1095
+  int * sort_price_list;61,1140
+  int max_price;62,1181
+  int min_price;63,1198
+  int * sort_up_list;65,1216
+  int max_up;66,1257
+  int min_up;67,1271
+  int * sort_down_list;69,1286
+  int max_down;70,1329
+  int min_down;71,1345
+  int * sort_range_list;73,1362
+  int max_range;74,1400
+  int min_range;75,1417
+  int * sort_max_list;77,1435
+  int max_max;78,1475
+  int min_max;79,1490
+  int * sort_min_list;81,1506
+  int max_min;82,1546
+  int min_min;83,1561
+  int * sort_buy_list;85,1577
+  int max_buy;86,1617
+  int min_buy;87,1632
+  int * sort_sell_list;89,1648
+  int max_sell;90,1690
+  int min_sell;91,1706
+
+comm.h,24
+#define __COMM_H__2,19
+
+main.c,970
+int last_time_market;18,337
+int cur_time;19,375
+int heart_times 20,411
+bool may_show_sort 21,432
+app_request_t app_list[app_list22,460
+pthread_mutex_t work_mutex;23,500
+char * g_buff 26,536
+unsigned long g_buff_max_len 27,558
+unsigned long g_buff_len 28,592
+char * g_zib_buff 29,622
+uLong g_zib_buff_max_len 30,648
+uLong g_zib_buff_len 31,678
+bool is_simulate 34,716
+bool is_exit 38,835
+int socket_fd 39,857
+market_t market_list[market_list41,877
+int main(48,1085
+int get_content(127,3228
+int init_socket(155,3678
+void reset_socket(178,4176
+int send_realtime(189,4415
+void init_receive(237,5685
+void init_sort_display(312,7420
+void init_app(347,8144
+void write_app(414,9583
+int send_auto_push(455,10592
+int send_heart(491,11628
+int parse(508,12046
+int parse_realtime(564,13462
+do_stock(595,14374
+int parse_auto_push(652,15586
+int unpack(676,16283
+int get_index_by_code_ascii(736,17799
+void sig_stop(753,18068
+void sig_pipe(761,18193
+
+lib/http_get.c,84
+#define IPSTR 15,288
+#define PORT 16,320
+#define BUFSIZE 17,337
+int main(19,360
+
+lib/http_post.c,84
+#define IPSTR 15,291
+#define PORT 16,322
+#define BUFSIZE 17,339
+int main(19,362
+
+config.h,4377
+#define __CONFIG_H__2,21
+#define SERVER_MARKET_PRE 5,79
+#define SERVER_MARKET 8,228
+#define SERVER_MARKET_PORT 10,302
+#define USERNAME 12,335
+#define PASSWORD 13,369
+#define HEADER 14,400
+#define TYPE_EMPTY 17,459
+#define TYPE_INIT 18,498
+#define TYPE_LOGIN 19,536
+#define TYPE_HEART 20,575
+#define TYPE_ZIB 21,619
+#define TYPE_REALTIME 22,653
+#define TYPE_HISTORY 23,687
+#define TYPE_TIME_SHARE 24,721
+#define TYPE_AUTO_PUSH 25,755
+#define TYPE_SERVERINFO 26,789
+#define TYPE_DAY_CURPOS 27,823
+#define PAGE_SIZE 29,858
+#define AREA_NUMBER 30,881
+#define AREA_QUEUE_DEFAULT_LEN 31,904
+#define SORT_SHOW_MAX_NUM 32,939
+#define system_3234,969
+#define PIPE_NAME 36,1007
+#define APP_SIZE 37,1034
+#define int_t 41,1088
+#define uint_t 42,1106
+#define long_t 43,1134
+#define short_t 44,1154
+#define ushort_t 45,1176
+typedef enum option_s option_n;50,1223
+typedef enum column_s column_n;51,1255
+typedef struct sort_area_queue_s sort_area_queue_t;52,1287
+typedef struct market_s market_t;53,1339
+typedef struct entity_s entity_t;54,1373
+  int ivalue;58,1424
+  float fvalue;59,1438
+}value_t;value_t60,1454
+enum column_s63,1482
+  NEW_PRICE,65,1498
+  UP_RANGE,66,1511
+  DOWN_RANGE67,1523
+enum option_s71,1554
+  ADD,73,1570
+  UPDATE74,1577
+  bool is_create;80,1628
+  pid_t pid;81,1646
+  int app_fifo_fd;82,1659
+  int begin;83,1678
+  int size;84,1691
+}app_request_t;app_request_t85,1703
+  char m_head[m_head89,1737
+  int  m_length;90,1755
+  unsigned short m_nType;91,1772
+  char  m_nIndex;92,1798
+  char  m_Not;93,1816
+  long  m_lKey;94,1831
+  short m_cCodeType;95,1847
+  char  m_cCode[m_cCode96,1868
+  short m_nSize;97,1888
+  unsigned short m_nOption;98,1905
+  unsigned short code_type;99,1933
+  char code[code100,1961
+}RealPack;RealPack101,1977
+  char m_head[m_head105,2006
+  int  m_length;106,2024
+  unsigned short m_nType;107,2041
+  char  m_nIndex;108,2067
+  char  m_Not;109,2085
+  long  m_lKey;110,2100
+  short m_cCodeType;111,2116
+  char  m_cCode[m_cCode112,2137
+  short m_nSize;113,2157
+  unsigned short m_nOption;114,2174
+}RealPack_ex;RealPack_ex115,2202
+  unsigned short m_nType;119,2234
+  char m_nIndex;120,2260
+  char m_not;121,2277
+  long m_lKey;122,2291
+  short m_cCodeType;123,2306
+  char m_cCode[m_cCode124,2327
+  short m_nSize;125,2346
+  unsigned short m_nOption;126,2363
+  short m_cCodeType2;127,2391
+  char m_cCode2[m_cCode2128,2413
+}AskData2;AskData2129,2433
+  short m_cCodeType;133,2462
+  char m_cCode[m_cCode134,2483
+  char m_othData[m_othData136,2503
+  int m_cNowData[m_cNowData137,2525
+}CommRealTimeData2;CommRealTimeData2139,2547
+  short m_cCodeType;143,2585
+  char m_cCode[m_cCode144,2627
+  unsigned short m_nTime;145,2663
+  unsigned short m_nSecond;146,2717
+  unsigned long m_lCurrent;147,2768
+  unsigned long m_lOutside;149,2797
+  unsigned long m_lInside;150,2833
+  unsigned long m_lPreClose;151,2869
+  unsigned long m_rate_status;152,2931
+}CommRealTimeData;CommRealTimeData153,2992
+  long m_lOpen;158,3044
+  long m_lMaxPrice;159,3083
+  long m_lMinPrice;160,3122
+  long m_lNewPrice;161,3161
+  unsigned long m_lTotal;162,3200
+  float m_fAvgPrice;163,3239
+  long m_lBuyPrice1;165,3282
+  long m_lBuyCount1;166,3321
+  long m_lBuyPrice2;167,3360
+  long m_lBuyCount2;168,3399
+  long m_lBuyPrice3;169,3438
+  long m_lBuyCount3;170,3477
+  long m_lBuyPrice4;171,3516
+  long m_lBuyCount4;172,3555
+  long m_lBuyPrice5;173,3594
+  long m_lBuyCount5;174,3633
+  long m_lSellPrice1;176,3673
+  long m_lSellCount1;177,3713
+  long m_lSellPrice2;178,3753
+  long m_lSellCount2;179,3793
+  long m_lSellPrice3;180,3833
+  long m_lSellCount3;181,3873
+  long m_lSellPrice4;182,3913
+  long m_lSellCount4;183,3953
+  long m_lSellPrice5;184,3993
+  long m_lSellCount5;185,4033
+  long m_nHand;187,4074
+  long m_lNationalDebtRatio;188,4117
+}HSStockRealTime;HSStockRealTime190,4176
+  char head[head194,4212
+  int  length;195,4228
+  unsigned short m_nType;196,4243
+  char   m_nIndex;197,4269
+  char   m_cOperator;198,4288
+}TestSrvData2;TestSrvData2199,4310
+  unsigned short m_nType;203,4343
+  short m_nAlignment;204,4369
+  long m_lZipLen;205,4391
+  long m_lOrigLen;206,4409
+  char m_cData[m_cData207,4428
+}TransZipData2;TransZipData2208,4447
+  unsigned short code_type;212,4481
+  char code[code213,4509
+}CodeInfo;CodeInfo214,4525
+
+app.c,47
+#define MAX_BUFF_SIZE 11,175
+int main(13,205
+
+sort.h,434
+#define __SORT_H__2,19
+struct sort_area_queue_s5,55
+  int index;7,82
+  entity_t * entity;8,95
+  int area_index;14,165
+  value_t min_value;16,184
+  value_t max_value;17,205
+  sort_area_queue_t * pre;19,227
+  sort_area_queue_t * next;20,254
+  sort_area_queue_t * cur;21,282
+  value_t effect_min_value;23,310
+  value_t effect_max_value;24,338
+  int allow_size;26,367
+  int real_size;27,385
+}sort_area_t;sort_area_t28,402
+
+help.c,21
+int jim_malloc(4,39
+
+cJSON.h,1059
+#define cJSON__h24,1114
+#define cJSON_False 32,1191
+#define cJSON_True 33,1213
+#define cJSON_NULL 34,1234
+#define cJSON_Number 35,1255
+#define cJSON_String 36,1278
+#define cJSON_Array 37,1301
+#define cJSON_Object 38,1323
+#define cJSON_IsReference 40,1348
+#define cJSON_StringIsConst 41,1378
+typedef struct cJSON 44,1438
+	struct cJSON *next,next45,1461
+	struct cJSON *next,*prev;prev45,1461
+	struct cJSON *child;child46,1602
+	int type;48,1736
+	char *valuestring;valuestring50,1790
+	int valueint;51,1859
+	double valuedouble;52,1924
+	char *string;string54,1995
+} cJSON;55,2117
+typedef struct cJSON_Hooks 57,2127
+      void *(*malloc_fn)malloc_fn58,2156
+      void (*free_fn)free_fn59,2193
+} cJSON_Hooks;60,2227
+#define cJSON_AddNullToObject(134,6577
+#define cJSON_AddTrueToObject(135,6677
+#define cJSON_AddFalseToObject(136,6777
+#define cJSON_AddBoolToObject(137,6879
+#define cJSON_AddNumberToObject(138,6981
+#define cJSON_AddStringToObject(139,7087
+#define cJSON_SetIntValue(142,7279
+#define cJSON_SetNumberValue(143,7383

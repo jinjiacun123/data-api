@@ -78,6 +78,7 @@ enum option_s
 };
 
 //app request struct
+/*
 typedef struct
 {
   bool is_create;
@@ -88,6 +89,7 @@ typedef struct
   int begin;
   int size;
 }app_request_t;
+*/
 
 typedef struct{
   //  request_s_t pre;

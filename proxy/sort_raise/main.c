@@ -549,7 +549,16 @@ static int send_sort(app_request_t * my_app)
     //write app pipe
     my_market = &market_list[0];
     memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-    res = sort_get(my_market, my_app->begin, my_app->size, entity_list);
+    switch(my_app->column){
+    case 0:
+      res = sort_get(my_market, NEW_PRICE, my_app->begin, my_app->size, entity_list);
+      break;
+    case 1:
+      res = sort_get(my_market, RAISE, my_app->begin, my_app->size, entity_list);
+      break;
+    default:
+      break;
+    }
     assert(res == 0);
     res = write(my_app->app_fifo_fd, &entity_list, my_app->size*sizeof(entity_t));
     if(res == -1){
@@ -649,7 +658,6 @@ int parse(char * buff, uLongf  buff_len)
     }
     option_times ++;
     printf("option_times:%d\n", option_times);
-    sleep(3);
     //is_simulate = true;
     res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
     assert(res == 0);
@@ -736,6 +744,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   unsigned int code_type_index = 0;
   entity_t * entity;
   column_n column = NEW_PRICE;
+  int raise = -1;
   switch(code_type){
   case 0x110:{
     code_type_index = 0;
@@ -759,13 +768,20 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +sizeof(CommRealTimeData)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
 
-  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
+  entity->price = tmp->m_lNewPrice;
+  if(entity->price != 0){
+    entity->raise = entity->price - entity->pre_close;
+  }else{
+    entity->raise = 0;
+  }
+  printf("index:%d\tcode_type:%2x\tcode:%s\tclose_price:%d\tnew_price:%d\traise:%d\n",
 	 i,
 	 code_type,
 	 code,
-	 tmp->m_lNewPrice);
+	 entity->pre_close,
+	 tmp->m_lNewPrice,
+	 entity->raise);
 
-  entity->price = tmp->m_lNewPrice;
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);
@@ -774,13 +790,13 @@ do_stock(my_market, code_type, code, buff, i, option)
   switch(option){
   case ADD:{
     //add to sort
-    sort_add(my_market, entity, NEW_PRICE);
-    //sort_add(my_market, entity, RAISE);
+    //sort_add(my_market, entity, NEW_PRICE);
+    sort_add(my_market, entity, RAISE);
   }break;
   case UPDATE:{
     //update
     //sort_update(my_market, entity, NEW_PRICE);
-    sort_update(my_market, entity, RAISE);
+    //sort_update(my_market, entity, RAISE);
   }break;
   default:{
 

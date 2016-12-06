@@ -68,6 +68,7 @@ int main(int argc, char * argv[])
   app_request.pid = pid;
   app_request.begin = begin;
   app_request.size = size;
+  app_request.column = 0;
   res = write(pipe_write_fd, &app_request, app_request_len);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
@@ -98,9 +99,11 @@ int main(int argc, char * argv[])
     //display
     entity = (entity_t *)buff;
     for(i = 0; i<size; i++){
-      printf("code:%.6s,price:%d\n",
+      printf("code_type:%x\tcode:%.6s\tprice:%d\traise:%d\n",
+	     entity->type,
 	     entity->code,
-	     entity->price);
+	     entity->price,
+	     entity->raise);
       entity ++;
     }
     printf("------------------------------------\n");

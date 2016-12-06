@@ -489,15 +489,25 @@ int display_sort(my_market)
   return 0;
 }
 
-int sort_get(my_market, index, size, entity_list)
+int sort_get(my_market, column, index, size, entity_list)
      market_t * my_market;
+     column_n column;
      int index;
      int size;
      entity_t * entity_list;
 {
   sort_area_t * area = NULL;
   int cur_real_size = 0;
-  area = &my_market->sort_area_price;
+  switch(column){
+  case NEW_PRICE:
+    area = &my_market->sort_area_price;
+    break;
+  case RAISE:
+    area = &my_market->sort_area_raise;
+    break;
+  default:
+    break;
+  }
   entity_t * entity_target = &entity_list[0];
   entity_t * entity = NULL;
   int off = index;

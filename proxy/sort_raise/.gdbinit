@@ -4,11 +4,12 @@ b main
 #b send_auto_push
 #b 414
 #b 427
-b parse
+#b parse
+#b sort_get
 #b parse_auto_push
 #b parse_realtime
 #b init_sort_display
-#b sort_get
+b sort_get
 #b do_stock
 #b do_stock if i == 368
 #b do_stock if i == 7 
