@@ -1,0 +1,1 @@
+cc -w -g -fprofile-arcs -ftest-coverage main.o cJSON.o sort.c market.o help.o  -o main -pg -lm -lpthread -lz -lprofiler

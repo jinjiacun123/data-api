@@ -1,0 +1,344 @@
+==12584== Memcheck, a memory error detector
+==12584== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==12584== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==12584== Command: ./main
+==12584== Parent PID: 12583
+==12584== 
+==12584== Invalid write of size 1
+==12584==    at 0x402C6C3: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x8050337: get_market (market.c:145)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==12584== 
+==12584== 
+==12584== Process terminating with default action of signal 11 (SIGSEGV)
+==12584==  Access not within mapped region at address 0x0
+==12584==    at 0x402C6C3: strcpy (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x8050337: get_market (market.c:145)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584==  If you believe this happened as a result of a stack
+==12584==  overflow in your program's main thread (unlikely but
+==12584==  possible), you can try to increase the size of the
+==12584==  main thread stack using the --main-stacksize= flag.
+==12584==  The main thread stack size used in this run was 8388608.
+==12584== 
+==12584== HEAP SUMMARY:
+==12584==     in use at exit: 2,466,958 bytes in 11,369 blocks
+==12584==   total heap usage: 11,369 allocs, 0 frees, 2,466,958 bytes allocated
+==12584== 
+==12584== 5 bytes in 1 blocks are still reachable in loss record 1 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D41C: parse_value (cJSON.c:525)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 5 bytes in 1 blocks are still reachable in loss record 2 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D41C: parse_value (cJSON.c:525)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 7 bytes in 1 blocks are still reachable in loss record 3 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D4A5: parse_value (cJSON.c:529)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 8 bytes in 1 blocks are still reachable in loss record 4 of 32
+==12584==    at 0x402B9B4: operator new(unsigned int) (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x40B1731: ProfileHandler::RegisterCallback(void (*)(int, siginfo*, void*, void*), void*) (profile-handler.cc:342)
+==12584==    by 0x40B1C4B: ProfileHandlerRegisterCallback (profile-handler.cc:517)
+==12584==    by 0x40B03D2: CpuProfiler::EnableHandler() (profiler.cc:245)
+==12584==    by 0x40B053D: CpuProfiler::Start(char const*, ProfilerOptions const*) (profiler.cc:179)
+==12584==    by 0x40B099C: ProfilerStart (profiler.cc:302)
+==12584==    by 0x40D8532: (below main) (libc-start.c:226)
+==12584== 
+==12584== 9 bytes in 1 blocks are still reachable in loss record 5 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D4A5: parse_value (cJSON.c:529)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 12 bytes in 1 blocks are still reachable in loss record 6 of 32
+==12584==    at 0x402B9B4: operator new(unsigned int) (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x40B17A6: ProfileHandler::RegisterCallback(void (*)(int, siginfo*, void*, void*), void*) (new_allocator.h:92)
+==12584==    by 0x40B1C4B: ProfileHandlerRegisterCallback (profile-handler.cc:517)
+==12584==    by 0x40B03D2: CpuProfiler::EnableHandler() (profiler.cc:245)
+==12584==    by 0x40B053D: CpuProfiler::Start(char const*, ProfilerOptions const*) (profiler.cc:179)
+==12584==    by 0x40B099C: ProfilerStart (profiler.cc:302)
+==12584==    by 0x40D8532: (below main) (libc-start.c:226)
+==12584== 
+==12584== 14 bytes in 2 blocks are still reachable in loss record 7 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D539: parse_value (cJSON.c:537)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 15 bytes in 2 blocks are still reachable in loss record 8 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 16 bytes in 1 blocks are still reachable in loss record 9 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x413BDB0: strdup (strdup.c:43)
+==12584==    by 0x40B2034: ProfileData::Start(char const*, ProfileData::Options const&) (profiledata.cc:105)
+==12584==    by 0x40B0516: CpuProfiler::Start(char const*, ProfilerOptions const*) (profiler.cc:168)
+==12584==    by 0x40B099C: ProfilerStart (profiler.cc:302)
+==12584==    by 0x40D8532: (below main) (libc-start.c:226)
+==12584== 
+==12584== 36 bytes in 1 blocks are still reachable in loss record 10 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D884: cJSON_ParseWithOpts (cJSON.c:326)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 36 bytes in 1 blocks are still reachable in loss record 11 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D3C9: parse_value (cJSON.c:523)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 36 bytes in 1 blocks are still reachable in loss record 12 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D1D6: parse_value (cJSON.c:415)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 36 bytes in 1 blocks are still reachable in loss record 13 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D3C9: parse_value (cJSON.c:523)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 44 bytes in 1 blocks are still reachable in loss record 14 of 32
+==12584==    at 0x402B9B4: operator new(unsigned int) (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x40B1B21: ProfileHandler::Init() (profile-handler.cc:230)
+==12584==    by 0x4086E8D: pthread_once (pthread_once.S:122)
+==12584==    by 0x40B1B97: ProfileHandler::Instance() (profile-handler.cc:235)
+==12584==    by 0x40B1C03: ProfileHandlerRegisterThread (profile-handler.cc:512)
+==12584==    by 0x40AFCE3: ??? (profile-handler.cc:509)
+==12584==    by 0x400EE5A: call_init (dl-init.c:85)
+==12584==    by 0x400EF43: _dl_init (dl-init.c:134)
+==12584==    by 0x400120E: ??? (in /lib/i386-linux-gnu/ld-2.15.so)
+==12584== 
+==12584== 47 bytes in 5 blocks are still reachable in loss record 15 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D539: parse_value (cJSON.c:537)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 54 bytes in 4 blocks are still reachable in loss record 16 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 72 bytes in 2 blocks are still reachable in loss record 17 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D4E9: parse_value (cJSON.c:535)
+==12584==    by 0x804D229: parse_value (cJSON.c:417)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 180 bytes in 5 blocks are still reachable in loss record 18 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D4E9: parse_value (cJSON.c:535)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 4,537 bytes in 1 blocks are definitely lost in loss record 19 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x805086B: jim_malloc (help.c:10)
+==12584==    by 0x8050134: get_market (market.c:126)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 4,537 bytes in 1 blocks are definitely lost in loss record 20 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x805086B: jim_malloc (help.c:10)
+==12584==    by 0x80501C1: get_market (market.c:129)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 4,537 bytes in 1 blocks are definitely lost in loss record 21 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x805086B: jim_malloc (help.c:10)
+==12584==    by 0x805024E: get_market (market.c:132)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 5,665 bytes in 1,133 blocks are still reachable in loss record 22 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D41C: parse_value (cJSON.c:525)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 7,931 bytes in 1,133 blocks are still reachable in loss record 23 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D4A5: parse_value (cJSON.c:529)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 15,862 bytes in 2,266 blocks are still reachable in loss record 24 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804D539: parse_value (cJSON.c:537)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 16,608 bytes in 2,266 blocks are still reachable in loss record 25 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804A960: parse_string (cJSON.c:199)
+==12584==    by 0x804CE7F: parse_value (cJSON.c:363)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 40,788 bytes in 1,133 blocks are still reachable in loss record 26 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D26D: parse_value (cJSON.c:423)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 40,788 bytes in 1,133 blocks are still reachable in loss record 27 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D3C9: parse_value (cJSON.c:523)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 50,072 bytes in 1 blocks are still reachable in loss record 28 of 32
+==12584==    at 0x402A5E6: calloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x41B1094: monstartup (gmon.c:134)
+==12584==    by 0xBEBD3659: ???
+==12584==    by 0x622F3D4B: ???
+==12584== 
+==12584== 63,505 bytes in 1 blocks are definitely lost in loss record 29 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x805086B: jim_malloc (help.c:10)
+==12584==    by 0x80500A7: get_market (market.c:123)
+==12584==    by 0x8050765: init_market (market.c:45)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 81,576 bytes in 2,266 blocks are still reachable in loss record 30 of 32
+==12584==    at 0x402BE68: malloc (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x804AE67: cJSON_New_Item (cJSON.c:75)
+==12584==    by 0x804D4E9: parse_value (cJSON.c:535)
+==12584==    by 0x804D2BD: parse_value (cJSON.c:425)
+==12584==    by 0x804D5C7: parse_value (cJSON.c:541)
+==12584==    by 0x804D8D9: cJSON_ParseWithOpts (cJSON.c:330)
+==12584==    by 0x804D9D4: cJSON_Parse (cJSON.c:339)
+==12584==    by 0x80506E1: init_market (market.c:38)
+==12584==    by 0x8049B0F: main (main.c:46)
+==12584== 
+==12584== 1,048,576 bytes in 1 blocks are still reachable in loss record 31 of 32
+==12584==    at 0x402B454: operator new[](unsigned int) (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x40B206D: ProfileData::Start(char const*, ProfileData::Options const&) (profiledata.cc:114)
+==12584==    by 0x40B0516: CpuProfiler::Start(char const*, ProfilerOptions const*) (profiler.cc:168)
+==12584==    by 0x40B099C: ProfilerStart (profiler.cc:302)
+==12584==    by 0x40D8532: (below main) (libc-start.c:226)
+==12584== 
+==12584== 1,081,344 bytes in 1 blocks are still reachable in loss record 32 of 32
+==12584==    at 0x402B454: operator new[](unsigned int) (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==12584==    by 0x40B205F: ProfileData::Start(char const*, ProfileData::Options const&) (profiledata.cc:113)
+==12584==    by 0x40B0516: CpuProfiler::Start(char const*, ProfilerOptions const*) (profiler.cc:168)
+==12584==    by 0x40B099C: ProfilerStart (profiler.cc:302)
+==12584==    by 0x40D8532: (below main) (libc-start.c:226)
+==12584== 
+==12584== LEAK SUMMARY:
+==12584==    definitely lost: 77,116 bytes in 4 blocks
+==12584==    indirectly lost: 0 bytes in 0 blocks
+==12584==      possibly lost: 0 bytes in 0 blocks
+==12584==    still reachable: 2,389,842 bytes in 11,365 blocks
+==12584==         suppressed: 0 bytes in 0 blocks
+==12584== 
+==12584== For counts of detected and suppressed errors, rerun with: -v
+==12584== ERROR SUMMARY: 5 errors from 5 contexts (suppressed: 0 from 0)
