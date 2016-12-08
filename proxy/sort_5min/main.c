@@ -748,6 +748,10 @@ do_stock(my_market, code_type, code, buff, i, option)
   unsigned int code_type_index = 0;
   entity_t * entity;
   column_n column = NEW_PRICE;
+  char cmd_line[100];
+  int ret = -1;
+
+  memset(&cmd_line, 0x00, 100);
   switch(code_type){
   case 0x110:{
     code_type_index = 0;
@@ -765,7 +769,10 @@ do_stock(my_market, code_type, code, buff, i, option)
   address = find_entity_by_key(code, 6, code_type_index);
   assert(address != NULL);
   entity = (entity_t *)address;
-
+  CommRealTimeData * p_real_time = (CommRealTimeData*)(buff
+						       +20
+						       +i*(sizeof(CommRealTimeData)
+							   +sizeof(HSStockRealTime)));
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
 					      +sizeof(CommRealTimeData)
@@ -782,6 +789,14 @@ do_stock(my_market, code_type, code, buff, i, option)
   entity->min         = tmp->m_lMinPrice;
   entity->total       = tmp->m_lTotal;
   entity->money       = tmp->m_fAvgPrice;
+  entity->time        = p_real_time->m_nTime*60 + p_real_time->m_nSecond;
+  ret = snprintf(cmd_line,
+		 "python ./txt/save_five_minit.py -a  %2x %s %d %d",
+		 entity->type,
+		 entity->code,
+		 entity->price,
+		 entity->time);
+  system(cmd_line);
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);

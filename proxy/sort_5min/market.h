@@ -17,9 +17,10 @@ struct entity_s
   int price;       //now price
   int price_area[2]; //first is area, second is queue
 
-  float add;
-  float down;
-  float range;
+  int raise;
+  int five_minit_price;
+  int time;
+
   int max;
   int min;
   int total;

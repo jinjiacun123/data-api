@@ -285,6 +285,92 @@ typedef struct
   #endif
 }HSStockRealTime;
 
+typedef struct{
+  #ifdef system_32
+  long m_lOpen;
+  long m_lMaxPrice;
+  long m_lMinPrice;
+  long m_lNewPrice;
+  #else
+  int m_lOpen;
+  int m_lMaxPrice;
+  int m_lMinPrice;
+  int m_lNewPrice;
+  #endif
+
+  #ifdef system_32
+  unsigned long m_lTotal;
+  unsigned long m_lChiCangLiang;
+  #else
+  unsigned int m_lTotal;
+  unsigned int m_lChiCangLiang;
+  #endif
+
+  #ifdef system_32
+  long m_lBuyPrice1;
+  long m_lBuyContent1;
+  long m_lSellPrice1;
+  long m_lSellCount1;
+  long m_lPreJieSuanPrice;
+  #else
+  int m_lBuyPrice1;
+  int m_lBuyContent1;
+  int m_lSellPrice1;
+  int m_lSellCount1;
+  int m_lPreJieSuanPrice;
+  #endif
+
+  #ifdef system_32
+  long m_lBuyPrice2;
+  unsigned short m_lBuyCount2;
+  long m_lBuyPrice3;
+  unsigned short_lBuyCount3;
+  long m_lBuyPrice4;
+  unsigned short m_lBuyCount4;
+  long m_lBuyPrice5;
+  unsigned short m_lBuyCount5;
+  #else
+  long m_lBuyPrice2;
+  unsigned short m_lBuyCount2;
+  long m_lBuyPrice3;
+  unsigned short_lBuyCount3;
+  long m_lBuyPrice4;
+  unsigned short m_lBuyCount4;
+  long m_lBuyPrice5;
+  unsigned short m_lBuyCount5;
+  #endif
+
+  #ifdef system_32
+  long m_lSellPrice2;
+  unsigned short m_lSellCount2;
+  long m_lSellPrice3;
+  unsigned short m_lSellCount3;
+  long m_lSellPrice4;
+  unsigned short m_lSellCount4;
+  long m_lSellPrice5;
+  unsigned short m_lSellCount5;
+  #else
+  int m_lSellPrice2;
+  unsigned short m_lSellCount2;
+  int m_lSellPrice3;
+  unsigned short m_lSellCount3;
+  int m_lSellPrice4;
+  unsigned short m_lSellCount4;
+  int m_lSellPrice5;
+  unsigned short m_lSellCount5;
+  #endif
+
+  #ifdef system_32
+  long m_lPreClose1;
+  long m_nhand;
+  long m_lPreCloseChiCang;
+  #else
+  int m_lPreClose1;
+  int m_nhand;
+  int m_lPreCloseChiCang;
+  #endif
+}HSQHRealTime2;
+
 typedef struct
 {
   char head[4];
