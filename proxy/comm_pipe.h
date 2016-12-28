@@ -16,8 +16,6 @@ typedef struct
   int column;
   int begin;
   int size;
-  int total;
-  int money;
 }app_request_t;
 
 typedef enum{

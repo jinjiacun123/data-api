@@ -58,8 +58,8 @@ struct entity_s{
   float range;
   int max;
   int min;
-  int buy;
-  int sell;
+  int total;
+  int moeny;
 };
 #define TYPE_REALTIME 0X0201
 #define system_32

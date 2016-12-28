@@ -106,8 +106,8 @@ struct entity_s
   float range;
   int max;
   int min;
-  int buy;
-  int sell;
+  int total;
+  int money;
 };
 
 //buff------------------------------------------------------------
