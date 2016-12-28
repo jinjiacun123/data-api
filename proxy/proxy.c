@@ -277,7 +277,7 @@ void main(int argc,char *argv[])
 void WriteErrLog(const char *i_sFormat,...)
 {
   va_list args;
-  char  *sLogFile="/home/jim/source_code/data-api/test/proxy/err.log";
+  char  *sLogFile="/tmp/err.log";
   FILE  *fLogFile;
   time_t tWriteTime;
   char  sWriteTime[20];

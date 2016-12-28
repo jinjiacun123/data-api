@@ -17,7 +17,6 @@
 #include "market.h"
 #include "./../comm_pipe.h"
 
-
 int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
@@ -509,6 +508,11 @@ void init_app(void *param)
 	    res = send_sort(my_app);
 	    assert(res == 0);
 	    break;
+	  }else{
+	    //checked process is alive
+	    if(kill(my_app->pid, 0) != 0){
+	      close(my_app->app_fifo_fd);
+	    }
 	  }
 	}
       }
