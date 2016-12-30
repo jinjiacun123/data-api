@@ -512,6 +512,7 @@ static int deal_server_info(client_socket_fd,
   char tmp_buff[BUFSIZ]={0};
   int ret = -1;
   int nread = -1;
+  int wret = -1;
 
   //recive server info
   *alive_times++;
@@ -521,10 +522,25 @@ L1:  length = 8;
     n = 0;
     while((nread = read(proxy_client_socket_fd, tmp_buff, BUFSIZ-1))>0){
       n += nread;
-      ret = write(client_socket_fd, tmp_buff, nread);
-      if(ret <= 0){
-	WriteErrLog("%s write to client err!errno:%d\n", client_ip, errno);
-	exit(-1);
+      int off_len = 0;
+      int write_len = nread;      	
+      while(wret = write(client_socket_fd, tmp_buff+off_len, write_len)){
+      	if(wret <= 0){
+		if(errno == EAGAIN){
+            	usleep(1000);
+	    	continue;
+		}else{
+			WriteErrLog("%s write to client err!errno:%d\n", client_ip, errno);
+			exit(-1);
+		}
+      	}        
+	
+        if(wret == write_len){
+		break;
+	}
+	
+        off_len += wret;
+	write_len -= wret;
       }
       if(nread < BUFSIZ -1)
 	return 0;
@@ -1231,7 +1247,7 @@ void * deal_request_of_sort(pid,
   memset(sort_buff, 0x00, sort_buff_len);
   */
 
-  WriteErrLog("begin:%d,size:%d\n", begin, size);
+  WriteErrLog("begin:%d,size:%d,option:%d\n", begin, size, option);
   app_request_t app_request;
   memset(&app_request, 0x00, sizeof(app_request_t));
   //request

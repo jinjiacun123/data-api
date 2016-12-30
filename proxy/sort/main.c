@@ -320,34 +320,11 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
     entity ++;
   }
 
-  if(send(socket_fd, request, request_length, 0)){
-    printf("send success!\n");
+  int ret = 0;
+  if((ret = send(socket_fd, request, request_length, 0))){
+    printf("ret:%d, send success!\n", ret);
     return 0;
   }
-  /*
-  int send_length = 340;
-  int send_off = 0;
-  int send_ret = 0;
-  if(send_length < request_length){
-    while(send_ret = send(socket_fd, request+send_off, send_length, 0)){
-      if(send_ret > 0){
-	send_off += send_length;
-	if(request_length - send_off > 340){
-	  send_length = 340;
-	}else{
-	  send_length = request_length - send_off;
-	}
-      }else{
-       return 1;
-      }
-    }
-  }else{
-    if(send(socket_fd, request, request_length, 0)){
-	printf("send success!\n");
-	return 1;
-      }
-  }
-  */
 
   return -1;
 }
