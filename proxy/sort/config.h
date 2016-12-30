@@ -4,12 +4,20 @@
 #include<stdbool.h>
 #include<string.h>
 #include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/ioctl.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include<arpa/inet.h>
+#include<netdb.h>
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 #define SERVER_MARKET_DEMAIN "dsapp.yz.zjwtj.com"
 //#define SERVER_MARKET "127.0.0.1"
-//#define SERVER_MARKET_PORT 8001
-#define SERVER_MARKET "221.6.167.245"
-#define SERVER_MARKET_PORT 8881
+#define SERVER_MARKET "192.168.1.131"
+#define SERVER_MARKET_PORT 8800
+//#define SERVER_MARKET "221.6.167.245"
+//#define SERVER_MARKET_PORT 8881
 //#define SERVER_MARKET "192.168.1.131"
 //#define SERVER_MARKET "127.0.0.1"
 //#define SERVER_MARKET_PORT 8001

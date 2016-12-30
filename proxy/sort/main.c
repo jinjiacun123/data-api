@@ -94,8 +94,8 @@ int main()
   assert(ret == 0);
 
   //init server's login
-  ret = init_login(socket_fd);
-  assert( ret == 0);
+  //ret = init_login(socket_fd);
+  //assert( ret == 0);
 
   //init mutext
   ret = pthread_mutex_init(&work_mutex, NULL);
@@ -110,7 +110,7 @@ int main()
   //---init data and sort
   //get realtime data
   ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
-  assert(ret == 0);
+  //  assert(ret == 0);
   //send_realtime(socket_fd, 0, 100, 0);
   //---auto push data---
   //sleep(4);
@@ -188,6 +188,10 @@ int init_socket(int * socket_fd)
     printf("socket() failrue!\n");
     return -1;
   }
+
+  //  int v = 10*1024;
+  // int len;
+  //int rt = setsocket(socket_fd, SQL_SOCKET, SO_SENDBUF, (char*)&v, sizeof(v));
 
   if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
     printf("connect() failure!\n");
@@ -320,6 +324,30 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
     printf("send success!\n");
     return 0;
   }
+  /*
+  int send_length = 340;
+  int send_off = 0;
+  int send_ret = 0;
+  if(send_length < request_length){
+    while(send_ret = send(socket_fd, request+send_off, send_length, 0)){
+      if(send_ret > 0){
+	send_off += send_length;
+	if(request_length - send_off > 340){
+	  send_length = 340;
+	}else{
+	  send_length = request_length - send_off;
+	}
+      }else{
+       return 1;
+      }
+    }
+  }else{
+    if(send(socket_fd, request, request_length, 0)){
+	printf("send success!\n");
+	return 1;
+      }
+  }
+  */
 
   return -1;
 }

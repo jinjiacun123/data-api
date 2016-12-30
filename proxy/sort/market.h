@@ -24,8 +24,6 @@ struct entity_s
   int min;
   int total;
   int money;
-  int total;
-  int avg_price;
 };
 
 //from first floor to sixth floor

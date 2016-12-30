@@ -57,7 +57,8 @@ def change_json_to_struct(json_str, data_file):
                 write_struct_file(data_file, s)
 
 if __name__ == '__main__':
-	file_name_list = ["1101", "1201", "1206", "120b"]
+	file_name_list = ["1206"]
+        #["1101", "1201", "1206", "120b"]
 	#["1101", "1201", "1206", "120b"]
 	data_file_name = "./my_data"
 	#get source

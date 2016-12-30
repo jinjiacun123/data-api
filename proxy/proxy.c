@@ -509,7 +509,7 @@ static int deal_server_info(client_socket_fd,
   char header_buff[8];
   int length, len, n;
   p_response_header p_header;
-  char tmp_buff[BUFSIZ];
+  char tmp_buff[BUFSIZ]={0};
   int ret = -1;
   int nread = -1;
 
@@ -528,6 +528,7 @@ L1:  length = 8;
       }
       if(nread < BUFSIZ -1)
 	return 0;
+      memset(tmp_buff, 0x00, BUFSIZ);
     }
     if(nread == -1 && errno != EAGAIN){
       return 0;
@@ -623,8 +624,8 @@ static int deal_client_info(client_socket_fd,
   int ret;
   app_request_data * my_app_request_data = NULL;
   int status = -1;
-  char tmp_buff[BUFSIZ];
-  char sort_buff[1024];
+  char tmp_buff[BUFSIZ] = {0};
+  char sort_buff[1024] = {0};
   int nread = -1;
   int package_length = 0;
 
