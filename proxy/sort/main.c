@@ -720,7 +720,8 @@ int parse_realtime(char * buff, uLongf buff_len)
     //code_len = strlen(data_type->m_cCode);
     strncpy(code, data_type->m_cCode, 6);
     code[6] = '\0';
-    //printf("code:%s\n", code);
+    //printf("i:%d, code:%6s\n", i, code);
+    
     switch(data_type->m_cCodeType){
     case 0x1101:{
       my_market = &market_list[index];
@@ -740,6 +741,7 @@ int parse_realtime(char * buff, uLongf buff_len)
     }break;
     }
   }
+
   return 0;
 }
 
@@ -771,9 +773,9 @@ do_stock(my_market, code_type, code, buff, i, option)
     code_type_index = 3;
   }break;
   }
-  address = find_entity_by_key(code, 6, code_type_index);
-  assert(address != NULL);
-  entity = (entity_t *)address;
+  //address = find_entity_by_key(code, 6, code_type_index);
+  //assert(address != NULL);
+  //entity = (entity_t *)address;
 
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
@@ -785,6 +787,7 @@ do_stock(my_market, code_type, code, buff, i, option)
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
+  return 0;
 
   entity->price       = tmp->m_lNewPrice;
   entity->max         = tmp->m_lMaxPrice;
