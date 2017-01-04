@@ -14,11 +14,11 @@
 #define SERVER_MARKET_PRE "http://dsapp.yz.zjwtj.com:8010/initinfo/stock/"
 #define SERVER_MARKET_DEMAIN "dsapp.yz.zjwtj.com"
 //#define SERVER_MARKET "127.0.0.1"
-#define SERVER_MARKET "192.168.1.131"
-#define SERVER_MARKET_PORT 8800
+//#define SERVER_MARKET "192.168.1.131"
+//#define SERVER_MARKET_PORT 8800
 //#define SERVER_MARKET_PORT 8001
-//#define SERVER_MARKET "221.6.167.245"
-//#define SERVER_MARKET_PORT 8881
+#define SERVER_MARKET "221.6.167.245"
+#define SERVER_MARKET_PORT 8881
 //#define SERVER_MARKET "192.168.1.131"
 //#define SERVER_MARKET "127.0.0.1"
 //#define SERVER_MARKET_PORT 8001

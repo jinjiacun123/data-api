@@ -94,8 +94,8 @@ int main()
   assert(ret == 0);
 
   //init server's login
-  //ret = init_login(socket_fd);
-  //assert( ret == 0);
+  ret = init_login(socket_fd);
+  assert( ret == 0);
 
   //init mutext
   ret = pthread_mutex_init(&work_mutex, NULL);
@@ -773,9 +773,9 @@ do_stock(my_market, code_type, code, buff, i, option)
     code_type_index = 3;
   }break;
   }
-  //address = find_entity_by_key(code, 6, code_type_index);
-  //assert(address != NULL);
-  //entity = (entity_t *)address;
+  address = find_entity_by_key(code, 6, code_type_index);
+  assert(address != NULL);
+  entity = (entity_t *)address;
 
   HSStockRealTime * tmp = (HSStockRealTime *)(buff
 					      +20
@@ -787,7 +787,7 @@ do_stock(my_market, code_type, code, buff, i, option)
 	 code_type,
 	 code,
 	 tmp->m_lNewPrice);
-  return 0;
+  //return 0;
 
   entity->price       = tmp->m_lNewPrice;
   entity->max         = tmp->m_lMaxPrice;
