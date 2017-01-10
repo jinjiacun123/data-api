@@ -56,8 +56,9 @@ struct entity_s{
   int raise;
   int raise_area[2];
 
-  float down;
-  float range;
+  int range;
+  int range_area[2];
+
   int max;
   int min;
   int total;
@@ -225,7 +226,7 @@ static int request_sort(int socket_fd)
 
   memcpy(my_request_sort.header_name, HEADER_EX, 4);
   my_request_sort.body_len = sizeof(request_sort_t)-8;
-  my_request_sort.app_request.column = 1;
+  my_request_sort.app_request.column = 2;
   my_request_sort.app_request.option = 0;
   my_request_sort.app_request.index = 0;
   my_request_sort.app_request.begin = 1000;

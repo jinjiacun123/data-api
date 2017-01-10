@@ -68,7 +68,8 @@ typedef union
 enum column_s
 {
   NEW_PRICE,
-  RAISE
+  RAISE,
+  RANGE
 };
 
 //option type

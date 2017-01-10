@@ -10,7 +10,7 @@ cJSON.o:cJSON.c
 	$(CC) -g -w -fprofile-arcs -ftest-coverage -c cJSON.c -pg 
 
 sort.o:sort.c
-	$(CC) -g -w -fprofile-arcs -ftest-coverage -c sort.c -pg 
+	$(CC) -g -w -fprofile-arcs -ftest-coverage -c sort.c -pg -lm
 
 market.o:market.c
 	$(CC) -g -w -fprofile-arcs -ftest-coverage -c market.c -pg 

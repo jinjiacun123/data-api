@@ -1250,14 +1250,16 @@ void * deal_request_of_sort(pid,
   app_request_data * my_app_request_data = (app_request_data  *)p_app_request_data;
   char * sort_buff;
   int sort_buff_len;
-  int option = -1;
+  int option = 0;
+  int column = 0;
 
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
   my_request = (app_request_t *)my_app_request_data->buff;
-  begin = my_request->begin;
-  size  = my_request->size;
+  begin  = my_request->begin;
+  size   = my_request->size;
   option = my_request->option;
+  column = my_request->column;
 
   int app_request_len = sizeof(app_request_t);
   int res = 0;

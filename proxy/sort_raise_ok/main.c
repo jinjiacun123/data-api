@@ -464,6 +464,7 @@ void init_app(void *param)
     res = read(fifo_fd, app_request_buff, app_request_len);
     if(res < 0){
       if(errno == EAGAIN){
+	usleep(1000);
 	continue;
       }
       printf("receive client app request error!\nx");
@@ -560,22 +561,19 @@ static int send_sort(app_request_t * my_app)
     my_market = &market_list[0];
     entity_list_size = my_market->entity_list_size;
     memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-    if(my_app->column == 0){
-      if(my_app->begin < entity_list_size
-      && my_app->begin + my_app->size < entity_list_size){
-        res = sort_get(my_market, NEW_PRICE, my_app->begin, my_app->size, entity_list);
-     }else if(my_app->begin < entity_list_size){
-        res = sort_get(my_market, NEW_PRICE, my_app->begin, entity_list_size - my_app->begin, entity_list);
-     }
-    }
-    else if(my_app->column == 1){
-      if(my_app->begin < entity_list_size
-      && my_app->begin + my_app->size < entity_list_size){
-        res = sort_get(my_market, RAISE, my_app->begin, my_app->size, entity_list);
-     }
-     else if(my_app->begin < entity_list_size){
-        res = sort_get(my_market, RAISE, my_app->begin, entity_list_size - my_app->begin, entity_list);
-     }
+    if(my_app->begin < entity_list_size
+       && my_app->begin + my_app->size < entity_list_size){
+      res = sort_get(my_market,
+		     my_app->column,
+		     my_app->begin,
+		     my_app->size,
+		     entity_list);
+    }else if(my_app->begin < entity_list_size){
+      res = sort_get(my_market,
+		     my_app->column,
+		     my_app->begin,
+		     entity_list_size - my_app->begin,
+		     entity_list);
     }
     assert(res == 0);
     res = write(my_app->app_fifo_fd, &my_app->option, sizeof(int));
@@ -798,21 +796,32 @@ do_stock(my_market, code_type, code, buff, i, option)
 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
 
   entity->price       = tmp->m_lNewPrice;
-  if(entity->price == 0)
+  if(entity->price == 0){
     entity->raise = 0;
-  else
+    entity->range = 0;
+  }
+  else{
     entity->raise  = entity->price - entity->pre_close;
+    entity->range  = entity->raise *10000 / entity->pre_close;
+  }
   entity->max         = tmp->m_lMaxPrice;
   entity->min         = tmp->m_lMinPrice;
   entity->total       = tmp->m_lTotal;
   entity->money       = tmp->m_fAvgPrice;
-  printf("index:%d\tcode_type:%2x\tcode:%s\tpre_close:%d\tnew_price:%d\traise:%d\n",
+  printf("index:%d, \
+          code_type:%2x, \
+          code:%s, \
+          pre_close:%d, \
+          new_price:%d, \
+          raise:%d, \
+          range:%d\n",
 	 i,
 	 code_type,
 	 code,
 	 entity->pre_close,
 	 entity->price,
-	 entity->raise);
+	 entity->raise,
+	 entity->range);
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);
@@ -823,11 +832,13 @@ do_stock(my_market, code_type, code, buff, i, option)
     //add to sort
     sort_add(my_market, entity, NEW_PRICE);
     sort_add(my_market, entity, RAISE);
+    sort_add(my_market, entity, RANGE);
   }break;
   case UPDATE:{
     //update
     sort_update(my_market, entity, NEW_PRICE);
     sort_update(my_market, entity, RAISE);
+    sort_update(my_market, entity, RANGE);
   }break;
   default:{
 

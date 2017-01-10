@@ -104,12 +104,19 @@ int main(int argc, char * argv[])
     //display
     entity = (entity_t *)(buff + sizeof(int));
     for(i = 0; i<my_size; i++){
-      printf("code_type:%x, code:%.6s,pre_close:%d,price:%d,raise:%d\n",
+      printf("code_type:%x, \
+code:%.6s, \
+pre_close:%d, \
+price:%d, \
+raise:%d, \
+range:%d, \
+\n",
 	     entity->type,
 	     entity->code,
 	     entity->pre_close,
 	     entity->price,
-	     entity->raise);
+	     entity->raise,
+	     entity->range);
       entity ++;
     }
     printf("------------------------------------\n");

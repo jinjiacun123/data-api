@@ -13,13 +13,13 @@ b main
 #b do_stock if i == 368
 #b do_stock if i == 7 
 #b do_stock if i = 5
-b do_stock if i == 422
+#b do_stock if i == 422
 #b do_stock if((int)$gdb_strcmp(code, "600008") == 0)
 #b do_stock if((int)strcmp(600010", code)) == 0
 #b sort_add
 #b sort_get
 #b get_market
-#b init_sort_area
+b init_sort_area
 #b unpack
 #b save_key
 #b find_entity_by_key

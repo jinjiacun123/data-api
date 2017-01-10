@@ -19,9 +19,10 @@ struct entity_s
 
   int raise;
   int raise_area[2];
-  
-  float down;
-  float range;
+
+  int range;
+  int range_area[2];
+
   int max;
   int min;
   int total;
@@ -63,6 +64,7 @@ struct market_s
   sort_area_t sort_area_price_zero;
   sort_area_t sort_area_price[AREA_NUMBER];
   sort_area_t sort_area_raise[AREA_NUMBER];
+  sort_area_t sort_area_range[AREA_NUMBER];
 
   int max_price;
   int min_price;

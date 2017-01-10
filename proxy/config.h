@@ -103,9 +103,10 @@ struct entity_s
 
   int raise;
   int raise_area[2];
-  
-  float down;
-  float range;
+
+  int range;
+  int range_area[2];
+
   int max;
   int min;
   int total;
