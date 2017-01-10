@@ -101,7 +101,9 @@ struct entity_s
   int price;       //now price
   int price_area[2]; //first is area, second is queue
 
-  float add;
+  int raise;
+  int raise_area[2];
+  
   float down;
   float range;
   int max;

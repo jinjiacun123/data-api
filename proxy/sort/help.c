@@ -7,11 +7,11 @@ int jim_malloc(int size, void ** out){
   page_size = ceil(size / 4);
   length = page_size * 4;
   //  if(length == size) length = (page_size+1)*4;
-  *out = (void *)malloc(size);
+  *out = (void *)malloc(size+1);
   if(*out == NULL){
     printf("malloc error!\n");
     return -1;
   }
-  memset(*out, 0x00, size);
+  memset(*out, 0x00, size+1);
   return 0;
 }

@@ -8,8 +8,7 @@ my_key_t key_root = {0};
 extern market_t market_list[];
 
 //get code for both market
-int init_market()
-{
+int init_market(){
   char * data_file_name = "./txt/my_data";
   FILE * fp = fopen(data_file_name, "r");
 
@@ -27,7 +26,7 @@ int init_market()
   }
   fseek(fp, 0L, SEEK_SET);
   //stock
-  size = 10;
+  //size = 200;
   get_market(index, fp, size);
   close(fp);
   return 0;

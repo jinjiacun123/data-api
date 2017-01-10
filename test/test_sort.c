@@ -53,7 +53,9 @@ struct entity_s{
   int price;       //now price
   int price_area[2]; //first is area, second is queue
 
-  float add;
+  int raise;
+  int raise_area[2];
+
   float down;
   float range;
   int max;
@@ -121,7 +123,6 @@ int main()
   }
 
   //init receive
-  
   ret = pthread_create(&t_id, NULL, init_receive, NULL);
   if(ret != 0){
     perror("create thread err!\n");
@@ -129,10 +130,8 @@ int main()
   }
 
   //send sort request
-  /*
   ret = request_sort(client);
   assert(ret == 0);
-  */
   /*
   sleep(3);
   option = 1;
@@ -140,16 +139,17 @@ int main()
   assert(ret == 0);
   */
 
-  
+  /*
   sleep(3);
   ret = send_realtime(client);
   assert(ret == 0);
- 
+  */
+
   /*
   ret = send_test(client);
   assert(ret == 0);
   */
-   
+
   /*
   if((ret = read(client, buff, 1024*1024)) == 0){
     sleep(2);
@@ -225,19 +225,21 @@ static int request_sort(int socket_fd)
 
   memcpy(my_request_sort.header_name, HEADER_EX, 4);
   my_request_sort.body_len = sizeof(request_sort_t)-8;
-  my_request_sort.app_request.column = 0;
-  my_request_sort.app_request.option = option;
+  my_request_sort.app_request.column = 1;
+  my_request_sort.app_request.option = 0;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = 500+option;
+  my_request_sort.app_request.begin = 1000;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
-  sleep(5);
-  my_request_sort.app_request.begin = 600;
+  
+  sleep(3);
+  my_request_sort.app_request.begin = 200;
   my_request_sort.app_request.option = 1;
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
+ 
   return 0;
 }
 
@@ -274,11 +276,11 @@ static void *init_receive(void * param)
 	printf("close...\n");
 	break;
       }
-      body_buff[length] = '\0';		
+      body_buff[length] = '\0';
       printf("option times:%d\n", option);
       printf("type:%x\n", *(int*)body_buff);
       //printf("body_buff:%s\n", body_buff);
-      entity = (entity_t*)(body_buff+4);	
+      entity = (entity_t*)(body_buff+4);
       for(i = 0; i<10; i++){
 	printf("code:%.6s,price:%d\n", entity->code, entity->price);
 	entity++;

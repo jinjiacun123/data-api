@@ -29,10 +29,14 @@ int init_sort_area(my_market)
   int default_area_queue_len = AREA_NUMBER*AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
   int price_page_size = 0;
   int raise_page_size = 0;
-  price_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
-  raise_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
-  price_area_queue_len = price_page_size * PAGE_SIZE;
-  raise_area_queue_len = raise_page_size * PAGE_SIZE;
+  price_page_size = default_area_queue_len;
+  raise_page_size = default_area_queue_len;
+  //price_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
+  //raise_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
+  //price_area_queue_len = price_page_size * PAGE_SIZE;
+  //raise_area_queue_len = raise_page_size * PAGE_SIZE;
+  price_area_queue_len = price_page_size;
+  raise_area_queue_len = raise_page_size;
   sort_area_queue_t * price_base_queue = (char *)malloc(price_area_queue_len);
   sort_area_queue_t * raise_base_queue = (char *)malloc(raise_area_queue_len);
   if(price_base_queue == NULL){
@@ -57,6 +61,8 @@ int init_sort_area(my_market)
     raise_sort_area->min_value.ivalue = raise_min + raise_step_len *i;
     raise_sort_area->max_value.ivalue = raise_sort_area->min_value.ivalue + raise_step_len + 1;
 
+    price_sort_area->real_size  = 0;
+    raise_sort_area->real_size  = 0;
     price_sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
     raise_sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
 
@@ -259,6 +265,7 @@ static int find_location(my_market, entity, column, area_index, queue_index)
 {
   int i = 0;
   sort_area_t * area = NULL;
+  sort_area_t * pre_area = NULL;
   int tmp_value = 0;
   switch(column){
   case NEW_PRICE:
@@ -288,9 +295,11 @@ static int find_location(my_market, entity, column, area_index, queue_index)
   }break;
   }
 
+  pre_area = area;
   //find area
   for(; i<AREA_NUMBER; i++){
     if(value.ivalue > area->max_value.ivalue){
+      pre_area = area;
       area ++;
       continue;
     }
@@ -300,7 +309,13 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     queue = area->cur;
     break;
   }
-
+  if(i == AREA_NUMBER){
+    area = pre_area;
+    i = AREA_NUMBER -1;
+    *area_index = i;
+    real_size = area->real_size;
+    queue = area->cur;
+  }
   //find queue
   if(area->real_size == 0){
     *queue_index = 0;
@@ -343,11 +358,13 @@ static int find_location(my_market, entity, column, area_index, queue_index)
       memset(tmp_queue, 0x00, 2 * area->allow_size * sizeof(sort_area_queue_t));
       //copy old to new
       memcpy(tmp_queue, area->cur, area->allow_size * sizeof(sort_area_queue_t));
-      //sort_area_queue_t * ttt = area->cur;
+      if(area->allow_size != AREA_QUEUE_DEFAULT_LEN){ 
+      	sort_area_queue_t * ttt = area->cur;
+	free(ttt);
+      }	
       area->cur = tmp_queue;
       area->allow_size = area->allow_size *  2;
       *queue_index = area->real_size;
-      //free(ttt);
     }
   }
 

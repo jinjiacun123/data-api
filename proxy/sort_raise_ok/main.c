@@ -480,10 +480,18 @@ void init_app(void *param)
 	  is_exists = true;
 	  app_list[i].begin = tmp_app->begin;
 	  app_list[i].size  = tmp_app->size;
+	  if(app_list[i].size > 10){
+		app_list[i].size = 10;
+	  }
 	  my_app = &app_list[i];
 	  res = send_sort(my_app);
 	  assert(res == 0);
 	  break;
+	}
+	else{
+	  if(kill(app_list[i].pid, 0) != 0){
+		close(app_list[i].app_fifo_fd);
+	}
 	}
       }
       if(!is_exists){
@@ -542,18 +550,33 @@ void write_app(void *param)
 
 static int send_sort(app_request_t * my_app)
 {
-  int res = -1;
+  int res = 0;
   market_t * my_market = NULL;
   entity_t entity_list[SORT_SHOW_MAX_NUM];
+  int entity_list_size = 0;
 
   if(my_app->app_fifo_fd >0){
     //write app pipe
     my_market = &market_list[0];
+    entity_list_size = my_market->entity_list_size;
     memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-    if(my_app->column == 0)
-      res = sort_get(my_market, NEW_PRICE, my_app->begin, my_app->size, entity_list);
-    else
-      res = sort_get(my_market, RAISE,     my_app->begin, my_app->size, entity_list);
+    if(my_app->column == 0){
+      if(my_app->begin < entity_list_size
+      && my_app->begin + my_app->size < entity_list_size){
+        res = sort_get(my_market, NEW_PRICE, my_app->begin, my_app->size, entity_list);
+     }else if(my_app->begin < entity_list_size){
+        res = sort_get(my_market, NEW_PRICE, my_app->begin, entity_list_size - my_app->begin, entity_list);
+     }
+    }
+    else if(my_app->column == 1){
+      if(my_app->begin < entity_list_size
+      && my_app->begin + my_app->size < entity_list_size){
+        res = sort_get(my_market, RAISE, my_app->begin, my_app->size, entity_list);
+     }
+     else if(my_app->begin < entity_list_size){
+        res = sort_get(my_market, RAISE, my_app->begin, entity_list_size - my_app->begin, entity_list);
+     }
+    }
     assert(res == 0);
     res = write(my_app->app_fifo_fd, &my_app->option, sizeof(int));
     if(res == -1){
@@ -666,8 +689,8 @@ int parse(char * buff, uLongf  buff_len)
     printf("option_times:%d\n", option_times);
     sleep(3);
     //is_simulate = true;
-    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    //assert(res == 0);
+    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
@@ -804,7 +827,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   case UPDATE:{
     //update
     sort_update(my_market, entity, NEW_PRICE);
-    //sort_update(my_market, entity, RAISE);
+    sort_update(my_market, entity, RAISE);
   }break;
   default:{
 

@@ -30,17 +30,18 @@
 #define HEADER   "ZJHR"
 
 /*number of type as hexadicimal*/
-#define TYPE_EMPTY      0x0D03 //empty
-#define TYPE_INIT       0x0101 //init
-#define TYPE_LOGIN      0X0102 //login
-#define TYPE_HEART      0x0905 //heart tick
-#define TYPE_ZIB        0x8001 //
-#define TYPE_REALTIME   0x0201 //
-#define TYPE_HISTORY    0x0402 //
-#define TYPE_TIME_SHARE 0x0301 //
-#define TYPE_AUTO_PUSH  0x0A01 //
-#define TYPE_SERVERINFO 0x0103 //
-#define TYPE_DAY_CURPOS 0x020c //
+#define TYPE_EMPTY        0x0D03 //empty
+#define TYPE_INIT         0x0101 //init
+#define TYPE_LOGIN        0X0102 //login
+#define TYPE_HEART        0x0905 //heart tick
+#define TYPE_ZIB          0x8001 //
+#define TYPE_REALTIME     0x0201 //
+#define TYPE_HISTORY      0x0402 //
+#define TYPE_TIME_SHARE   0x0301 //
+#define TYPE_TIME_SHARE_H 0x0304
+#define TYPE_AUTO_PUSH    0x0A01 //
+#define TYPE_SERVERINFO   0x0103 //
+#define TYPE_DAY_CURPOS   0x020c //
 
 #define PAGE_SIZE 4096
 #define AREA_NUMBER 50
@@ -52,7 +53,7 @@
 //#define system_64
 //#define PIPE_NAME "./../jim_sort"
 //#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
-#define APP_SIZE  10
+#define APP_SIZE  100
 
 //basic type
 /*
@@ -153,8 +154,8 @@ typedef struct
   char  m_cCode[6];
   short m_nSize;
   unsigned short m_nOption;
-  unsigned short code_type;
-  char code[6];
+  //  unsigned short code_type;
+  //char code[6];
 }RealPack;
 
 typedef struct

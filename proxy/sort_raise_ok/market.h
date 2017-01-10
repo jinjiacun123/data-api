@@ -19,6 +19,7 @@ struct entity_s
 
   int raise;
   int raise_area[2];
+  
   float down;
   float range;
   int max;

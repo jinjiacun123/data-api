@@ -121,7 +121,7 @@ int main()
 
   int menu = 1;
   while(true){
-    sleep(3);
+    sleep(10);
     ret = send_heart(socket_fd);
     assert(ret == 0);
     /*
@@ -135,6 +135,15 @@ int main()
     // if(test_times > 1000) break;
   }
 
+  if(g_buff != NULL){
+    free(g_buff);
+  }
+  g_buff_max_len = 0;
+  g_buff_len = 0;
+  if(market_list[0].sort_area_price == NULL){
+    free(market_list[0].sort_area_price);
+  }
+  exit(-1);
   //ProfilerStop();
   pthread_join(p_socket_id, &recycle);
   //pthread_join(p_sort_id, &recycle);
@@ -260,6 +269,7 @@ int init_login(int proxy_client_fd)
     }
 
     printf("recive login info check ok!\n");
+    free(buff);
     return 0;
   }
   else{
@@ -322,17 +332,19 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
 
   int ret = 0;
   if((ret = send(socket_fd, request, request_length, 0))){
+    free(request);
     printf("ret:%d, send success!\n", ret);
     return 0;
   }
 
+  free(request);
   return -1;
 }
 
 void init_receive(void * socket_fd)
 {
-  char head[4];
-  char head_buff[9];
+  char head[4] = {0};
+  char head_buff[9] = {0};
   char * buff = NULL;
   int package_body_length = 0;
   int ret_count = 0;
@@ -457,7 +469,8 @@ void init_app(void *param)
   bool is_exists = false;
 
   //open fifo
-  fifo_fd = open(PUBLIC_PIPE, O_RDONLY|O_NONBLOCK);
+  //fifo_fd = open(PUBLIC_PIPE, O_RDONLY|O_NONBLOCK);
+  fifo_fd = open(PUBLIC_PIPE, O_RDWR);
   if(fifo_fd == -1){
     printf("open pipe error!\n");
     exit(-1);
@@ -474,6 +487,7 @@ void init_app(void *param)
       exit(-1);
       //continue;
     }else if(res == 0){
+      usleep(5000);
       continue;
     }else{
       //check is exists
@@ -720,8 +734,8 @@ int parse_realtime(char * buff, uLongf buff_len)
     //code_len = strlen(data_type->m_cCode);
     strncpy(code, data_type->m_cCode, 6);
     code[6] = '\0';
-    //printf("i:%d, code:%6s\n", i, code);
-    
+    //    printf("i:%d, code:%6s\n", i, code);
+
     switch(data_type->m_cCodeType){
     case 0x1101:{
       my_market = &market_list[index];
