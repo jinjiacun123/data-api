@@ -229,15 +229,17 @@ static int request_sort(int socket_fd)
   my_request_sort.app_request.column = 2;
   my_request_sort.app_request.option = 0;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = 1000;
+  my_request_sort.app_request.begin = 0;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
   
+  /*
   sleep(3);
   my_request_sort.app_request.begin = 200;
   my_request_sort.app_request.option = 1;
+  */
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
  
@@ -283,7 +285,11 @@ static void *init_receive(void * param)
       //printf("body_buff:%s\n", body_buff);
       entity = (entity_t*)(body_buff+4);
       for(i = 0; i<10; i++){
-	printf("code:%.6s,price:%d\n", entity->code, entity->price);
+	printf("code:%.6s,price:%d,close:%d,ange:%d\n", 
+	entity->code, 
+	entity->price,
+	entity->pre_close, 
+	entity->range);
 	entity++;
       }
       printf("----------------------------------\n");
