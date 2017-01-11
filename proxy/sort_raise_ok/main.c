@@ -17,7 +17,6 @@
 #include "market.h"
 #include "./../comm_pipe.h"
 
-
 int last_time_market;//effective time
 int cur_time;        //current time
 int heart_times = 0;
@@ -476,6 +475,17 @@ void init_app(void *param)
       //check is exists
       tmp_app = (app_request_t*)app_request_buff;
       for(i = 0; i< APP_SIZE; i++){
+	if(app_list[i].pid >0){
+	  if(kill(app_list[i].pid, 0) != 0){
+	    printf("close pid:%d\n", app_list[i].pid);
+	    close(app_list[i].app_fifo_fd);
+	    app_list[i].pid = 0;
+	    app_list[i].app_fifo_fd = -1;
+	    app_list[i].begin = 0;
+	    app_list[i].size  = 0;
+	    break;
+	  }
+	}
 	if((tmp_app->pid == app_list[i].pid)
 	   && (tmp_app->option == app_list[i].option)){
 	  is_exists = true;
@@ -488,11 +498,6 @@ void init_app(void *param)
 	  res = send_sort(my_app);
 	  assert(res == 0);
 	  break;
-	}
-	else{
-	  if(kill(app_list[i].pid, 0) != 0){
-		close(app_list[i].app_fifo_fd);
-	}
 	}
       }
       if(!is_exists){
@@ -555,6 +560,8 @@ static int send_sort(app_request_t * my_app)
   market_t * my_market = NULL;
   entity_t entity_list[SORT_SHOW_MAX_NUM];
   int entity_list_size = 0;
+  char t_buff[4 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
+
 
   if(my_app->app_fifo_fd >0){
     //write app pipe
@@ -576,6 +583,7 @@ static int send_sort(app_request_t * my_app)
 		     entity_list);
     }
     assert(res == 0);
+    /*
     res = write(my_app->app_fifo_fd, &my_app->option, sizeof(int));
     if(res == -1){
       printf("write app fifo err!\n");
@@ -587,7 +595,10 @@ static int send_sort(app_request_t * my_app)
       my_app->size = 0;
       my_app->is_create = false;
     }
-    res = write(my_app->app_fifo_fd, &entity_list, my_app->size*sizeof(entity_t));
+    */
+    memcpy(t_buff, &my_app->option, 4);
+    memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
+    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t));
     if(res == -1){
       printf("write app fifo err!\n");
       //close pipe

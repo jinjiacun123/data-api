@@ -166,7 +166,7 @@ int main()
     sleep(8);
     send_heart(client);
     /*
-    sleep(1);
+    sleep(2);
     ret = request_sort(client);
     assert(ret == 0);
     */
@@ -229,7 +229,7 @@ static int request_sort(int socket_fd)
   my_request_sort.app_request.column = 2;
   my_request_sort.app_request.option = 0;
   my_request_sort.app_request.index = 0;
-  my_request_sort.app_request.begin = 0;
+  my_request_sort.app_request.begin = option;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
@@ -239,9 +239,9 @@ static int request_sort(int socket_fd)
   sleep(3);
   my_request_sort.app_request.begin = 200;
   my_request_sort.app_request.option = 1;
-  */
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
+  */
  
   return 0;
 }
@@ -249,14 +249,22 @@ static int request_sort(int socket_fd)
 static void *init_receive(void * param)
 {
   int ret = -1;
-  char head_buff[9];
+  char head_buff[9]={0};
+  char header[4] = {0};
   char * body_buff;
   int length;
   entity_t * entity = NULL;
   int i = 0;
+  int res = -1;
+  bool is_new = false;
+  bool is_continue = true;
+  int off = 0;
 
   while(true){
+    is_new = false;
+    is_continue = false;
     memset(&head_buff, 0x00, 9);
+    memset(&header, 0x00, 4);
     //read head
     ret = read(client, head_buff, 8);
     if(ret == 0){
@@ -265,35 +273,57 @@ static void *init_receive(void * param)
     }else if(ret == -1){
       pthread_exit("receive err!\n");
     }else if(ret == 8){
+      strncpy(header, head_buff, 4);
+      if(strcmp(header, "SERV") == 0){
+        is_new = true;
+      }
+      else{
+	continue;
+      }
       //read content
       length = *(int *)(head_buff+4);
-      body_buff = (char *)malloc(length +1);
+      body_buff = (char *)malloc(length);
       if(body_buff == NULL){
 	pthread_exit("malloc error!\n");
       }
-      ret = read(client, body_buff, length);
-      if(ret <0){
-	printf("read body_buff error\n");
-	break;
-      }else if(ret == 0){
-	printf("close...\n");
-	break;
+
+      while(ret = read(client, body_buff+off, length-off)){
+	if(ret <0){
+	  printf("read body_buff error\n");
+	  break;
+	}else if(ret == 0){
+	  printf("close...\n");
+	  break;
+	}else if(ret = length-off){
+	  is_continue = true;
+	  break;
+	}else{
+	  off += ret;
+	}
       }
-      body_buff[length] = '\0';
-      printf("option times:%d\n", option);
-      printf("type:%x\n", *(int*)body_buff);
-      //printf("body_buff:%s\n", body_buff);
-      entity = (entity_t*)(body_buff+4);
-      for(i = 0; i<10; i++){
-	printf("code:%.6s,price:%d,close:%d,ange:%d\n", 
-	entity->code, 
-	entity->price,
-	entity->pre_close, 
-	entity->range);
-	entity++;
+      if(is_continue){
+	printf("option times:%d\n", option);
+	printf("type:%x\n", *(int*)body_buff);
+	//printf("body_buff:%s\n", body_buff);
+	entity = (entity_t*)(body_buff+4);
+	for(i = 0; i<10; i++){
+	  printf("code:%.6s,price:%d,close:%d,ange:%d\n", 
+		 entity->code, 
+		 entity->price,
+		 entity->pre_close, 
+		 entity->range);
+	  entity++;
+	}
+	free(body_buff);
+	printf("----------------------------------\n");
+	if(is_new){
+	  option += 10;
+	  if(option > 30)exit(-1);
+	  ret = request_sort(client);
+	  assert(ret == 0);
+	  printf("send request_sort ...\n");
+	}
       }
-      printf("----------------------------------\n");
-      //ret = request_sort(client);
     }
   }
 }
@@ -301,7 +331,7 @@ static void *init_receive(void * param)
 void stop(int signo)
 {
   printf("sigint close...\n");
-  //shutdown(client, 2);	
+  //shutdown(client, 2);
   close(client);
   exit(-1);
 }

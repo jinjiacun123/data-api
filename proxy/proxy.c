@@ -644,7 +644,6 @@ static int deal_client_info(client_socket_fd,
   char sort_buff[1024] = {0};
   int nread = -1;
   int package_length = 0;
-  int wret  = -1;
 
   while(true){
     is_custom = false;
@@ -681,29 +680,6 @@ L:    length = 8;
       }
       n  += nread;
       if((nread - package_length) == 0)return 0;
-
-      int off_len = 0;
-      int write_len = nread;
-      while(wret = write(proxy_client_socket_fd, tmp_buff+off_len, write_len)){
-      	if(wret <= 0){
-		if(errno == EAGAIN){
-            		usleep(1000);
-	    		continue;
-		}else{
-			WriteErrLog("%s write to client err!errno:%d\n", client_ip, errno);
-			exit(-1);
-		}
-      	}
-
-        if(wret == write_len){
-		break;
-	}
-
-        off_len += wret;
-	write_len -= wret;
-      }
-
-      /*
       ret = write(proxy_client_socket_fd,
 		  tmp_buff + package_length,
 		  nread - package_length);
@@ -711,10 +687,8 @@ L:    length = 8;
 	WriteErrLog("%s write to proxy err!\n", client_ip);
 	exit(-1);
       }
-      */
       if(nread < BUFSIZ -1)
 	return 0;
-      memset(&tmp_buff, 0x00, BUFSIZ);
     }
     if(nread == -1 && errno != EAGAIN){
       return 0;
@@ -1283,6 +1257,7 @@ void * deal_request_of_sort(pid,
   app_request.begin = begin;
   app_request.size = size;
   app_request.option = option;
+  app_request.column = column;
   res = write(pipe_write_fd, &app_request, app_request_len);
   assert(res >0);
   WriteErrLog("send pipe request...\n");

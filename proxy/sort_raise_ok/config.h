@@ -41,7 +41,7 @@
 //#define system_64
 //#define PIPE_NAME "./../jim_sort"
 //#define PRIVATE_PIPE_TEMPLATE "./../child_pipe/sort_%d"
-#define APP_SIZE  1024
+#define APP_SIZE  2
 
 //basic type
 /*
