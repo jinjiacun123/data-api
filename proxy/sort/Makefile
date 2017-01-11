@@ -24,4 +24,4 @@ test_sort:test_sort.c
 	$(CC) -g -w test_sort.c -o test_sort
 
 clean:
-	rm *.o main
+	rm *.o main app *.out
