@@ -6,9 +6,9 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<assert.h>
-//#define SERVER_HOST "127.0.0.1"
+#define SERVER_HOST "127.0.0.1"
 //#define SERVER_HOST "192.168.1.131"
-#define SERVER_HOST "122.144.139.237"
+//#define SERVER_HOST "122.144.139.237"
 #define SERVER_PORT 8001
 //#define SERVER_PORT 8800
 #define HEADER   "ZJHR"
@@ -16,6 +16,7 @@
 #define TYPE_HEART      0x0905 //heart tick
 #pragma pack (4)
 int option = 0;
+int times  = 0;
 typedef struct{
   bool is_create;
   pid_t pid;
@@ -164,12 +165,10 @@ int main()
   //pthread_join(t_id, &thread_result);
   while(true){
     sleep(8);
-    send_heart(client);
-    /*
-    sleep(2);
-    ret = request_sort(client);
-    assert(ret == 0);
-    */
+//    send_heart(client);
+   // sleep(7);
+  // ret = request_sort(client);
+   // assert(ret == 0);
   }
   pthread_join(t_id, NULL);
   return 0;
@@ -228,7 +227,7 @@ static int request_sort(int socket_fd)
   my_request_sort.body_len = sizeof(request_sort_t)-8;
   my_request_sort.app_request.column = 2;
   my_request_sort.app_request.option = 0;
-  my_request_sort.app_request.index = 0;
+  my_request_sort.app_request.index = times;
   my_request_sort.app_request.begin = option;
   my_request_sort.app_request.size = 10;
 
@@ -268,7 +267,7 @@ static void *init_receive(void * param)
     //read head
     ret = read(client, head_buff, 8);
     if(ret == 0){
-      printf("close continue\n");
+      printf("close ...\n");
       break;
     }else if(ret == -1){
       pthread_exit("receive err!\n");
@@ -302,8 +301,7 @@ static void *init_receive(void * param)
 	}
       }
       if(is_continue){
-	printf("option times:%d\n", option);
-	printf("type:%x\n", *(int*)body_buff);
+	printf("option times:%d,type:%x,times:%d\n", option, *(int*)body_buff, times);
 	//printf("body_buff:%s\n", body_buff);
 	entity = (entity_t*)(body_buff+4);
 	for(i = 0; i<10; i++){
@@ -317,8 +315,15 @@ static void *init_receive(void * param)
 	free(body_buff);
 	printf("----------------------------------\n");
 	if(is_new){
+	  /*
 	  option += 10;
-	  if(option > 30)exit(-1);
+	  if(option > 90){
+		option = 0;
+		times++;
+		printf("times:%d\n", times);
+	  }
+	  */
+	  printf("times:%d\n", times++);
 	  ret = request_sort(client);
 	  assert(ret == 0);
 	  printf("send request_sort ...\n");

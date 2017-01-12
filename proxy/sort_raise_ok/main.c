@@ -124,11 +124,12 @@ int main()
     sleep(3);
     ret = send_heart(socket_fd);
     assert(ret == 0);
-    /*
-    ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
-    assert(ret == 0);
-    sleep(8);
-    */
+
+    if(is_simulate){
+      ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+      assert(ret == 0);
+      sleep(5);
+    }
     heart_times++;
     test_times++;
     //if(is_exit) break;
@@ -452,7 +453,7 @@ void init_app(void *param)
   bool is_exists = false;
 
   //open fifo
-  fifo_fd = open(PUBLIC_PIPE, O_RDONLY|O_NONBLOCK);
+  fifo_fd = open(PUBLIC_PIPE, O_RDWR|O_NONBLOCK);
   if(fifo_fd == -1){
     printf("open pipe error!\n");
     exit(-1);
@@ -474,6 +475,7 @@ void init_app(void *param)
     }else{
       //check is exists
       tmp_app = (app_request_t*)app_request_buff;
+      printf("index:%d\n", tmp_app->index);
       for(i = 0; i< APP_SIZE; i++){
 	if(app_list[i].pid >0){
 	  if(kill(app_list[i].pid, 0) != 0){
@@ -558,7 +560,7 @@ static int send_sort(app_request_t * my_app)
 {
   int res = 0;
   market_t * my_market = NULL;
-  entity_t entity_list[SORT_SHOW_MAX_NUM];
+  //entity_t entity_list[SORT_SHOW_MAX_NUM];
   int entity_list_size = 0;
   char t_buff[4 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
 
@@ -567,20 +569,20 @@ static int send_sort(app_request_t * my_app)
     //write app pipe
     my_market = &market_list[0];
     entity_list_size = my_market->entity_list_size;
-    memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
+    //memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
     if(my_app->begin < entity_list_size
        && my_app->begin + my_app->size < entity_list_size){
       res = sort_get(my_market,
 		     my_app->column,
 		     my_app->begin,
 		     my_app->size,
-		     entity_list);
+		     t_buff + 4);
     }else if(my_app->begin < entity_list_size){
       res = sort_get(my_market,
 		     my_app->column,
 		     my_app->begin,
 		     entity_list_size - my_app->begin,
-		     entity_list);
+		     t_buff + 4);
     }
     assert(res == 0);
     /*
@@ -597,7 +599,7 @@ static int send_sort(app_request_t * my_app)
     }
     */
     memcpy(t_buff, &my_app->option, 4);
-    memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
+    //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
     res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t));
     if(res == -1){
       printf("write app fifo err!\n");
@@ -698,8 +700,8 @@ int parse(char * buff, uLongf  buff_len)
     printf("option_times:%d\n", option_times);
     sleep(3);
     //is_simulate = true;
-    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    assert(res == 0);
+    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    //assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");

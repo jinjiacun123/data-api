@@ -49,17 +49,32 @@ int deal_from_client_to_server(int proxy_client_fd, const char * buf, unsigned l
 int deal_from_server_to_client(int client_fd, const char * buf, unsigned long buf_len);
 
 //request of realtime
-static int deal_request_of_realtime(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_realtime(int proxy_client_socket_fd,
+				    const char * buff,
+				    unsigned int buff_len);
 //request of auto_push
-static int deal_request_of_auto_push(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_auto_push(int proxy_client_socket_fd,
+				     const char * buff,
+				     unsigned int buff_len);
 //request of time_share
-static int deal_request_of_time_share(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_time_share(int proxy_client_socket_fd,
+				      const char * buff,
+				      unsigned int buff_len);
 //request of history
-static int deal_request_of_history(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_history(int proxy_client_socket_fd,
+				   const char * buff,
+				   unsigned int buff_len);
 //request of zib
-static int deal_request_of_zlib(int proxy_client_socket_fd, const char * buff, unsigned int buff_len);
+static int deal_request_of_zlib(int proxy_client_socket_fd,
+				const char * buff,
+				unsigned int buff_len);
 static int init_request_sort(pid_t p_id, int * pipe_write_fd);
-void * deal_request_of_sort(pid_t p_id,void * p_app_request_data, int pipe_write_fd, int * pipe_read_fd, int epfd);
+void * deal_request_of_sort(pid_t p_id,
+			    void * p_app_request_data,
+			    int pipe_write_fd,
+			    int * pipe_read_fd,
+			    int epfd,
+			    bool * is_create_pipe);
 static int make_socket_non_blocking(int sfd);
 
 //response of realtime
@@ -89,7 +104,8 @@ static int deal_client_info(int clientSocketId,
 			    char * client_ip,
 			    int epfd,
 			    int * pipe_write_fd,
-			    int * pipe_read_fd 
+			    int * pipe_read_fd,
+			    bool * is_create_pipe
 			    );
 static int deal_sort_info(int clientSocketId,
 			  int pipe_read_fd,
@@ -390,6 +406,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   int epfd, nfds;
   struct epoll_event ev, events[3]={0};
   epfd = epoll_create(256);
+  bool is_create_pipe = false;
 
   //init server's login
   ret = init_login(proxyClientSocketId);
@@ -417,7 +434,6 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
     nfds = epoll_wait(epfd, events, 3, -1);
     is_custom = false;
 
-    
     if((nfds == -1) && (errno == EINTR))
       continue;
     else if(nfds == -1){
@@ -461,7 +477,8 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 client_ip,
 				 epfd,
 				 &pipe_write_fd,
-				 &pipe_read_fd);
+				 &pipe_read_fd,
+				 &is_create_pipe);
 	  assert(ret == 0);
 	  if(ret != 0){
 	    WriteErrLog("%s\tdeal client info err!\n", client_ip);
@@ -625,7 +642,8 @@ static int deal_client_info(client_socket_fd,
 			    client_ip,
 			    epfd,
 			    pipe_write_fd,
-			    pipe_read_fd)
+			    pipe_read_fd,
+			    is_create_pipe)
      int client_socket_fd;
      int proxy_client_socket_fd;
      int * alive_times;
@@ -633,6 +651,7 @@ static int deal_client_info(client_socket_fd,
      int epfd;
      int * pipe_write_fd;
      int * pipe_read_fd;
+     bool * is_create_pipe;
 {
   bool is_custom = false;
   int length, n;
@@ -644,13 +663,14 @@ static int deal_client_info(client_socket_fd,
   char sort_buff[1024] = {0};
   int nread = -1;
   int package_length = 0;
+  char header[8] = {0};
 
   while(true){
     is_custom = false;
     //recive client info
     *alive_times = 0;
     //head of package
-L:    length = 8;
+  L:    length = 8;
     n = 0;
     package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
@@ -675,7 +695,12 @@ L:    length = 8;
 	my_app_request_data->buff      = sort_buff;
 	my_app_request_data->buff_len  = package_length-8;
 	my_app_request_data->start     = true;
-	deal_request_of_sort(getpid(), my_app_request_data, *pipe_write_fd, pipe_read_fd, epfd);
+	deal_request_of_sort(getpid(),
+			     my_app_request_data,
+			     *pipe_write_fd,
+			     pipe_read_fd,
+			     epfd,
+			     is_create_pipe);
 	free(my_app_request_data);
       }
       n  += nread;
@@ -808,21 +833,20 @@ static int deal_sort_info(clientSocketId,
 {
   int res = -1;
   int size = 10;
-  char head[9];
-  char * sort_buff = NULL;
   int entity_len = sizeof(sort_entity_t);
-  int sort_buff_len = entity_len *size+ sizeof(int);
+  int sort_buff_len = entity_len *size + sizeof(int);
+  char * sort_buff = NULL;;
+  int off = 0;
 
-  WriteErrLog("read pipe...\n");
-  //read sort
-
-  sort_buff = (char *)malloc(sort_buff_len + 1);
+  sort_buff = (char *)malloc(sort_buff_len + 8);
   if(sort_buff == NULL){
-    WriteErrLog("%s\t malloc err!\n", client_ip);
+    printf("error malloc\n");
     exit(-1);
   }
-  memset(sort_buff, 0x00, sort_buff_len+1);
-  res = read(pipe_read_fd, sort_buff, sort_buff_len);
+  memset(sort_buff, 0x00, sort_buff_len + 8);
+  WriteErrLog("read pipe...\n");
+  //read sort
+  res = read(pipe_read_fd, sort_buff+8, sort_buff_len);
   if(res == -1){
     WriteErrLog("read error!\n");
     exit(-1);
@@ -832,14 +856,22 @@ static int deal_sort_info(clientSocketId,
   }
 
   //write client
-  memset(head, 0x00, 8);
-  memcpy(head, HEADER_EX, 4);
-  memcpy(head+4, &sort_buff_len, 4);
-  head[8] = '\0';
-  res = write(clientSocketId, head, 8);
-  WriteErrLog("write head res:%d\n", res);
+  memcpy(sort_buff, HEADER_EX, 4);
+  memcpy(sort_buff+4, &sort_buff_len, 4);
   assert(res >0);
-  res = write(clientSocketId, sort_buff, sort_buff_len);
+  while(res = write(clientSocketId, sort_buff+off, sort_buff_len+8-off)){
+    if(res == -1){
+      if(errno == EAGAIN){
+	continue;
+      }
+    }else if(res == sort_buff_len + 8 - off){
+      free(sort_buff);
+      break;
+    }
+    else{
+      off += res;
+    }
+  }
   WriteErrLog("res=%d\n", res);
   assert(res > 0);
 
@@ -1208,12 +1240,14 @@ void * deal_request_of_sort(pid,
 			    p_app_request_data,
 			    pipe_write_fd,
 			    pipe_read_fd,
-			    epfd)
+			    epfd,
+			    is_create_pipe)
   pid_t pid;
   void * p_app_request_data;
   int pipe_write_fd;
   int * pipe_read_fd;
   int epfd;
+  bool * is_create_pipe;
 {
   struct epoll_event ev;
   char cur_app_pipe[100];
@@ -1226,6 +1260,7 @@ void * deal_request_of_sort(pid,
   int sort_buff_len;
   int option = 0;
   int column = 0;
+  int index  = 0;
 
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
@@ -1234,6 +1269,7 @@ void * deal_request_of_sort(pid,
   size   = my_request->size;
   option = my_request->option;
   column = my_request->column;
+  index  = my_request->index;
 
   int app_request_len = sizeof(app_request_t);
   int res = 0;
@@ -1258,19 +1294,24 @@ void * deal_request_of_sort(pid,
   app_request.size = size;
   app_request.option = option;
   app_request.column = column;
+  app_request.index  = index;
   res = write(pipe_write_fd, &app_request, app_request_len);
   assert(res >0);
   WriteErrLog("send pipe request...\n");
-  *pipe_read_fd = open(cur_app_pipe, O_RDWR);
-  if(*pipe_read_fd == -1){
-    WriteErrLog("open pipe read fd error!\n");
-    exit(-1);
+  if(*pipe_read_fd <= 0){
+    *pipe_read_fd = open(cur_app_pipe, O_RDWR);
+    if(*pipe_read_fd == -1){
+      WriteErrLog("open pipe read fd error!\n");
+      exit(-1);
+    }
   }
   //add pipe_read_fd to epoll
-  ev.data.fd = *pipe_read_fd;
-  ev.events = EPOLLIN | EPOLLET;
-  epoll_ctl(epfd, EPOLL_CTL_ADD, *pipe_read_fd, &ev);
-
+  if(*is_create_pipe == false){
+    ev.data.fd = *pipe_read_fd;
+    ev.events = EPOLLIN | EPOLLET;
+    epoll_ctl(epfd, EPOLL_CTL_ADD, *pipe_read_fd, &ev);
+    *is_create_pipe = true;
+  }
   return 0;
 }
 
