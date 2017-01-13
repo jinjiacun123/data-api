@@ -3,6 +3,7 @@ SOURCE_LIST = main.o sort.c market.o help.o
 CCFLAGS = -fno-omit-frame-pointer
 main:$(SOURCE_LIST)
 	$(CC)  -w -g  -fprofile-arcs -ftest-coverage $(SOURCE_LIST)  -o main -pg -lm -lpthread -lz 
+	(cd txt;python my_read.py)
 main.o:main.c
 	$(CC)  -w -g  -fprofile-arcs -ftest-coverage -c main.c -pg 
 
@@ -24,4 +25,5 @@ test_sort:test_sort.c
 	$(CC) -g -w test_sort.c -o test_sort
 
 clean:
+	(cd txt;rm *.txt my_data)
 	rm *.o main *.gcda *.gcno *.out

@@ -36,6 +36,26 @@
 #define AREA_QUEUE_DEFAULT_LEN 100
 #define SORT_SHOW_MAX_NUM 10
 
+/*
+#define _DEBUG_TRACE_CMH_2
+#if 0 != _DEBUG_TRACE_CMH_
+    #include<stdio.h>
+#endif
+
+#if 1 == _DEBUG_TRACE_CMH_
+  #define TRACE_CMH_printf
+#elif 2 == _DEBUG_TRACE_CMH_
+#define TRACE_CMH(fmt, ...) \
+  printf("%s(%d):"##fmt, __FILE__, __LINE__, ##__VA_ARGS__)
+#elif 3 == _DEBUG_TRACE_CMH_
+#define TRACE_CMH(fmt, ...) \
+  printf("%s(%d)-<%s>"##fmt, __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#else
+#define TRACE_CMH
+#endif
+*/
+#define DEBUG(fmt, ...) printf("%s(%d)-<%s>:"#fmt"\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+
 //#define system_32
 #define system_64
 //#define system_64

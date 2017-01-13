@@ -3,25 +3,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#define DATA_FILE "./txt/my_data"
 
 my_key_t key_root = {0};
 extern market_t market_list[];
 
 //get code for both market
 int init_market(){
-  char * data_file_name = "./txt/my_data";
+  char * data_file_name = DATA_FILE;
   FILE * fp = fopen(data_file_name, "r");
 
   int size = 0;
   int index = 0;
   if(fp == 0){
-    printf("read my_data err!\n");
+    DEBUG("error:[%s]","read my_data err!");
     return -1;
   }
   fseek(fp, 0L, SEEK_END);
   size = ftell(fp)/14;
   if(size == 0){
-    printf("get file size err!\n");
+    DEBUG("error[%s]", "get file size err!");
     return -1;
   }
   fseek(fp, 0L, SEEK_SET);
@@ -29,21 +30,6 @@ int init_market(){
   size = 10;
   get_market(index, fp, size);
   close(fp);
-  return 0;
-}
-
-int out_market(int code_type_index)
-{
-  int i = 0;
-  entity_t * entity;
-  char * template = "code_type:%2x\tcode:%s\tprice:%d\n";
-
-  entity = market_list[code_type_index].list;
-  for(; i<market_list[code_type_index].entity_list_size; i++){
-    printf(template, market_list[code_type_index].code_type,
-	   entity->code,
-	   entity->price);
-  }
   return 0;
 }
 
@@ -75,10 +61,9 @@ int get_market(int index, FILE * fp, int size)
     //if(max >12) break;
     c = fread(buff, sizeof(unsigned char), 14, fp);
     if(c == 0){
-      printf("read err!\n");
+      DEBUG("error[%s]", "read err!");
       return -1;
     }
-    //printf("code:%s\n", cJSON_GetObjectItem(item, "code")->valuestring);
     entity->type = *(int*)buff;
     //strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
     strncpy(entity->code, buff+8, 6);
@@ -90,7 +75,7 @@ int get_market(int index, FILE * fp, int size)
       if(*yestoday_min_price > entity->pre_close){ *yestoday_min_price = entity->pre_close;}
     }
 
-    printf("index:%d\tcode:%s\tpreclose:%d\n",
+    DEBUG("info:[index:%d\tcode:%s\tpreclose:%d]",
 	   i,
 	   entity->code,
 	   entity->pre_close);
@@ -116,9 +101,7 @@ int get_market(int index, FILE * fp, int size)
     max ++;
   }
 
-  printf("yestoday_max:%d\tyestoday_min:%d\m", 
-	 *yestoday_max_price,
-	 *yestoday_min_price);
+  DEBUG("info:[yestoday_max:%d\tyestoday_min:%d]", *yestoday_max_price, *yestoday_min_price);
   //set setting_price
   market_list[index].setting_max = market_list[index].yestoday_max * 1.1;
   market_list[index].setting_min = market_list[index].yestoday_min * 0.9;
@@ -126,7 +109,7 @@ int get_market(int index, FILE * fp, int size)
   //init sort area
   init_sort_area(&market_list[index]);
 
-  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
+  DEBUG("info:[date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d]",
 	 market_list[index].date,
 	 market_list[index].code_type,
 	 market_list[index].unit,
@@ -156,7 +139,7 @@ int save_key(char * code, unsigned code_len, int code_type_index, entity_t * ent
     if(cur_key->childs[location] == NULL){
       tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
       if(tmp_key == NULL){
-	printf("malloc error!\n");
+	DEBUG("error:[%s]","malloc error!");
 	exit(-1);
       }
       memset(tmp_key, 0x00, sizeof(my_key_t));

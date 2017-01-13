@@ -2,7 +2,6 @@
 #define __MARKET_H__
 #include "config.h"
 #include "sort.h"
-#include "cJSON.h"
 #include<string.h>
 #include<stdlib.h>
 #include<stdio.h>

@@ -54,3 +54,5 @@ test_epoll:test_epoll.c
 
 test_simulate_server:test_simulate_server.c
 	gcc -g -w test_simulate_server.c -o test_simulate_server
+debug:debug.c
+	gcc -g -w debug.c -o debug

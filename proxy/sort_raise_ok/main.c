@@ -12,7 +12,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <errno.h>
-#include "cJSON.h"
 #include "comm.h"
 #include "market.h"
 #include "./../comm_pipe.h"
@@ -69,7 +68,7 @@ int main()
   sigaddset(&signal_mask, SIGPIPE);
   int rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
   if(rc != 0){
-    printf("block sigpipe error\n");
+    DEBUG("error:[%s]", "block sigpipe error!");
   }
 #endif
 
@@ -88,7 +87,7 @@ int main()
   //printf("init app ret:%d\n", ret);
   //--receive both shanghhai and shenzhen market stock
   ret = init_market();
-  printf("ret:%d\n", ret);
+  DEBUG("info:[ret:%d]", ret);
   assert(ret == 0);
   ret = init_socket(&socket_fd);
   assert(ret == 0);
@@ -143,7 +142,7 @@ int main()
   pthread_mutex_destroy(&work_mutex);
   pthread_cond_destroy(&allow_start_app);
   pthread_cond_destroy(&allow_display_sort);
-  printf("exit system...\n");
+  DEBUG("info:[%s]", "exit system");
   return 0;
 }
 
@@ -152,7 +151,7 @@ int get_content(char * filename, char * buff, int buff_len)
   int fd;
   fd = open(filename, O_RDONLY);
   if( fd == -1){
-    printf("open err!\n");
+    DEBUG("error:[%s]", "open err!");
     exit(-1);
   }
 
@@ -161,7 +160,7 @@ int get_content(char * filename, char * buff, int buff_len)
   while(1){
     ret = read( fd, buff, buff_len);
     if(ret == -1){
-      printf("read err!\n");
+      DEBUG("error:[%s]", "read err!");
       exit(-1);
     }
     length += ret;
@@ -186,15 +185,15 @@ int init_socket(int * socket_fd)
 
   *socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if(*socket_fd < 0){
-    printf("socket() failrue!\n");
+    DEBUG("info:[%s]","socket() failrue!");
     return -1;
   }
 
   if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
-    printf("connect() failure!\n");
+    DEBUG("error:[%s]", "connect() failure!");
     return -1;
   }
-  printf("connect() success\n");
+  DEBUG("info:[%s]", "connect() success");
   return 0;
 }
 
@@ -221,7 +220,7 @@ int init_login(int proxy_client_fd)
 
   write(proxy_client_fd, package, package_len);
   free(package);
-  printf("send login info!\n");
+  DEBUG("info:[%s]", "send login info!");
 
   //response login
   p_response_s_t  p_response_s;
@@ -231,12 +230,12 @@ int init_login(int proxy_client_fd)
   assert(buff = (char *)malloc(buff_len+1));
   memset(buff, 0x00, buff_len);
   int n = read(proxy_client_fd, buff, buff_len);
-  printf("recive login info!\n");
+  DEBUG("info:[%s]", "recive login info!");
   if(n == 8){
     p_response_s = (p_response_s_t)buff;
     //parse head
     if(strncmp(p_response_s->header_name, HEADER, 4)){
-      printf("recive login head of info err!\n");
+      DEBUG("error:[%s]", "recive login head of info err!");
       exit(-1);
     }
     buff_len = p_response_s->body_len;
@@ -246,21 +245,21 @@ int init_login(int proxy_client_fd)
     memset(buff, 0x00, buff_len+1);
     n = read(proxy_client_fd, buff, buff_len);
     if(n != buff_len){
-      printf("recive login body's length of info err!\n");
+      DEBUG("error:[%s]", "recive login body's length of info err!");
       exit(-1);
     }
 
     type = *((unsigned short *)buff);
     if(type != TYPE_LOGIN){
-      printf("recive login body's type of info err!\n");
+      DEBUG("error:[%s]", "recive login body's type of info err!");
       exit(-1);
     }
 
-    printf("recive login info check ok!\n");
+    DEBUG("info:[%s]", "recive login info check ok!");
     return 0;
   }
   else{
-    printf("recive login info err!\n");
+    DEBUG("error:[%s]", "recive login info err!");
     exit(-1);
   }
   return -1;
@@ -289,13 +288,13 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
 
   request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
   if(request == NULL){
-    printf("malloc err!\n");
+    DEBUG("error:[%s]", "malloc err!");
     exit(-1);
   }
   int request_length = sizeof(RealPack)+ codeinfo_length * size;
 
   if(request == NULL){
-    printf("malloc err!\n");
+    DEBUG("error:[%s]", "malloc err!");
     exit(-1);
   }
   memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
@@ -318,7 +317,7 @@ int send_realtime(int socket_fd, int index, int size, int code_type_index)
   }
 
   if(send(socket_fd, request, request_length, 0)){
-    printf("send success!\n");
+    DEBUG("info:[%s]", "send success!");
     return 0;
   }
 
@@ -346,12 +345,12 @@ void init_receive(void * socket_fd)
      ret_count = read(fd, head_buff, head_length);
      //printf("fd:%d\n", fd);
      if(ret_count == 0){
-       printf("connect close!\n");
+       DEBUG("info:[%s]", "connect close!");
        sleep(3);
        return 0;
      }
      else if(ret_count <0){
-       printf("recive server err!\n");
+       DEBUG("error:[%s]", "recive server err!");
        reset_socket(socket_fd);
        sleep(3);
        return 0;
@@ -364,7 +363,7 @@ void init_receive(void * socket_fd)
        if(g_buff_len == 0){
 	 g_buff = (char *)malloc(length);
 	 if(g_buff == NULL){
-	   printf("malloc err!\n");
+	   DEBUG("error:[%s]", "malloc err!");
 	   exit(-1);
 	 }
 	 memset(g_buff, 0x00, length);
@@ -376,7 +375,7 @@ void init_receive(void * socket_fd)
 	   //remalloc
 	   g_buff = (char *)malloc(length);
 	   if(g_buff == NULL){
-	     printf("malloc err!\n");
+	     DEBUG("error:[%s]", "malloc err!");
 	     exit(-1);
 	   }
 	   memset(g_buff, 0x00, length);
@@ -420,7 +419,7 @@ void init_sort_display(void * param)
 	  continue;
 	}
       }
-      printf("display show complete ... \n");
+      DEBUG("info:[%s]", "display show complete");
       sleep(2);
     }else{
       sleep(3);
@@ -455,7 +454,7 @@ void init_app(void *param)
   //open fifo
   fifo_fd = open(PUBLIC_PIPE, O_RDWR|O_NONBLOCK);
   if(fifo_fd == -1){
-    printf("open pipe error!\n");
+    DEBUG("error:[%s]", "open pipe error!");
     exit(-1);
   }
 
@@ -467,7 +466,7 @@ void init_app(void *param)
 	usleep(1000);
 	continue;
       }
-      printf("receive client app request error!\nx");
+      DEBUG("error:[%s]", "receive client app request error!");
       exit(-1);
       //continue;
     }else if(res == 0){
@@ -475,11 +474,11 @@ void init_app(void *param)
     }else{
       //check is exists
       tmp_app = (app_request_t*)app_request_buff;
-      printf("index:%d\n", tmp_app->index);
+      DEBUG("info:[index:%d]", tmp_app->index);
       for(i = 0; i< APP_SIZE; i++){
 	if(app_list[i].pid >0){
 	  if(kill(app_list[i].pid, 0) != 0){
-	    printf("close pid:%d\n", app_list[i].pid);
+	    DEBUG("info:[close pid:%d]", app_list[i].pid);
 	    close(app_list[i].app_fifo_fd);
 	    app_list[i].pid = 0;
 	    app_list[i].app_fifo_fd = -1;
@@ -585,24 +584,11 @@ static int send_sort(app_request_t * my_app)
 		     t_buff + 4);
     }
     assert(res == 0);
-    /*
-    res = write(my_app->app_fifo_fd, &my_app->option, sizeof(int));
-    if(res == -1){
-      printf("write app fifo err!\n");
-      //close pipe
-      close(my_app->app_fifo_fd);
-      my_app->app_fifo_fd = 0;
-      my_app->pid = 0;
-      my_app->begin = 0;
-      my_app->size = 0;
-      my_app->is_create = false;
-    }
-    */
     memcpy(t_buff, &my_app->option, 4);
     //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
     res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t));
     if(res == -1){
-      printf("write app fifo err!\n");
+      DEBUG("error:[%s]", "write app fifo err!");
       //close pipe
       close(my_app->app_fifo_fd);
       my_app->app_fifo_fd = 0;
@@ -697,11 +683,11 @@ int parse(char * buff, uLongf  buff_len)
       pthread_mutex_unlock(&work_mutex);
     }
     option_times ++;
-    printf("option_times:%d\n", option_times);
+    DEBUG("info:[option_times:%d]", option_times);
     sleep(3);
     //is_simulate = true;
-    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    //assert(res == 0);
+    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
@@ -711,7 +697,7 @@ int parse(char * buff, uLongf  buff_len)
     pthread_cond_signal(&allow_display_sort);
     pthread_mutex_unlock(&work_mutex);
     option_times ++;
-    printf("option_times:%d\n", option_times);
+    DEBUG("info:[option_times:%d]", option_times);
   }break;
   case TYPE_HEART:{
     //printf("heart...\n");
@@ -725,7 +711,7 @@ int parse(char * buff, uLongf  buff_len)
     assert( res == 0);
   }break;
   default:{
-    printf("unknown type:%d...\n", type);
+    DEBUG("info:[unknown type:%d]", type);
   }break;
   }
   return 0;
@@ -821,20 +807,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   entity->min         = tmp->m_lMinPrice;
   entity->total       = tmp->m_lTotal;
   entity->money       = tmp->m_fAvgPrice;
-  printf("index:%d, \
-          code_type:%2x, \
-          code:%s, \
-          pre_close:%d, \
-          new_price:%d, \
-          raise:%d, \
-          range:%d\n",
-	 i,
-	 code_type,
-	 code,
-	 entity->pre_close,
-	 entity->price,
-	 entity->raise,
-	 entity->range);
+  DEBUG("info:[index:%d,code_type:%2x,code:%s,pre_close:%d,new_price:%d,raise:%d,range:%d]",i, code_type, code, entity->pre_close, entity->price, entity->raise, entity->range);
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);
@@ -857,13 +830,6 @@ do_stock(my_market, code_type, code, buff, i, option)
 
   }
   }
-  /*
-  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
-	 i,
-	 code_type,
-	 code,
-  	 entity->price);
-  */
 }
 
 int parse_auto_push(char * buff, uLong   buff_len)
@@ -913,7 +879,7 @@ int unpack(char * des_buff, uLongf des_buff_len)
   TransZipData2   * zheader;
   zheader = (TransZipData2 *)des_buff;
   if(zheader->m_nType != TYPE_ZIB){
-    printf("parse zlib package type error!\n");
+    DEBUG("error:[%s]", "parse zlib package type error!");
     return -100;
   }
 
@@ -924,7 +890,7 @@ int unpack(char * des_buff, uLongf des_buff_len)
     g_zib_buff = (char *)malloc(g_zib_buff_len);
     assert(g_zib_buff != NULL);
     if(g_zib_buff == NULL){
-      printf("malloc err!\n");
+      DEBUG("error:[%s]", "malloc err!");
       return -1;
     }
     memset(g_zib_buff, 0x00, g_zib_buff_len);
@@ -936,7 +902,7 @@ int unpack(char * des_buff, uLongf des_buff_len)
       g_zib_buff = (char *)malloc(g_zib_buff_len);
       assert(g_zib_buff != NULL);
       if(g_zib_buff == NULL){
-	printf("malloc err!\n");
+	DEBUG("error:[%s]", "malloc err!");
 	return -1;
       }
       memset(g_zib_buff, 0x00, g_zib_buff_len);
@@ -950,22 +916,23 @@ int unpack(char * des_buff, uLongf des_buff_len)
   int unzip =  uncompress((Bytef *)(g_zib_buff), &g_zib_buff_len,
 			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
   if(unzip == Z_MEM_ERROR){
-    printf("memory not enough\n");
+    DEBUG("error:[%s]", "memory not enough");
     return -2;
   }
   if(unzip == Z_BUF_ERROR){
-    printf("buff not enough!\n");
+    DEBUG("error:[%s]", "buff not enough!");
     return -3;
   }
   if(unzip == Z_DATA_ERROR){
-    printf("unpack data err!\n");
+    DEBUG("error:[%s]", "unpack data err!");
     return -4;
    }
   if(unzip == Z_OK
      && g_zib_buff_len == zheader->m_lOrigLen){
+    DEBUG("info:[%s]", "unpack success!");
     return 0;
   }
-  printf("unzip:%d\n", unzip);
+  DEBUG("info:[unzip:%d]", unzip);
   return -1;
 }
 
@@ -988,7 +955,7 @@ int get_index_by_code_ascii(char ascii)
 
 void sig_stop(int signo)
 {
-  printf("abovt exit!\n");
+  DEBUG("info:[%s]", "abovt exit!");
   shutdown(socket_fd, SHUT_RDWR);
   //close(socket_fd);
   exit(-1);

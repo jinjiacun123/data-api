@@ -1,5 +1,4 @@
 #include "config.h"
-#include "cJSON.h"
 #include "sort.h"
 #include "market.h"
 #include <assert.h>
@@ -55,17 +54,17 @@ int init_sort_area(my_market)
   sort_area_queue_t * raise_base_queue = (char *)malloc(raise_area_queue_len);
   sort_area_queue_t * range_base_queue = (char *)malloc(range_area_queue_len);
   if(price_base_queue == NULL){
-    printf("malloc error!\n");
+    DEBUG("error:[%s]", "malloc error!");
     return -1;
   }
   memset(price_base_queue, 0x00, price_area_queue_len);
   if(raise_base_queue == NULL){
-    printf("malloc error!\n");
+    DEBUG("error:[%s]", "malloc error!");
     return -1;
   }
   memset(raise_base_queue, 0x00, raise_area_queue_len);
   if(range_base_queue == NULL){
-    printf("malloc error!\n");
+    DEBUG("error:[%s]", "malloc error!");
     return -1;
   }
   memset(range_base_queue, 0x00, range_area_queue_len);
@@ -456,13 +455,13 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     else{//not enough, remalloc
       tmp_queue = (sort_area_queue_t *)malloc(2 * area->allow_size * sizeof(sort_area_queue_t));
       if(tmp_queue == NULL){
-	printf("malloc err!\n");
+	DEBUG("error:[%s]", "malloc err!");
 	return -1;
       }
       memset(tmp_queue, 0x00, 2 * area->allow_size * sizeof(sort_area_queue_t));
       //copy old to new
       memcpy(tmp_queue, area->cur, area->allow_size * sizeof(sort_area_queue_t));
-      if(area->allow_size != AREA_QUEUE_DEFAULT_LEN){ 
+      if(area->allow_size != AREA_QUEUE_DEFAULT_LEN){
       	sort_area_queue_t * ttt = area->cur;
 	free(ttt);
       }
@@ -620,55 +619,6 @@ static int sort_area(my_market, column)
   return 0;
 }
 
-
-static int sort_list(my_market, column)
-     market_t * my_market;
-     column_n column;
-{
-  int i = 0, j = 0;
-  int size = market_list[0].entity_list_size;
-  entity_t *p, *q, *swap;
-  int sort_size = sizeof(market_t *);
-  int *ip = 0, *iq = 0, iswap = 0;
-
-  printf("begin sort...\n");
-  /*
-  for(i=0; i<size; i++){
-    for(j=i+1; j< size; j++){
-      ip = my_market->sort_price_list+(j-1);
-      p = (entity_t*)(*(my_market->sort_price_list+(j-1)));
-      iq = my_market->sort_price_list+j;
-      q = (entity_t *)(*(my_market->sort_price_list+j));
-      if(p->price > q->price){
-	iswap = *ip;
-	*ip = *iq;
-	*iq = iswap;
-      }
-    }
-  }
-  */
-  printf("sort complete...\n");
-
-  return 0;
-}
-
-int display_sort(my_market)
-     market_t * my_market;
-{
-  entity_t * entity;
-  int i = 0;
-  char * template = "code:%s\tprice:%d\n";
-  /*
-  for(; i<my_market->entity_list_size; i++){
-    entity = (entity_t *)(*(my_market->sort_price_list+i));
-    printf(template, entity->code, entity->price);
-  }
-  */
-  printf("display sort complete...\n");
-
-  return 0;
-}
-
 int sort_get(my_market, column, index, size, entity_list)
      market_t * my_market;
      column_n column;
@@ -702,7 +652,7 @@ int sort_get(my_market, column, index, size, entity_list)
   int area_count = 0;
 
   if(entity_list == NULL){
-    printf("malloc error!\n");
+    DEBUG("error:[%s]", "malloc error!");
     exit(-1);
   }
 
@@ -761,14 +711,6 @@ int sort_get(my_market, column, index, size, entity_list)
     }
     if(area_count > AREA_NUMBER) return -1;
   }
-
-  // entity = entity_list[0];
-  /*
-  for(i = 0; i< size; i++){
-    printf("code:%s\tprice:%d\n", entity_list[i].code, entity_list[i].price);
-    entity ++;
-    }
-  */
 
   return 0;
 }
