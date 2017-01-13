@@ -234,13 +234,11 @@ static int request_sort(int socket_fd)
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
   
-  /*
   sleep(3);
   my_request_sort.app_request.begin = 200;
   my_request_sort.app_request.option = 1;
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
-  */
  
   return 0;
 }

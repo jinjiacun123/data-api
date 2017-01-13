@@ -447,9 +447,10 @@ void init_app(void *param)
   char app_request_buff[app_request_len];
   int app_fifo_fd = 0;
   char *template = PRIVATE_PIPE_TEMPLATE;
-  char app_fifo_name[100];
+  char app_fifo_name[100] = {0};
   app_request_t * my_app = NULL, *tmp_app = NULL;
   bool is_exists = false;
+  int ret = -1;
 
   //open fifo
   fifo_fd = open(PUBLIC_PIPE, O_RDWR|O_NONBLOCK);
@@ -479,6 +480,11 @@ void init_app(void *param)
 	if(app_list[i].pid >0){
 	  if(kill(app_list[i].pid, 0) != 0){
 	    DEBUG("info:[close pid:%d]", app_list[i].pid);
+	    //delete pipe
+	    ret = snprintf(app_fifo_name, 100, template, app_list[i].pid);
+	    assert(res > 0);
+	    ret = unlink(app_fifo_name);
+	    DEBUG("info:[delete fifo pid:%d retL%d]", app_list[i].pid);
 	    close(app_list[i].app_fifo_fd);
 	    app_list[i].pid = 0;
 	    app_list[i].app_fifo_fd = -1;

@@ -675,34 +675,46 @@ static int deal_client_info(client_socket_fd,
     package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
       WriteErrLog("%s read client info!\n", client_ip);
-      //check is request of sort
-      if(strncmp(tmp_buff, HEADER_EX, 4) == 0){
-	package_length = *(int*)(tmp_buff+4) + 8;
-	memcpy(sort_buff, tmp_buff+8, package_length -8);
-	if(-1 == * pipe_write_fd){
-	      //open sort pipe
-	  ret = init_request_sort(getpid(), pipe_write_fd);
-	  assert(ret == 0);
+      //      int app_off = 0;
+      //int packages = 0;
+      // while(true){
+	//check is request of sort
+	if(strncmp(tmp_buff, HEADER_EX, 4) == 0){
+	  //	  packages ++;
+	  package_length = *(int*)(tmp_buff+4) + 8;
+	  memcpy(sort_buff, tmp_buff+8, package_length -8);
+	  if(-1 == * pipe_write_fd){
+	    //open sort pipe
+	    ret = init_request_sort(getpid(), pipe_write_fd);
+	    assert(ret == 0);
+	  }
+	  //init sort of request
+	  my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
+	  if(my_app_request_data == NULL){
+	    WriteErrLog("malloc my_app_request_data error!\n");
+	    exit(-1);
+	  }
+	  memset(my_app_request_data, 0x00, sizeof(app_request_data));
+	  my_app_request_data->socket_fd = client_socket_fd;
+	  my_app_request_data->buff      = sort_buff;
+	  my_app_request_data->buff_len  = package_length-8;
+	  my_app_request_data->start     = true;
+	  deal_request_of_sort(getpid(),
+			       my_app_request_data,
+			       *pipe_write_fd,
+			       pipe_read_fd,
+			       epfd,
+			       is_create_pipe);
+	  free(my_app_request_data);
 	}
-	//init sort of request
-	my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
-	if(my_app_request_data == NULL){
-	  WriteErrLog("malloc my_app_request_data error!\n");
-	  exit(-1);
-	}
-	memset(my_app_request_data, 0x00, sizeof(app_request_data));
-	my_app_request_data->socket_fd = client_socket_fd;
-	my_app_request_data->buff      = sort_buff;
-	my_app_request_data->buff_len  = package_length-8;
-	my_app_request_data->start     = true;
-	deal_request_of_sort(getpid(),
-			     my_app_request_data,
-			     *pipe_write_fd,
-			     pipe_read_fd,
-			     epfd,
-			     is_create_pipe);
-	free(my_app_request_data);
-      }
+	//else{
+	//  break;
+	//}
+	//if(nread > package_length){
+	//  app_off += package_length;
+	///	}
+	//      }
+
       n  += nread;
       if((nread - package_length) == 0)return 0;
       ret = write(proxy_client_socket_fd,
@@ -893,11 +905,11 @@ int send_heart_to_server(int proxy_client_fd, int * heart_times)
   memcpy(data->header_name, HEADER, 4);
   data->body_len = package_len -8;
   data->type = TYPE_HEART;
-  
+
   REQUEST_T(heart) * data_ex;
   data_ex = (REQUEST_T(heart) *)(package + request_len);
   data_ex->index = 1;
-  
+
   write(proxy_client_fd, package, package_len);
 
   free(package);
