@@ -56,20 +56,28 @@ def change_json_to_struct(json_str, data_file):
                                 str(item["code"]))
                 write_struct_file(data_file, s)
 
-if __name__ == '__main__':
-	file_name_list = ["1101", "1201", "1206", "120b"]
+#main
+def main():
+        dir_prefix = "/home/jim/source_code/data-api/"
+        template_json = "%s.txt"
+        template_data = dir_prefix + "proxy/sort_raise_ok/txt/%s.txt"
+        file_name_list = ["1101", "1201", "1206", "120b"]
 	#["1101", "1201", "1206", "120b"]
-	data_file_name = "/home/jim/source_code/data-api/proxy/sort_raise_ok/txt/my_data"
+	data_file_name = dir_prefix + "proxy/sort_raise_ok/txt/my_data"
+
 	#get source
 	for file_name in file_name_list:
-		content = get_json_content("%s.txt" % file_name)
-                set_json_to_local("./%s.txt" % file_name, content)
+		content = get_json_content(template_json % file_name)
+                set_json_to_local(template_data % file_name, content)
 	#clean struct file
 	clean_struct_file(data_file_name)
 
 	#chang to struct
 	for file_name in file_name_list:
-		content = get_content("./%s.txt" % file_name)
+		content = get_content(template_data % file_name)
                 change_json_to_struct(content, data_file_name)
 
 	print "success\n"
+
+if __name__ == "__main__":
+        main()

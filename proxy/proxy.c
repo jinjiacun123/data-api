@@ -1225,6 +1225,11 @@ static int init_request_sort(pid_t p_id, int *pipe_write_fd)
 
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
+
+  //if exists , delete it
+  if(access(cur_app_pipe, F_OK) == 0){
+    res = unlink(cur_app_pipe);
+  }
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
