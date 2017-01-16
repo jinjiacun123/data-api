@@ -71,11 +71,9 @@ int main(int argc, char * argv[])
   app_request.size = my_size;
   app_request.column = column;
   res = write(pipe_write_fd, &app_request, app_request_len);
-  /*
   app_request.option = 1;
-  app_request.begin = my_begin+10;
+  app_request.begin = my_begin+1;
   res = write(pipe_write_fd, &app_request, app_request_len);
-  */
   close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);

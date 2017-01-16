@@ -692,8 +692,8 @@ int parse(char * buff, uLongf  buff_len)
     DEBUG("info:[option_times:%d]", option_times);
     sleep(3);
     //is_simulate = true;
-    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    assert(res == 0);
+    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    //assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
