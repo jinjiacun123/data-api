@@ -351,8 +351,9 @@ void init_receive(void * socket_fd)
      }
      else if(ret_count <0){
        DEBUG("error:[%s]", "recive server err!");
-       reset_socket(socket_fd);
-       sleep(3);
+	   exit(-1);
+       //reset_socket(socket_fd);
+       //sleep(3);
        return 0;
      }else if(ret_count == head_length){
        off = 0;
@@ -692,8 +693,8 @@ int parse(char * buff, uLongf  buff_len)
     DEBUG("info:[option_times:%d]", option_times);
     sleep(3);
     //is_simulate = true;
-    //res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
-    //assert(res == 0);
+    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+    assert(res == 0);
   }break;
   case TYPE_AUTO_PUSH:{
     //printf("recieve auto_push...\n");
@@ -807,7 +808,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   }
   else{
     entity->raise  = entity->price - entity->pre_close;
-    entity->range  = entity->raise *10000 / entity->pre_close;
+    entity->range  = ceil(entity->raise *10000.0 / entity->pre_close);
   }
   entity->max         = tmp->m_lMaxPrice;
   entity->min         = tmp->m_lMinPrice;

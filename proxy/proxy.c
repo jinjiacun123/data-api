@@ -664,6 +664,8 @@ static int deal_client_info(client_socket_fd,
   int nread = -1;
   int package_length = 0;
   char header[8] = {0};
+  int app_off = 0;
+  int packages = 0;
 
   while(true){
     is_custom = false;
@@ -675,13 +677,13 @@ static int deal_client_info(client_socket_fd,
     package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
       WriteErrLog("%s read client info!\n", client_ip);
-      int app_off = 0;
-      int packages = 0;
-      while(true){
+      app_off = 0;
+      packages = 0;
+      //while(true){
 	//check is request of sort
-	if(strncmp(tmp_buff, HEADER_EX, 4) == 0){
-	  //	  packages ++;
-	  package_length = *(int*)(tmp_buff+4) + 8;
+	if(strncmp(tmp_buff+app_off, HEADER_EX, 4) == 0){
+	  	  packages ++;
+	  package_length = *(int*)(tmp_buff+4+app_off) + 8;
 	  memcpy(sort_buff, tmp_buff+8, package_length -8);
 	  if(-1 == * pipe_write_fd){
 	    //open sort pipe
@@ -707,13 +709,15 @@ static int deal_client_info(client_socket_fd,
 			       is_create_pipe);
 	  free(my_app_request_data);
 	}
+        /*
 	else{
 	  break;
 	}
 	if(nread > package_length){
 	  app_off += package_length;
 	}
-      }
+        */
+      //}
 
       n  += nread;
       if((nread - package_length) == 0)return 0;
