@@ -1306,7 +1306,7 @@ void * deal_request_of_sort(pid,
   memset(sort_buff, 0x00, sort_buff_len);
   */
 
-  WriteErrLog("begin:%d,size:%d,option:%d\n", begin, size, option);
+  WriteErrLog("begin:%d,size:%d,option:%d,column:%d,index:%d\n", begin, size, option,column,index);
   app_request_t app_request;
   memset(&app_request, 0x00, sizeof(app_request_t));
   //request

@@ -98,6 +98,7 @@ int client;
 char buff[1024*1024];
 int send_realtime(int socket_fd);
 static int send_test(int socket_fd);
+static void printhex(unsigned char *src,int len);
 
 int main()
 {
@@ -227,19 +228,21 @@ static int request_sort(int socket_fd)
   my_request_sort.body_len = sizeof(request_sort_t)-8;
   my_request_sort.app_request.column = 2;
   my_request_sort.app_request.option = 0;
-  my_request_sort.app_request.index = times;
+  my_request_sort.app_request.index = -100;
   my_request_sort.app_request.begin = option;
   my_request_sort.app_request.size = 10;
 
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
   
+  /*
   sleep(3);
   my_request_sort.app_request.begin = 200;
   my_request_sort.app_request.option = 1;
   ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
- 
+  */ 
+
   return 0;
 }
 
@@ -256,6 +259,7 @@ static void *init_receive(void * param)
   bool is_new = false;
   bool is_continue = true;
   int off = 0;
+  int type = 0;
 
   while(true){
     is_new = false;
@@ -299,9 +303,20 @@ static void *init_receive(void * param)
 	}
       }
       if(is_continue){
+        type = *(int*)body_buff;
+	/*
+	if(type != 0){
+		printhex(body_buff, ret);
+		printf("type:%d,系统错误!\n", type);
+		exit(-1);
+	}
+	*/
 	printf("option times:%d,type:%x,times:%d\n", option, *(int*)body_buff, times);
 	//printf("body_buff:%s\n", body_buff);
 	entity = (entity_t*)(body_buff+4);
+	if(type != 0){
+	 entity = (entity_t*)body_buff;
+	}
 	for(i = 0; i<10; i++){
 	  printf("code:%.6s,price:%d,close:%d,ange:%d\n", 
 		 entity->code, 
@@ -310,17 +325,21 @@ static void *init_receive(void * param)
 		 entity->range);
 	  entity++;
 	}
+	if(type != 0){
+		printhex(body_buff, ret);
+		printf("type:%d,ret:%d,系统错误！\n", type, ret);
+		exit(-1);
+	}
 	free(body_buff);
 	printf("----------------------------------\n");
 	if(is_new){
-	  /*
+//	  sleep(2);
 	  option += 10;
-	  if(option > 90){
+	  if(option > 110){
 		option = 0;
 		times++;
 		printf("times:%d\n", times);
 	  }
-	  */
 	  printf("times:%d\n", times++);
 	  ret = request_sort(client);
 	  assert(ret == 0);
@@ -432,4 +451,33 @@ static int send_test(int socket_fd)
 	return -1;
   }
 	return 0;
+}
+
+static void printhex(unsigned char *src,int len)
+{
+    if(src==NULL)
+    {
+        return;
+    }
+    if(len>(1024*1024*3-1))
+    {      
+        return;
+    }
+    char x[1024*1024*3]={0};
+    int i=0;
+    for(i=0;i<len;i++)
+    {
+        char tmp[10]={0};
+        if(isprint(src[i]))
+        {
+          snprintf(tmp,8,"%c",src[i]);
+          strcat(x,tmp);
+        }else
+        {
+          snprintf(tmp,8,"(%X)",src[i]);
+          strcat(x,tmp);
+        }      
+    }
+    printf("%s",x);
+    return;
 }

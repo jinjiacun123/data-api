@@ -22,6 +22,7 @@ int heart_times = 0;
 bool may_show_sort = false;
 app_request_t app_list[APP_SIZE] = {0};
 pthread_mutex_t work_mutex;
+pthread_mutex_t send_sort_mutex;
 pthread_cond_t allow_start_app    = PTHREAD_COND_INITIALIZER;
 pthread_cond_t allow_display_sort = PTHREAD_COND_INITIALIZER;
 
@@ -98,6 +99,8 @@ int main()
 
   //init mutext
   ret = pthread_mutex_init(&work_mutex, NULL);
+  assert( ret == 0);
+  ret = pthread_mutex_init(&send_sort_mutex, NULL);
   assert( ret == 0);
   if(ret != 0){
     perror("Mutext initialization failed");
@@ -570,8 +573,8 @@ static int send_sort(app_request_t * my_app)
   int entity_list_size = 0;
   char t_buff[4 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
 
-
-  if(my_app->app_fifo_fd >0){
+  if(pthread_mutex_trylock(&send_sort_mutex)){
+    if(my_app->app_fifo_fd >0){
     //write app pipe
     my_market = &market_list[0];
     entity_list_size = my_market->entity_list_size;
@@ -593,7 +596,7 @@ static int send_sort(app_request_t * my_app)
     assert(res == 0);
     memcpy(t_buff, &my_app->option, 4);
     //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
-    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t));
+    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+4);
     if(res == -1){
       DEBUG("error:[%s]", "write app fifo err!");
       //close pipe
@@ -604,6 +607,8 @@ static int send_sort(app_request_t * my_app)
       my_app->size = 0;
       my_app->is_create = false;
     }
+  }
+    pthread_mutex_unlock(&send_sort_mutex);
   }
   return 0;
 }
@@ -692,7 +697,7 @@ int parse(char * buff, uLongf  buff_len)
     option_times ++;
     DEBUG("info:[option_times:%d]", option_times);
     sleep(3);
-    //is_simulate = true;
+    // is_simulate = true;
     res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
     assert(res == 0);
   }break;
