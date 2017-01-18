@@ -573,7 +573,7 @@ static int send_sort(app_request_t * my_app)
   int entity_list_size = 0;
   char t_buff[4 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
 
-  if(pthread_mutex_trylock(&send_sort_mutex)){
+  while(pthread_mutex_trylock(&send_sort_mutex)){
     if(my_app->app_fifo_fd >0){
     //write app pipe
     my_market = &market_list[0];
