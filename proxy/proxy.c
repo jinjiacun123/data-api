@@ -850,7 +850,7 @@ static int deal_sort_info(clientSocketId,
   int res = -1;
   int size = 10;
   int entity_len = sizeof(sort_entity_t);
-  int sort_buff_len = entity_len *size + sizeof(int);
+  int sort_buff_len = entity_len *size + 2 * sizeof(int);
   char * sort_buff = NULL;;
   int off = 0;
 

@@ -260,6 +260,7 @@ static void *init_receive(void * param)
   bool is_continue = true;
   int off = 0;
   int type = 0;
+  int begin = 0;
 
   while(true){
     is_new = false;
@@ -311,17 +312,22 @@ static void *init_receive(void * param)
 		exit(-1);
 	}
 	*/
-	printf("option times:%d,type:%x,times:%d\n", option, *(int*)body_buff, times);
+	printf("option times:%d,type:%x,times:%d,begin:%d,type:%d\n",
+	       option,
+	       *(int*)body_buff,
+	       times,
+	       *(int*)(body_buff+4),
+	       type);
 	//printf("body_buff:%s\n", body_buff);
-	entity = (entity_t*)(body_buff+4);
+	entity = (entity_t*)(body_buff+8);
 	if(type != 0){
 	 entity = (entity_t*)body_buff;
 	}
 	for(i = 0; i<10; i++){
-	  printf("code:%.6s,price:%d,close:%d,ange:%d\n", 
-		 entity->code, 
+	  printf("code:%.6s,price:%d,close:%d,ange:%d\n",
+		 entity->code,
 		 entity->price,
-		 entity->pre_close, 
+		 entity->pre_close,
 		 entity->range);
 	  entity++;
 	}

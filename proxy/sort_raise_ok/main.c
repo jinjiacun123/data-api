@@ -571,9 +571,10 @@ static int send_sort(app_request_t * my_app)
   market_t * my_market = NULL;
   //entity_t entity_list[SORT_SHOW_MAX_NUM];
   int entity_list_size = 0;
-  char t_buff[4 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
+  int head_off = 8;
+  char t_buff[8 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
 
-  while(pthread_mutex_trylock(&send_sort_mutex)){
+  if(pthread_mutex_trylock(&send_sort_mutex) == 0){
     if(my_app->app_fifo_fd >0){
     //write app pipe
     my_market = &market_list[0];
@@ -585,18 +586,19 @@ static int send_sort(app_request_t * my_app)
 		     my_app->column,
 		     my_app->begin,
 		     my_app->size,
-		     t_buff + 4);
+		     t_buff + head_off);
     }else if(my_app->begin < entity_list_size){
       res = sort_get(my_market,
 		     my_app->column,
 		     my_app->begin,
 		     entity_list_size - my_app->begin,
-		     t_buff + 4);
+		     t_buff + head_off);
     }
     assert(res == 0);
     memcpy(t_buff, &my_app->option, 4);
+    memcpy(t_buff+4, &my_app->begin, 4);
     //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
-    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+4);
+    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+head_off);
     if(res == -1){
       DEBUG("error:[%s]", "write app fifo err!");
       //close pipe
