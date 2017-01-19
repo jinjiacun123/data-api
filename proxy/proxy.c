@@ -463,8 +463,10 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	   (events[i].events & EPOLLRDHUP) ||
 	   (!(events[i].events & EPOLLIN))){
 	  WriteErrLog("%s\tepoll err!\n", client_ip);
-	  close(clientSocketId);
 	  close(proxyClientSocketId);
+	  shutdown(proxyClientSocketId,2);
+	  close(clientSocketId);
+	  shutdown(clientSocketId,2);
 	  exit(-1);
 	}
 	//}

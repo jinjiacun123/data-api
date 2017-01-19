@@ -494,7 +494,7 @@ void init_app(void *param)
 	    app_list[i].app_fifo_fd = -1;
 	    app_list[i].begin = 0;
 	    app_list[i].size  = 0;
-	    break;
+	    continue;
 	  }
 	}
 	if((tmp_app->pid == app_list[i].pid)
@@ -522,15 +522,16 @@ void init_app(void *param)
 	    *my_app = *((app_request_t*)app_request_buff);
 	    snprintf(app_fifo_name, 100, template, my_app->pid);
 	    //open fifo
-	    app_fifo_fd = open(app_fifo_name, O_WRONLY);
+	    app_fifo_fd = open(app_fifo_name, O_WRONLY|O_NONBLOCK);
 	    if(app_fifo_fd == -1){
 	      // printf("open %s error!\n");
 	      app_list[i].pid = 0;
 	      app_list[i].app_fifo_fd = 0;
 	      app_list[i].is_create = false;
-	      continue;
+	      break;
 	    }
 	    my_app->app_fifo_fd = app_fifo_fd;
+	    DEBUG("info[pid:%d]", my_app->pid);
 	    res = send_sort(my_app);
 	    assert(res == 0);
 	    break;
@@ -573,43 +574,66 @@ static int send_sort(app_request_t * my_app)
   int entity_list_size = 0;
   int head_off = 8;
   char t_buff[8 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
+  bool is_allow_send = true;
+  char *template = PRIVATE_PIPE_TEMPLATE;
+  int ret = 0;
+  char app_fifo_name[100] = {0};
 
   if(pthread_mutex_trylock(&send_sort_mutex) == 0){
-    if(my_app->app_fifo_fd >0){
+    if(my_app->pid > 0){
+      if(kill(my_app->pid, 0) != 0){
+	is_allow_send = false;
+	DEBUG("info:[close pid:%d]", my_app->pid);
+	    //delete pipe
+	ret = snprintf(app_fifo_name, 100, template, my_app->pid);
+	assert(ret > 0);
+	ret = unlink(app_fifo_name);
+	DEBUG("info:[delete fifo pid:%d retL%d]", my_app->pid);
+	close(my_app->app_fifo_fd);
+	my_app->pid = 0;
+	my_app->app_fifo_fd = -1;
+	my_app->begin = 0;
+	my_app->size  = 0;
+      }
+    }
+
+    if(is_allow_send){
+      if(my_app->app_fifo_fd >0 && my_app->pid > 0){
     //write app pipe
-    my_market = &market_list[0];
-    entity_list_size = my_market->entity_list_size;
-    //memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-    if(my_app->begin < entity_list_size
-       && my_app->begin + my_app->size < entity_list_size){
-      res = sort_get(my_market,
-		     my_app->column,
-		     my_app->begin,
-		     my_app->size,
-		     t_buff + head_off);
-    }else if(my_app->begin < entity_list_size){
-      res = sort_get(my_market,
-		     my_app->column,
-		     my_app->begin,
-		     entity_list_size - my_app->begin,
-		     t_buff + head_off);
+      my_market = &market_list[0];
+      entity_list_size = my_market->entity_list_size;
+      //memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
+      if(my_app->begin < entity_list_size
+	 && my_app->begin + my_app->size < entity_list_size){
+	res = sort_get(my_market,
+		       my_app->column,
+		       my_app->begin,
+		       my_app->size,
+		       t_buff + head_off);
+      }else if(my_app->begin < entity_list_size){
+	res = sort_get(my_market,
+		       my_app->column,
+		       my_app->begin,
+		       entity_list_size - my_app->begin,
+		       t_buff + head_off);
+      }
+      assert(res == 0);
+      memcpy(t_buff, &my_app->option, 4);
+      memcpy(t_buff+4, &my_app->begin, 4);
+      //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
+      res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+head_off);
+      if(res == -1){
+	DEBUG("error:[%s]", "write app fifo err!");
+	//close pipe
+	close(my_app->app_fifo_fd);
+	my_app->app_fifo_fd = 0;
+	my_app->pid = 0;
+	my_app->begin = 0;
+	my_app->size = 0;
+	my_app->is_create = false;
+      }
     }
-    assert(res == 0);
-    memcpy(t_buff, &my_app->option, 4);
-    memcpy(t_buff+4, &my_app->begin, 4);
-    //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
-    res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+head_off);
-    if(res == -1){
-      DEBUG("error:[%s]", "write app fifo err!");
-      //close pipe
-      close(my_app->app_fifo_fd);
-      my_app->app_fifo_fd = 0;
-      my_app->pid = 0;
-      my_app->begin = 0;
-      my_app->size = 0;
-      my_app->is_create = false;
     }
-  }
     pthread_mutex_unlock(&send_sort_mutex);
   }
   return 0;

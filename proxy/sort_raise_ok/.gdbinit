@@ -1,4 +1,4 @@
-b main
+#b main
 #b send_sort
 #b send_realtime
 #b send_auto_push
@@ -19,7 +19,7 @@ b main
 #b sort_add
 #b sort_get
 #b get_market
-b init_sort_area
+#b init_sort_area
 #b unpack
 #b save_key
 #b find_entity_by_key
@@ -35,4 +35,4 @@ b init_sort_area
 #b write_app
 #b sort_update
 #b remove_entity
-r
+#r

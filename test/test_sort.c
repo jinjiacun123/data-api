@@ -166,7 +166,7 @@ int main()
   //pthread_join(t_id, &thread_result);
   while(true){
     sleep(8);
-//    send_heart(client);
+    //    send_heart(client);
    // sleep(7);
   // ret = request_sort(client);
    // assert(ret == 0);
