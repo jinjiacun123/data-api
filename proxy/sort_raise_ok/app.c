@@ -34,6 +34,7 @@ int main(int argc, char * argv[])
   int res = 0;
   entity_t * entity = NULL;
   int i = 0;
+  int begin = 0;
 
   buff = (entity_t *)malloc(buff_len+1);
   if(buff == NULL){
@@ -43,6 +44,7 @@ int main(int argc, char * argv[])
   memset(buff, 0x00, buff_len);
   memset(&cur_app_pipe, 0x00, 100);
   snprintf(cur_app_pipe, 100, template, getpid());
+  unlink(cur_app_pipe);
   //create cur app pipe
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
@@ -70,10 +72,14 @@ int main(int argc, char * argv[])
   app_request.begin = my_begin;
   app_request.size = my_size;
   app_request.column = column;
+  app_request.index  = -100;
+  app_request.option = 0;
   res = write(pipe_write_fd, &app_request, app_request_len);
+  /*
   app_request.option = 1;
   app_request.begin = my_begin+1;
   res = write(pipe_write_fd, &app_request, app_request_len);
+  */
   close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
@@ -81,7 +87,7 @@ int main(int argc, char * argv[])
     printf("open pipe read fd error!\n");
     exit(-1);
   }
- 
+
   printf("wait read ...\n");
   //read sort
   while(true){
@@ -100,15 +106,9 @@ int main(int argc, char * argv[])
 
     //printf("price:%s\n", buff);
     //display
-    entity = (entity_t *)(buff + sizeof(int));
+    entity = (entity_t *)(buff + 2*sizeof(int));
     for(i = 0; i<my_size; i++){
-      printf("code_type:%x, \
-code:%.6s, \
-pre_close:%d, \
-price:%d, \
-raise:%d, \
-range:%d, \
-\n",
+      printf("code_type:%x, code:%.6s,pre_close:%d,price:%d,raise:%d,range:%d\n",
 	     entity->type,
 	     entity->code,
 	     entity->pre_close,

@@ -681,7 +681,7 @@ static int deal_client_info(client_socket_fd,
       WriteErrLog("%s read client info!\n", client_ip);
       app_off = 0;
       packages = 0;
-      //while(true){
+      //      while(true){
 	//check is request of sort
 	if(strncmp(tmp_buff+app_off, HEADER_EX, 4) == 0){
 	  	  packages ++;
@@ -711,15 +711,13 @@ static int deal_client_info(client_socket_fd,
 			       is_create_pipe);
 	  free(my_app_request_data);
 	}
-        /*
-	else{
-	  break;
-	}
-	if(nread > package_length){
-	  app_off += package_length;
-	}
-        */
-      //}
+	//else{
+	// break;
+	  //}
+	//if(nread > package_length){
+	//  app_off += package_length;
+	//}
+	//}
 
       n  += nread;
       if((nread - package_length) == 0)return 0;

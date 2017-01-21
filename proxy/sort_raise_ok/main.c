@@ -594,12 +594,13 @@ static int send_sort(app_request_t * my_app)
 	my_app->app_fifo_fd = -1;
 	my_app->begin = 0;
 	my_app->size  = 0;
+	pthread_mutex_unlock(&send_sort_mutex);
+	return 0;
       }
     }
 
-    if(is_allow_send){
-      if(my_app->app_fifo_fd >0 && my_app->pid > 0){
-    //write app pipe
+    if(my_app->app_fifo_fd >0 && my_app->pid > 0){
+      //write app pipe
       my_market = &market_list[0];
       entity_list_size = my_market->entity_list_size;
       //memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
@@ -632,7 +633,6 @@ static int send_sort(app_request_t * my_app)
 	my_app->size = 0;
 	my_app->is_create = false;
       }
-    }
     }
     pthread_mutex_unlock(&send_sort_mutex);
   }

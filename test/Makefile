@@ -56,3 +56,8 @@ test_simulate_server:test_simulate_server.c
 	gcc -g -w test_simulate_server.c -o test_simulate_server
 debug:debug.c
 	gcc -g -w debug.c -o debug
+
+test_get_ip:test_get_ip.c
+	gcc -g -w test_get_ip.c -o test_get_ip
+test_ini:test_ini.c
+	gcc -g -w test_ini.c -o test_ini

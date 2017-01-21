@@ -26,7 +26,8 @@
 #define LISTENMAX    1024
 #define PROXY_SERVER "127.0.0.1"
 #define PROXY_PORT   8001
-#define SERVER       "221.6.167.245"
+//#define SERVER       "221.6.167.245"
+#define SERVER "106.14.37.254"
 //#define SERVER "127.0.0.1"
 #define SERVER_PORT  8881
 //#define SERVER_PORT 8800
