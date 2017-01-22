@@ -839,7 +839,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   }
   else{
     entity->raise  = entity->price - entity->pre_close;
-    entity->range  = ceil(entity->raise *10000.0 / entity->pre_close);
+    entity->range  = round(entity->raise *10000.0 / entity->pre_close);
   }
   entity->max         = tmp->m_lMaxPrice;
   entity->min         = tmp->m_lMinPrice;
