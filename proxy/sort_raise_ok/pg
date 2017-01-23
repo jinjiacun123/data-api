@@ -1,331 +1,259 @@
 Flat profile:
 
 Each sample counts as 0.01 seconds.
+ no time accumulated
+
   %   cumulative   self              self     total           
- time   seconds   seconds    calls  ms/call  ms/call  name    
-100.00      0.01     0.01     1134     0.01     0.01  cJSON_GetArrayItem
-  0.00      0.01     0.00    17037     0.00     0.00  skip
-  0.00      0.01     0.00     6815     0.00     0.00  parse_string
-  0.00      0.01     0.00     6804     0.00     0.00  get_index_by_code_ascii
-  0.00      0.01     0.00     4557     0.00     0.00  cJSON_strcasecmp
-  0.00      0.01     0.00     4543     0.00     0.00  cJSON_New_Item
-  0.00      0.01     0.00     4543     0.00     0.00  parse_value
-  0.00      0.01     0.00     2274     0.00     0.00  cJSON_GetObjectItem
-  0.00      0.01     0.00     1135     0.00     0.00  parse_object
-  0.00      0.01     0.00     1134     0.00     0.00  save_key
-  0.00      0.01     0.00        1     0.00     0.00  cJSON_GetArraySize
-  0.00      0.01     0.00        1     0.00     0.00  cJSON_Parse
-  0.00      0.01     0.00        1     0.00     0.00  cJSON_ParseWithOpts
-  0.00      0.01     0.00        1     0.00     0.00  get_content
-  0.00      0.01     0.00        1     0.00    10.00  get_market
-  0.00      0.01     0.00        1     0.00    10.00  init_market
-  0.00      0.01     0.00        1     0.00     0.00  init_sort_area
-  0.00      0.01     0.00        1     0.00     0.00  parse_array
+ time   seconds   seconds    calls  Ts/call  Ts/call  name    
+  0.00      0.00     0.00     1200     0.00     0.00  get_index_by_code_ascii
+  0.00      0.00     0.00      300     0.00     0.00  find_location
+  0.00      0.00     0.00      300     0.00     0.00  sort_add
+  0.00      0.00     0.00      100     0.00     0.00  do_stock
+  0.00      0.00     0.00      100     0.00     0.00  find_entity_by_key
+  0.00      0.00     0.00      100     0.00     0.00  save_key
+  0.00      0.00     0.00        3     0.00     0.00  parse
+  0.00      0.00     0.00        2     0.00     0.00  jim_malloc
+  0.00      0.00     0.00        2     0.00     0.00  send_heart
+  0.00      0.00     0.00        1     0.00     0.00  get_market
+  0.00      0.00     0.00        1     0.00     0.00  init_login
+  0.00      0.00     0.00        1     0.00     0.00  init_market
+  0.00      0.00     0.00        1     0.00     0.00  init_socket
+  0.00      0.00     0.00        1     0.00     0.00  init_sort_area
+  0.00      0.00     0.00        1     0.00     0.00  parse_realtime
+  0.00      0.00     0.00        1     0.00     0.00  send_auto_push
+  0.00      0.00     0.00        1     0.00     0.00  send_realtime
+  0.00      0.00     0.00        1     0.00     0.00  unpack
 
 			Call graph
 
 
-granularity: each sample hit covers 4 byte(s) for 100.00% of 0.01 seconds
+granularity: each sample hit covers 4 byte(s) no time propagated
 
 index % time    self  children    called     name
-                0.01    0.00    1134/1134        get_market [2]
-[1]    100.0    0.01    0.00    1134         cJSON_GetArrayItem [1]
+                0.00    0.00     600/1200        save_key [6]
+                0.00    0.00     600/1200        find_entity_by_key [5]
+[1]      0.0    0.00    0.00    1200         get_index_by_code_ascii [1]
 -----------------------------------------------
-                0.00    0.01       1/1           init_market [3]
-[2]    100.0    0.00    0.01       1         get_market [2]
-                0.01    0.00    1134/1134        cJSON_GetArrayItem [1]
-                0.00    0.00    2274/2274        cJSON_GetObjectItem [12]
-                0.00    0.00    1134/1134        save_key [14]
-                0.00    0.00       1/1           cJSON_GetArraySize [15]
-                0.00    0.00       1/1           init_sort_area [19]
+                0.00    0.00     300/300         sort_add [3]
+[2]      0.0    0.00    0.00     300         find_location [2]
 -----------------------------------------------
-                0.00    0.01       1/1           main [4]
-[3]    100.0    0.00    0.01       1         init_market [3]
-                0.00    0.01       1/1           get_market [2]
-                0.00    0.00       1/1           get_content [18]
-                0.00    0.00       1/1           cJSON_Parse [16]
+                0.00    0.00     300/300         do_stock [4]
+[3]      0.0    0.00    0.00     300         sort_add [3]
+                0.00    0.00     300/300         find_location [2]
 -----------------------------------------------
-                                                 <spontaneous>
-[4]    100.0    0.00    0.01                 main [4]
-                0.00    0.01       1/1           init_market [3]
+                0.00    0.00     100/100         parse_realtime [15]
+[4]      0.0    0.00    0.00     100         do_stock [4]
+                0.00    0.00     300/300         sort_add [3]
+                0.00    0.00     100/100         find_entity_by_key [5]
 -----------------------------------------------
-[5]      0.0    0.00    0.00       1+5678    <cycle 1 as a whole> [5]
-                0.00    0.00    4543             parse_value <cycle 1> [11]
-                0.00    0.00    1135             parse_object <cycle 1> [13]
-                0.00    0.00       1             parse_array <cycle 1> [20]
+                0.00    0.00     100/100         do_stock [4]
+[5]      0.0    0.00    0.00     100         find_entity_by_key [5]
+                0.00    0.00     600/1200        get_index_by_code_ascii [1]
 -----------------------------------------------
-                0.00    0.00       1/17037       cJSON_ParseWithOpts [17]
-                0.00    0.00    2269/17037       parse_array <cycle 1> [20]
-                0.00    0.00   14767/17037       parse_object <cycle 1> [13]
-[6]      0.0    0.00    0.00   17037         skip [6]
+                0.00    0.00     100/100         get_market [10]
+[6]      0.0    0.00    0.00     100         save_key [6]
+                0.00    0.00     600/1200        get_index_by_code_ascii [1]
 -----------------------------------------------
-                0.00    0.00    3407/6815        parse_value <cycle 1> [11]
-                0.00    0.00    3408/6815        parse_object <cycle 1> [13]
-[7]      0.0    0.00    0.00    6815         parse_string [7]
+                                   1             parse [7]
+                0.00    0.00       3/3           init_receive [28]
+[7]      0.0    0.00    0.00       3+1       parse [7]
+                0.00    0.00       1/1           parse_realtime [15]
+                0.00    0.00       1/1           send_auto_push [16]
+                0.00    0.00       1/1           unpack [18]
+                                   1             parse [7]
 -----------------------------------------------
-                0.00    0.00    6804/6804        save_key [14]
-[8]      0.0    0.00    0.00    6804         get_index_by_code_ascii [8]
+                0.00    0.00       1/2           send_auto_push [16]
+                0.00    0.00       1/2           get_market [10]
+[8]      0.0    0.00    0.00       2         jim_malloc [8]
 -----------------------------------------------
-                0.00    0.00    4557/4557        cJSON_GetObjectItem [12]
-[9]      0.0    0.00    0.00    4557         cJSON_strcasecmp [9]
+                0.00    0.00       2/2           main [30]
+[9]      0.0    0.00    0.00       2         send_heart [9]
 -----------------------------------------------
-                0.00    0.00       1/4543        cJSON_ParseWithOpts [17]
-                0.00    0.00    1134/4543        parse_array <cycle 1> [20]
-                0.00    0.00    3408/4543        parse_object <cycle 1> [13]
-[10]     0.0    0.00    0.00    4543         cJSON_New_Item [10]
+                0.00    0.00       1/1           init_market [12]
+[10]     0.0    0.00    0.00       1         get_market [10]
+                0.00    0.00     100/100         save_key [6]
+                0.00    0.00       1/2           jim_malloc [8]
+                0.00    0.00       1/1           init_sort_area [14]
 -----------------------------------------------
-                                1134             parse_array <cycle 1> [20]
-                                3408             parse_object <cycle 1> [13]
-                0.00    0.00       1/1           cJSON_ParseWithOpts [17]
-[11]     0.0    0.00    0.00    4543         parse_value <cycle 1> [11]
-                0.00    0.00    3407/6815        parse_string [7]
-                                1135             parse_object <cycle 1> [13]
-                                   1             parse_array <cycle 1> [20]
+                0.00    0.00       1/1           main [30]
+[11]     0.0    0.00    0.00       1         init_login [11]
 -----------------------------------------------
-                0.00    0.00    2274/2274        get_market [2]
-[12]     0.0    0.00    0.00    2274         cJSON_GetObjectItem [12]
-                0.00    0.00    4557/4557        cJSON_strcasecmp [9]
+                0.00    0.00       1/1           main [30]
+[12]     0.0    0.00    0.00       1         init_market [12]
+                0.00    0.00       1/1           get_market [10]
 -----------------------------------------------
-                                1135             parse_value <cycle 1> [11]
-[13]     0.0    0.00    0.00    1135         parse_object <cycle 1> [13]
-                0.00    0.00   14767/17037       skip [6]
-                0.00    0.00    3408/4543        cJSON_New_Item [10]
-                0.00    0.00    3408/6815        parse_string [7]
-                                3408             parse_value <cycle 1> [11]
+                0.00    0.00       1/1           main [30]
+[13]     0.0    0.00    0.00       1         init_socket [13]
 -----------------------------------------------
-                0.00    0.00    1134/1134        get_market [2]
-[14]     0.0    0.00    0.00    1134         save_key [14]
-                0.00    0.00    6804/6804        get_index_by_code_ascii [8]
+                0.00    0.00       1/1           get_market [10]
+[14]     0.0    0.00    0.00       1         init_sort_area [14]
 -----------------------------------------------
-                0.00    0.00       1/1           get_market [2]
-[15]     0.0    0.00    0.00       1         cJSON_GetArraySize [15]
+                0.00    0.00       1/1           parse [7]
+[15]     0.0    0.00    0.00       1         parse_realtime [15]
+                0.00    0.00     100/100         do_stock [4]
 -----------------------------------------------
-                0.00    0.00       1/1           init_market [3]
-[16]     0.0    0.00    0.00       1         cJSON_Parse [16]
-                0.00    0.00       1/1           cJSON_ParseWithOpts [17]
+                0.00    0.00       1/1           parse [7]
+[16]     0.0    0.00    0.00       1         send_auto_push [16]
+                0.00    0.00       1/2           jim_malloc [8]
 -----------------------------------------------
-                0.00    0.00       1/1           cJSON_Parse [16]
-[17]     0.0    0.00    0.00       1         cJSON_ParseWithOpts [17]
-                0.00    0.00       1/4543        cJSON_New_Item [10]
-                0.00    0.00       1/17037       skip [6]
-                0.00    0.00       1/1           parse_value <cycle 1> [11]
+                0.00    0.00       1/1           main [30]
+[17]     0.0    0.00    0.00       1         send_realtime [17]
 -----------------------------------------------
-                0.00    0.00       1/1           init_market [3]
-[18]     0.0    0.00    0.00       1         get_content [18]
------------------------------------------------
-                0.00    0.00       1/1           get_market [2]
-[19]     0.0    0.00    0.00       1         init_sort_area [19]
------------------------------------------------
-                                   1             parse_value <cycle 1> [11]
-[20]     0.0    0.00    0.00       1         parse_array <cycle 1> [20]
-                0.00    0.00    2269/17037       skip [6]
-                0.00    0.00    1134/4543        cJSON_New_Item [10]
-                                1134             parse_value <cycle 1> [11]
+                0.00    0.00       1/1           parse [7]
+[18]     0.0    0.00    0.00       1         unpack [18]
 -----------------------------------------------
 
 Index by function name
 
-   [1] cJSON_GetArrayItem     [18] get_content             [7] parse_string (cJSON.c)
-  [15] cJSON_GetArraySize      [8] get_index_by_code_ascii [11] parse_value (cJSON.c)
-  [12] cJSON_GetObjectItem     [2] get_market             [14] save_key
-  [10] cJSON_New_Item (cJSON.c) [3] init_market            [6] skip (cJSON.c)
-  [16] cJSON_Parse            [19] init_sort_area          [5] <cycle 1>
-  [17] cJSON_ParseWithOpts    [20] parse_array (cJSON.c)
-   [9] cJSON_strcasecmp (cJSON.c) [13] parse_object (cJSON.c)
+   [4] do_stock (main.c)      [12] init_market             [6] save_key
+   [5] find_entity_by_key     [13] init_socket            [16] send_auto_push
+   [2] find_location (sort.c) [14] init_sort_area          [9] send_heart
+   [1] get_index_by_code_ascii [8] jim_malloc             [17] send_realtime
+  [10] get_market              [7] parse                   [3] sort_add
+  [11] init_login (main.c)    [15] parse_realtime         [18] unpack
 
-*** File /home/jim/source_code/data_api/proxy/sort/market.c:
+*** File /home/jim/source_code/data-api/proxy/sort_raise_ok/help.c:
+                #include<stdio.h>
+                #include "config.h"
+                
+           2 -> int jim_malloc(int size, void ** out){
+                  int page_size = 0;
+                  unsigned int length = 0;
+                  page_size = ceil(size / 4);
+                  length = page_size * 4;
+                  //  if(length == size) length = (page_size+1)*4;
+                  *out = (void *)malloc(size);
+                  if(*out == NULL){
+                    printf("malloc error!\n");
+                    return -1;
+                  }
+                  memset(*out, 0x00, size);
+                  return 0;
+       ##### -> }
+
+
+Top 10 Lines:
+
+     Line      Count
+
+        4          2
+
+Execution Summary:
+
+        2   Executable lines in this file
+        2   Lines executed
+   100.00   Percent of the file executed
+
+        2   Total number of line executions
+     1.00   Average executions per line
+
+
+*** File /home/jim/source_code/data-api/proxy/sort_raise_ok/market.c:
                 #include "market.h"
                 #include "assert.h"
+                #include <stdlib.h>
+                #include <stdio.h>
+                #include <string.h>
+                #define DATA_FILE "./txt/my_data"
                 
                 my_key_t key_root = {0};
                 extern market_t market_list[];
                 
                 //get code for both market
-                int init_market()
-           1 -> {
-                  char buff[100*1024];
-                  //get both txt
+           1 -> int init_market(){
+                  char * data_file_name = DATA_FILE;
+                  FILE * fp = fopen(data_file_name, "r");
                 
-                  char template_str[][100] =  {
-                    "rm -f ./txt/%s* ./txt/%s*",
-                    "wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/%s",
-                    "./txt/%s"
-                  };
-                  char cmd[100];
-                  sort_area_queue_t * area_queue_item = NULL; 
-                
-                  memset(&cmd, 0x00, 100);
-                  sprintf(cmd, template_str[0], market_list[0].file_name, market_list[1].file_name);
-                  system(cmd);
-                  memset(&cmd, 0x00, 100);
-                  sprintf(cmd, template_str[1], market_list[0].file_name);
-                  system(cmd);
-                  //system("wget -P ./txt/ http://dsapp.yz.zjwtj.com:8010/initinfo/stock/1101.txt");
-                  memset(&cmd, 0x00, 100);
-                  sprintf(cmd, template_str[1], market_list[1].file_name);
-                  system(cmd);
-                
-                  //parse
+                  int size = 0;
                   int index = 0;
-                  memset(buff, 0x00, 1024*100);
-                  memset(&cmd, 0x00, 50);
-                  sprintf(cmd, template_str[2], market_list[index].file_name);
-                  int length = get_content(cmd, buff, 1024*100);
-                  cJSON * root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-                  if (NULL == root_json){
-                      printf("error:%s\n", cJSON_GetErrorPtr());
-                      cJSON_Delete(root_json);
-                      return -1;
+                  if(fp == 0){
+                    DEBUG("error:[%s]","read my_data err!");
+                    return -1;
                   }
-                  //parse 1101
-                  get_market(root_json, index);
-                  free(root_json);
-                  return 0;
-                
-                  //parse 1201
-                  index = 1;
-                  memset(buff, 0x00, 1024*100);
-                  memset(&cmd, 0x00, 50);
-                  sprintf(cmd, template_str[2], market_list[index].file_name);
-                  length = get_content(cmd, buff, 1024*100);
-                  root_json = cJSON_Parse(buff);    //将字符串解析成json结构体
-                  if (NULL == root_json){
-                      printf("error:%s\n", cJSON_GetErrorPtr());
-                      cJSON_Delete(root_json);
-                      return;
+                  fseek(fp, 0L, SEEK_END);
+                  size = ftell(fp)/14;
+                  if(size == 0){
+                    DEBUG("error[%s]", "get file size err!");
+                    return -1;
                   }
-                  get_market(root_json, index);
-                
+                  fseek(fp, 0L, SEEK_SET);
+                  //stock
+                  //size = 3050;
+                  size = 100;
+                  get_market(index, fp, size);
+                  close(fp);
                   return 0;
                 }
                 
-                int out_market(int code_type_index)
-       ##### -> {
-                  int i = 0;
-                  entity_t * entity;
-                  char * template = "code_type:%2x\tcode:%s\tprice:%d\n";
-                
-                  entity = market_list[code_type_index].list;
-                  for(; i<market_list[code_type_index].entity_list_size; i++){
-                    printf(template, market_list[code_type_index].code_type,
-                	   entity->code,
-                	   entity->price);
-                  }
-                  return 0;
-                }
-                
-                int get_market(cJSON * root_json, int index)
+                int get_market(int index, FILE * fp, int size)
            1 -> {
                   entity_t * entity;
-                  cJSON * obj;
                   int entity_list_len = 0;
-                  obj = cJSON_GetObjectItem(root_json, "date");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  strncpy(market_list[index].date, obj->valuestring, 6);
-                  obj = cJSON_GetObjectItem(root_json, "codetype");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  market_list[index].code_type = strtol(obj->valuestring, NULL, 16);
-                  obj = cJSON_GetObjectItem(root_json, "szname");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  obj = cJSON_GetObjectItem(root_json, "priceunit");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  market_list[index].unit = atoi(obj->valuestring);
-                  obj = cJSON_GetObjectItem(root_json, "open_close_time");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  strcpy(market_list[index].open_close_time, obj->valuestring);
-                  obj = cJSON_GetObjectItem(root_json, "list");
-                  if(obj == NULL){
-                    printf("get object of date err!\n");
-                    exit(-1);
-                  }
-                  market_list[index].entity_list_size = cJSON_GetArraySize(obj);
+                  char buff[14];
+                  int ret = -1;
+                
+                  market_list[index].entity_list_size = size;
+                  //market_list[index].entity_list_size = 12;
                   if(market_list[index].list != NULL){free(market_list[index].list);}
                   //init list
-                  market_list[index].list = (entity_t *)malloc(market_list[index].entity_list_size*sizeof(entity_t));
-                  if(market_list[index].list == NULL){
-                    printf("molloc menory err!\n");
-                    exit(-1);
-                  }
-                  memset(market_list[index].list, 0x00, market_list[index].entity_list_size*sizeof(entity_t));
-                  if(market_list[index].sort_price_list != NULL){free(market_list[index].sort_price_list);}
-                  //init sort_price_list
-                  market_list[index].sort_price_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-                  if(market_list[index].sort_price_list == NULL){
-                    printf("malloc memory err!\n");
-                    exit(-1);
-                  }
-                  memset(market_list[index].sort_price_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
-                  if(market_list[index].sort_up_list != NULL){free(market_list[index].sort_up_list);}
-                  //init sort_up_list
-                  market_list[index].sort_up_list = (int*)malloc(market_list[index].entity_list_size*sizeof(int *)); 
-                  if(market_list[index].sort_up_list == NULL){
-                	printf("malloc memory err!\n");
-                	exit(-1);
-                  }
-                  memset(market_list[index].sort_up_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
-                  if(market_list[index].sort_down_list != NULL){free(market_list[index].sort_down_list);}
-                  //init sort_down_list
-                  market_list[index].sort_down_list = (int *)malloc(market_list[index].entity_list_size*sizeof(int *));
-                  if(market_list[index].sort_down_list == NULL){
-                 	printf("malloc memory err!\n");
-                	exit(-1);
-                  }
-                  memset(market_list[index].sort_down_list, 0x00, market_list[index].entity_list_size*sizeof(int *));
+                  ret = jim_malloc(market_list[index].entity_list_size*sizeof(entity_t), &market_list[index].list);
+                  assert(ret == 0);
                 
                   int i = 0;
-                  cJSON * item;
                   entity = market_list[index].list;
-                  int * item_sort_price = market_list[index].sort_price_list;
-                  int * item_sort_up    = market_list[index].sort_up_list;
-                  int * item_sort_down  = market_list[index].sort_down_list;
                   int * yestoday_max_price = &market_list[index].yestoday_max;
                   int * yestoday_min_price = &market_list[index].yestoday_min;
-                  *yestoday_min_price = 100000;
+                  *yestoday_min_price      = 100000;
+                  char * code = NULL;
+                  unsigned short code_type = 0;
+                  int max = 0;
+                  char *c = NULL;
                   for(; i< market_list[index].entity_list_size; i++){
-                    item = cJSON_GetArrayItem(obj, i);
-                    strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
-                    entity->pre_close = atoi(cJSON_GetObjectItem(item, "preclose")->valuestring);
-                    *item_sort_price = entity;
-                    *item_sort_up    = entity;
-                    *item_sort_down  = entity;
+                    memset(&buff, 0x00, 14);
+                    //if(max >12) break;
+                    c = fread(buff, sizeof(unsigned char), 14, fp);
+                    if(c == 0){
+                      DEBUG("error[%s]", "read err!");
+                      return -1;
+                    }
+                    entity->type = *(int*)buff;
+                    //strcpy(entity->code, cJSON_GetObjectItem(item, "code")->valuestring);
+                    strncpy(entity->code, buff+8, 6);
+                    entity->code[6] = '\0';
+                    entity->pre_close = *(int*)(buff+4);
                     //find max and min of price
                     if(entity->pre_close != 0){
                       if(*yestoday_max_price < entity->pre_close){ *yestoday_max_price = entity->pre_close;}
                       if(*yestoday_min_price > entity->pre_close){ *yestoday_min_price = entity->pre_close;}
                     }
                 
-                    printf("index:%d\tcode:%s\tpreclose:%d\n",
+                    DEBUG("info:[index:%d\tcode:%s\tpreclose:%d]",
                 	   i,
                 	   entity->code,
                 	   entity->pre_close);
-                
                     //save to key
-                    assert(save_key(entity->code, 6, index, entity) == 0);
+                    switch(entity->type){
+                    case 0x1101:{
+                      assert(save_key(entity->code, 6, 0, entity) == 0);
+                    }break;
+                    case 0x1201:{
+                      assert(save_key(entity->code, 6, 1, entity) == 0);
+                    }break;
+                    case 0x1206:{
+                      assert(save_key(entity->code, 6, 2, entity) == 0);
+                    }break;
+                    case 0x120b:{
+                      assert(save_key(entity->code, 6, 3, entity) == 0);
+                    }break;
+                    }
                 
                     entity ++;
-                    item_sort_price ++;
-                    item_sort_up ++;
-                    item_sort_down ++;
+                    //item_sort_price ++;
+                    //item_sort_raise ++;
+                    max ++;
                   }
                 
-                  printf("yestoday_max:%d\tyestoday_min:%d\m", 
-                	 *yestoday_max_price,
-                	 *yestoday_min_price);
+                  DEBUG("info:[yestoday_max:%d\tyestoday_min:%d]", *yestoday_max_price, *yestoday_min_price);
                   //set setting_price
                   market_list[index].setting_max = market_list[index].yestoday_max * 1.1;
                   market_list[index].setting_min = market_list[index].yestoday_min * 0.9;
@@ -333,7 +261,7 @@ Index by function name
                   //init sort area
                   init_sort_area(&market_list[index]);
                 
-                  printf("date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d\n",
+                  DEBUG("info:[date:%s\tcode_type:%x\tunit:%d\topen_close_time:%s\tcode_size:%d]",
                 	 market_list[index].date,
                 	 market_list[index].code_type,
                 	 market_list[index].unit,
@@ -347,7 +275,7 @@ Index by function name
                    from first letter to last,every letter point floor
                 */
                 int save_key(char * code, unsigned code_len, int code_type_index, entity_t * entity)
-        1134 -> {
+         100 -> {
                   int i              = 0;
                   char ascii         = 0;
                   int unit           = 0;
@@ -363,7 +291,7 @@ Index by function name
                     if(cur_key->childs[location] == NULL){
                       tmp_key = (my_key_t *)malloc(sizeof(my_key_t));
                       if(tmp_key == NULL){
-                	printf("malloc error!\n");
+                	DEBUG("error:[%s]","malloc error!");
                 	exit(-1);
                       }
                       memset(tmp_key, 0x00, sizeof(my_key_t));
@@ -384,12 +312,12 @@ Index by function name
                   return 0;
                 }
                 
-                int find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
-       ##### -> {
+                void * find_entity_by_key(char * code, unsigned int code_len, int code_type_index)
+         100 -> {
                   int location = 0;
                   char ascii   = 0;
                   int i        = 0;
-                  int address  = 0;
+                  void * address  = NULL;
                   my_key_t * cur_key = &key_root;
                 
                   //from first to sixth bit
@@ -411,32 +339,32 @@ Top 10 Lines:
 
      Line      Count
 
-      214       1134
-        9          1
-       82          1
+      127        100
+      165        100
+       12          1
+       38          1
 
 Execution Summary:
 
-        6   Executable lines in this file
-        6   Lines executed
+        5   Executable lines in this file
+        5   Lines executed
    100.00   Percent of the file executed
 
-     1136   Total number of line executions
-   189.33   Average executions per line
+      202   Total number of line executions
+    40.40   Average executions per line
 
 
-*** File /home/jim/source_code/data_api/proxy/sort/sort.c:
+*** File /home/jim/source_code/data-api/proxy/sort_raise_ok/sort.c:
                 #include "config.h"
-                #include "cJSON.h"
                 #include "sort.h"
                 #include "market.h"
                 #include <assert.h>
                 #include <stdbool.h>
+                #include <math.h>
                 
                 static int sort_area(market_t * my_market, column_n column);
                 static int find_location(market_t * my_market, entity_t * entity, column_n column, int * area_index, int * queue_index);
                 static int remove_entity(market_t * my_market, entity_t * entity, column_n column);
-                static int search_queue_index(int value, int begin, int length, sort_area_queue_t * queue, column_n column);
                 extern market_t market_list[];
                 
                 //init area and queueof area
@@ -445,35 +373,85 @@ Execution Summary:
                      market_t * my_market;
            1 -> {
                   int i = 0;
-                  sort_area_t * sort_area = NULL;
-                  sort_area_t * sort_area_zero = NULL;
-                  int step_len = (my_market->setting_max - my_market->setting_min)/AREA_NUMBER;
-                  int default_area_queue_len = AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
-                
-                  //deal zero
-                  sort_area_zero = &my_market->sort_area_price_zero;
-                  sort_area_zero->cur = (sort_area_queue_t *)malloc(AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t));
-                  if(sort_area_zero->cur == NULL){
-                    printf("malloc err!\n");
+                  sort_area_t * price_sort_area = NULL;
+                  sort_area_t * raise_sort_area = NULL;
+                  sort_area_t * range_sort_area = NULL;
+                  int price_step_len = 0;
+                  int raise_step_len = 0;
+                  int range_step_len = 0.0;
+                  //char tmp_range[6] = {0};
+                  price_step_len = (my_market->setting_max - my_market->setting_min)/AREA_NUMBER;
+                  raise_step_len = (my_market->yestoday_max *0.1*2)/AREA_NUMBER;
+                  //range_step_len = ceilf(0.4 * 10000/AREA_NUMBER)/10000;
+                  //snprintf(tmp_range, "%.4f", (float)(0.4/AREA_NUMBER), 6);
+                  //range_step_len = (float)atoll(tmp_range);
+                  range_step_len = 4000/AREA_NUMBER;
+                  //range_step_len = ( (float)( (int)( (range_step_len+0.005)*100 ) ) )/100;
+                  //range_step_len = ceilf(37.777779*100)/100;
+                  int raise_min = (-1)*(my_market->yestoday_max * 0.1);
+                  float range_min = -2000;
+                  int price_area_queue_len = 0;
+                  int raise_area_queue_len = 0;
+                  int range_area_queue_len = 0;
+                  int default_area_queue_len = AREA_NUMBER*AREA_QUEUE_DEFAULT_LEN*sizeof(sort_area_queue_t);
+                  int price_page_size = 0;
+                  int raise_page_size = 0;
+                  int range_page_size = 0;
+                  price_page_size = default_area_queue_len;
+                  raise_page_size = default_area_queue_len;
+                  range_page_size = default_area_queue_len;
+                  //price_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
+                  //raise_page_size = ceil(1.0*default_area_queue_len/PAGE_SIZE);
+                  //price_area_queue_len = price_page_size * PAGE_SIZE;
+                  //raise_area_queue_len = raise_page_size * PAGE_SIZE;
+                  price_area_queue_len = price_page_size;
+                  raise_area_queue_len = raise_page_size;
+                  range_area_queue_len = range_page_size;
+                  sort_area_queue_t * price_base_queue = (char *)malloc(price_area_queue_len);
+                  sort_area_queue_t * raise_base_queue = (char *)malloc(raise_area_queue_len);
+                  sort_area_queue_t * range_base_queue = (char *)malloc(range_area_queue_len);
+                  if(price_base_queue == NULL){
+                    DEBUG("error:[%s]", "malloc error!");
                     return -1;
                   }
-                  memset(sort_area_zero->cur, 0x00, default_area_queue_len);
-                
-                  sort_area = &my_market->sort_area_price;
-                  for(; i< AREA_NUMBER; i++){
-                    sort_area->cur = (sort_area_queue_t *)malloc(default_area_queue_len);
-                    if(sort_area->cur == NULL){
-                      printf("malloc err!\n");
-                      return -1;
-                    }
-                    memset(sort_area->cur, 0x00, default_area_queue_len);
-                    sort_area->min_value.ivalue = my_market->setting_min + step_len * i;
-                    sort_area->max_value.ivalue = sort_area->min_value.ivalue + step_len +1;
-                    sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
-                
-                    sort_area ++;
+                  memset(price_base_queue, 0x00, price_area_queue_len);
+                  if(raise_base_queue == NULL){
+                    DEBUG("error:[%s]", "malloc error!");
+                    return -1;
                   }
+                  memset(raise_base_queue, 0x00, raise_area_queue_len);
+                  if(range_base_queue == NULL){
+                    DEBUG("error:[%s]", "malloc error!");
+                    return -1;
+                  }
+                  memset(range_base_queue, 0x00, range_area_queue_len);
                 
+                  price_sort_area = &my_market->sort_area_price;
+                  raise_sort_area = &my_market->sort_area_raise;
+                  range_sort_area = &my_market->sort_area_range;
+                  for(; i< AREA_NUMBER; i++){
+                    price_sort_area->cur = price_base_queue + AREA_QUEUE_DEFAULT_LEN * i;
+                    raise_sort_area->cur = raise_base_queue + AREA_QUEUE_DEFAULT_LEN * i;
+                    range_sort_area->cur = range_base_queue + AREA_QUEUE_DEFAULT_LEN * i;
+                
+                    price_sort_area->min_value.ivalue = my_market->setting_min + price_step_len * i;
+                    price_sort_area->max_value.ivalue = price_sort_area->min_value.ivalue + price_step_len +1;
+                    raise_sort_area->min_value.ivalue = raise_min + raise_step_len * i;
+                    raise_sort_area->max_value.ivalue = raise_sort_area->min_value.ivalue + raise_step_len + 1;
+                    range_sort_area->min_value.ivalue = range_min + range_step_len * i;
+                    range_sort_area->max_value.ivalue = range_sort_area->min_value.ivalue + range_step_len + 1;
+                
+                    price_sort_area->real_size  = 0;
+                    raise_sort_area->real_size  = 0;
+                    range_sort_area->real_size  = 0;
+                    price_sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
+                    raise_sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
+                    range_sort_area->allow_size = AREA_QUEUE_DEFAULT_LEN;
+                
+                    price_sort_area ++;
+                    raise_sort_area ++;
+                    range_sort_area ++;
+                  }
                   return 0;
                 }
                 
@@ -492,19 +470,34 @@ Execution Summary:
                      market_t * my_market;
                      entity_t * entity;
                      column_n column;
-       ##### -> {
+         300 -> {
                   int i = 0;
                   int area_index = 0;
                   int queue_index = 0;
-                  int pre_ivalue = 0;
-                  float pre_fvalue = 0;
                   sort_area_t * cur_area = NULL;
                   sort_area_queue_t * cur_queue = NULL, * pre_queue = NULL;
+                  int ret = -1;
                 
                   //find entity from area
-                  assert(find_location(my_market, entity, column, &area_index, &queue_index) == 0);
-                  entity->price_area[0] = area_index;
-                  entity->price_area[1] = queue_index;
+                  ret = find_location(my_market, entity, column, &area_index, &queue_index);
+                  assert(ret == 0);
+                  switch(column){
+                  case NEW_PRICE:{
+                    entity->price_area[0] = area_index;
+                    entity->price_area[1] = queue_index;
+                  }break;
+                  case RAISE:{
+                    entity->raise_area[0] = area_index;
+                    entity->raise_area[1] = queue_index;
+                  }break;
+                  case RANGE:{
+                    entity->range_area[0] = area_index;
+                    entity->range_area[1] = queue_index;
+                  }break;
+                  default:{
+                
+                  }
+                  }
                   //check is exits,by pre_*
                   switch(column){
                   case NEW_PRICE:{
@@ -513,8 +506,9 @@ Execution Summary:
                     if(queue_index == 0){//first
                       if(cur_area->real_size == 0){
                 	cur_queue = cur_area->cur;
-                	cur_queue->entity = entity;
                 	cur_queue->index = 0;
+                	cur_queue->entity = entity;
+                	cur_queue->entity->price_area[1] = cur_queue->index;
                       }
                       else{
                 	i = cur_area->real_size;
@@ -523,18 +517,21 @@ Execution Summary:
                 	for(; i>queue_index; i--){
                 	  cur_queue->index = pre_queue->index+1;
                 	  cur_queue->entity = pre_queue->entity;
+                	  cur_queue->entity->price_area[1] = cur_queue->index;
                 	  cur_queue --;
                 	  pre_queue --;
                 	}
                 	cur_queue = cur_area->cur + queue_index;
                 	cur_queue->entity = entity;
                 	cur_queue->index = queue_index;
+                	cur_queue->entity->price_area[1] = cur_queue->index;
                       }
                     }
                     else if(queue_index == cur_area->real_size){//last
                       cur_queue = cur_area->cur + queue_index;
                       cur_queue->entity = entity;
                       cur_queue->index = queue_index;
+                      cur_queue->entity->price_area[1] = queue_index;
                     }
                     else if(queue_index < cur_area->real_size){//in btween real_size
                       //move
@@ -544,19 +541,133 @@ Execution Summary:
                       for(; i>queue_index; i--){
                 	cur_queue->index = pre_queue->index+1;
                 	cur_queue->entity = pre_queue->entity;
+                	cur_queue->entity->price_area[1] = cur_queue->index;
                 	cur_queue --;
                 	pre_queue --;
                       }
                       cur_queue = cur_area->cur + queue_index;
                       cur_queue->entity = entity;
                       cur_queue->index = queue_index;
+                      cur_queue->entity->price_area[1] = cur_queue->index;
                     }
                     else{//not enough and remalloc
                       cur_queue = cur_area->cur + queue_index;
                       cur_queue->index = queue_index;
                       cur_queue->entity = entity;
+                      cur_queue->entity->price_area[1] = cur_queue->index;
                     }
                 
+                    cur_area->real_size ++;
+                  }break;
+                  case RAISE:{
+                    cur_area = &my_market->sort_area_raise[area_index];
+                
+                    if(queue_index == 0){//first
+                      if(cur_area->real_size == 0){
+                	cur_queue = cur_area->cur;
+                	cur_queue->index = 0;
+                	cur_queue->entity = entity;
+                	cur_queue->entity->raise_area[1] = cur_queue->index;
+                      }
+                      else{
+                	i = cur_area->real_size;
+                	pre_queue = cur_area->cur + i -1;
+                	cur_queue = cur_area->cur + i;
+                	for(; i>queue_index; i--){
+                	  cur_queue->index = pre_queue->index+1;
+                	  cur_queue->entity = pre_queue->entity;
+                	  cur_queue->entity->raise_area[1] = cur_queue->index;
+                	  cur_queue --;
+                	  pre_queue --;
+                	}
+                	cur_queue = cur_area->cur + queue_index;
+                	cur_queue->entity = entity;
+                	cur_queue->index = queue_index;
+                	cur_queue->entity->raise_area[1] = cur_queue->index;
+                      }
+                    }
+                    else if(queue_index == cur_area->real_size){//last
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity->raise_area[1] = queue_index;
+                    }
+                    else if(queue_index < cur_area->real_size){//in btween real_size
+                      //move
+                      i = cur_area->real_size;
+                      pre_queue = cur_area->cur + i -1;
+                      cur_queue = cur_area->cur + i;
+                      for(; i>queue_index; i--){
+                	cur_queue->index = pre_queue->index+1;
+                	cur_queue->entity = pre_queue->entity;
+                	cur_queue->entity->raise_area[1] = cur_queue->index;
+                	cur_queue --;
+                	pre_queue --;
+                      }
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity->raise_area[1] = cur_queue->index;
+                    }
+                    else{//not enough and remalloc
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->entity->raise_area[1] = cur_queue->index;
+                    }
+                    cur_area->real_size ++;
+                  }break;
+                  case RANGE:{
+                    cur_area = &my_market->sort_area_range[area_index];
+                    if(queue_index == 0){//first
+                      if(cur_area->real_size == 0){
+                	cur_queue = cur_area->cur;
+                	cur_queue->index = 0;
+                	cur_queue->entity = entity;
+                	cur_queue->entity->range_area[1] = cur_queue->index;
+                      }else{
+                	i = cur_area->real_size;
+                	pre_queue = cur_area->cur + i -1;
+                	cur_queue = cur_area->cur + i;
+                	for(; i>queue_index; i--){
+                	  cur_queue->index = pre_queue->index+1;
+                	  cur_queue->entity = pre_queue->entity;
+                	  cur_queue->entity->range_area[1] = cur_queue->index;
+                	  cur_queue --;
+                	  pre_queue --;
+                	}
+                	cur_queue = cur_area->cur + queue_index;
+                	cur_queue->entity = entity;
+                	cur_queue->index = queue_index;
+                	cur_queue->entity->range_area[1] = cur_queue->index;
+                      }
+                    }else if(queue_index == cur_area->real_size){//last
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity->range_area[1] = queue_index;
+                    }else if(queue_index < cur_area->real_size){//in btween real_size
+                      //move
+                      i = cur_area->real_size;
+                      pre_queue = cur_area->cur + i -1;
+                      cur_queue = cur_area->cur + i;
+                      for(; i>queue_index; i--){
+                	cur_queue->index = pre_queue->index+1;
+                	cur_queue->entity = pre_queue->entity;
+                	cur_queue->entity->range_area[1] = cur_queue->index;
+                	cur_queue --;
+                	pre_queue --;
+                      }
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity->range_area[1] = cur_queue->index;
+                    }else{//not enough and remalloc
+                      cur_queue = cur_area->cur + queue_index;
+                      cur_queue->index = queue_index;
+                      cur_queue->entity = entity;
+                      cur_queue->entity->range_area[1] = cur_queue->index;
+                    }
                     cur_area->real_size ++;
                   }break;
                   default:{
@@ -587,9 +698,24 @@ Execution Summary:
                      column_n column;
                      int * area_index;
                      int * queue_index;
-       ##### -> {
+         300 -> {
                   int i = 0;
-                  sort_area_t * area = &my_market->sort_area_price;
+                  sort_area_t * area = NULL;
+                  sort_area_t * pre_area = NULL;
+                  int tmp_ivalue = 0;
+                  switch(column){
+                  case NEW_PRICE:
+                    area = &my_market->sort_area_price;
+                    break;
+                  case RAISE:
+                    area = &my_market->sort_area_raise;
+                    break;
+                  case RANGE:
+                    area = &my_market->sort_area_range;
+                    break;
+                  default:
+                    break;
+                  }
                   sort_area_queue_t * queue = NULL;
                   int real_size = 0;
                   value_t value;
@@ -600,14 +726,22 @@ Execution Summary:
                   case NEW_PRICE:{
                     value.ivalue = entity->price;
                   }break;
+                  case RAISE:{
+                    value.ivalue = entity->raise;
+                  }break;
+                  case RANGE:{
+                    value.ivalue = entity->range;
+                  }break;
                   default:{
                 
                   }break;
                   }
                 
+                  pre_area = area;
                   //find area
                   for(; i<AREA_NUMBER; i++){
                     if(value.ivalue > area->max_value.ivalue){
+                      pre_area = area;
                       area ++;
                       continue;
                     }
@@ -617,7 +751,13 @@ Execution Summary:
                     queue = area->cur;
                     break;
                   }
-                  
+                  if(i == AREA_NUMBER){
+                    area = pre_area;
+                    i = AREA_NUMBER -1;
+                    *area_index = i;
+                    real_size = area->real_size;
+                    queue = area->cur;
+                  }
                   //find queue
                   if(area->real_size == 0){
                     *queue_index = 0;
@@ -629,12 +769,38 @@ Execution Summary:
                       //      *queue_index = search_queue_index(value.ivalue, 0, real_size, queue, column);
                       for(i=0; i < real_size; i++){
                 	item = queue->entity;
-                	if(value.ivalue > item->price){
-                	  queue++;
-                	  continue;
-                	}
-                	else{
-                	  *queue_index = i;
+                	switch(column){
+                	case NEW_PRICE:{
+                	  tmp_ivalue = item->price;
+                	  if(value.ivalue > tmp_ivalue){
+                	    queue++;
+                	    continue;
+                	  }else{
+                	    *queue_index = i;
+                	    return 0;
+                	  }
+                	}break;
+                	case RAISE:{
+                	  tmp_ivalue = item->raise;
+                	  if(value.ivalue > tmp_ivalue){
+                	    queue++;
+                	    continue;
+                	  }else{
+                	    *queue_index = i;
+                	    return 0;
+                	  }
+                	}break;
+                	case RANGE:{
+                	  tmp_ivalue = item->range;
+                	  if(value.ivalue > tmp_ivalue){
+                	    queue++;
+                	    continue;
+                	  }else{
+                	    *queue_index = i;
+                	    return 0;
+                	  }
+                	}break;
+                	default:
                 	  break;
                 	}
                       }
@@ -646,13 +812,16 @@ Execution Summary:
                     else{//not enough, remalloc
                       tmp_queue = (sort_area_queue_t *)malloc(2 * area->allow_size * sizeof(sort_area_queue_t));
                       if(tmp_queue == NULL){
-                	printf("malloc err!\n");
+                	DEBUG("error:[%s]", "malloc err!");
                 	return -1;
                       }
                       memset(tmp_queue, 0x00, 2 * area->allow_size * sizeof(sort_area_queue_t));
                       //copy old to new
                       memcpy(tmp_queue, area->cur, area->allow_size * sizeof(sort_area_queue_t));
-                      free(area->cur);
+                      if(area->allow_size != AREA_QUEUE_DEFAULT_LEN){
+                      	sort_area_queue_t * ttt = area->cur;
+                	free(ttt);
+                      }
                       area->cur = tmp_queue;
                       area->allow_size = area->allow_size *  2;
                       *queue_index = area->real_size;
@@ -675,8 +844,22 @@ Execution Summary:
                   sort_area_queue_t * cur_queue = NULL;
                   sort_area_queue_t * after_queue = NULL;
                 
-                  area_index = entity->price_area[0];
-                  queue_index = entity->price_area[1];
+                  switch(column){
+                  case NEW_PRICE:{
+                    area_index  = entity->price_area[0];
+                    queue_index = entity->price_area[1];
+                  }break;
+                  case RAISE:{
+                    area_index  = entity->raise_area[0];
+                    queue_index = entity->raise_area[1];
+                  }break;
+                  case RANGE:{
+                    area_index  = entity->range_area[0];
+                    queue_index = entity->range_area[1];
+                  }break;
+                  default:
+                    break;
+                  }
                 
                   switch(column){
                   case NEW_PRICE:{
@@ -685,17 +868,94 @@ Execution Summary:
                       i = queue_index;
                       cur_queue = cur_area->cur+i;
                       after_queue = cur_area->cur +i + 1;
-                      for(; i< cur_area->real_size; i++){
-                	cur_queue->index = after_queue->index -1;
+                      for(; i < cur_area->real_size-1 ; i++){
                 	cur_queue->entity = after_queue->entity;
+                	cur_queue->entity->price_area[1] --;
                 	cur_queue ++;
                 	after_queue ++;
                       }
+                      /*
+                      after_queue = cur_area->cur + cur_area->real_size -1;
                       after_queue->index = -1;
                       after_queue->entity = NULL;
+                      */
+                      /*
+                      cur_queue->entity->price_area[0] = -1;
+                      cur_queue->entity->price_area[1] = -1;
+                      cur_queue->index = -1;
+                      cur_queue->entity = NULL;
+                      */
                     }
                     else if(queue_index == cur_area->real_size-1){//last
                       cur_queue = cur_area->cur+cur_area->real_size-1;
+                      cur_queue->entity->price_area[0] = -1;
+                      cur_queue->entity->price_area[1] = -1;
+                      cur_queue->index = -1;
+                      cur_queue->entity = NULL;
+                    }
+                    cur_area->real_size --;
+                  }break;
+                  case RAISE:{
+                    cur_area = &my_market->sort_area_raise[area_index];
+                    if(queue_index != cur_area->real_size-1){//not last
+                      i = queue_index;
+                      cur_queue = cur_area->cur+i;
+                      after_queue = cur_area->cur +i + 1;
+                      for(; i < cur_area->real_size-1 ; i++){
+                	cur_queue->entity = after_queue->entity;
+                	cur_queue->entity->raise_area[1] --;
+                	cur_queue ++;
+                	after_queue ++;
+                      }
+                      /*
+                      after_queue = cur_area->cur + cur_area->real_size -1;
+                      after_queue->index = -1;
+                      after_queue->entity = NULL;
+                      */
+                      /*
+                      cur_queue->entity->price_area[0] = -1;
+                      cur_queue->entity->price_area[1] = -1;
+                      cur_queue->index = -1;
+                      cur_queue->entity = NULL;
+                      */
+                    }
+                    else if(queue_index == cur_area->real_size-1){//last
+                      cur_queue = cur_area->cur+cur_area->real_size-1;
+                      cur_queue->entity->raise_area[0] = -1;
+                      cur_queue->entity->raise_area[1] = -1;
+                      cur_queue->index = -1;
+                      cur_queue->entity = NULL;
+                    }
+                    cur_area->real_size --;
+                  }break;
+                  case RANGE:{
+                    cur_area = &my_market->sort_area_range[area_index];
+                    if(queue_index != cur_area->real_size-1){//not last
+                      i = queue_index;
+                      cur_queue = cur_area->cur+i;
+                      after_queue = cur_area->cur +i + 1;
+                      for(; i < cur_area->real_size-1 ; i++){
+                	cur_queue->entity = after_queue->entity;
+                	cur_queue->entity->range_area[1] --;
+                	cur_queue ++;
+                	after_queue ++;
+                      }
+                      /*
+                      after_queue = cur_area->cur + cur_area->real_size -1;
+                      after_queue->index = -1;
+                      after_queue->entity = NULL;
+                      */
+                      /*
+                      cur_queue->entity->price_area[0] = -1;
+                      cur_queue->entity->price_area[1] = -1;
+                      cur_queue->index = -1;
+                      cur_queue->entity = NULL;
+                      */
+                    }
+                    else if(queue_index == cur_area->real_size-1){//last
+                      cur_queue = cur_area->cur+cur_area->real_size-1;
+                      cur_queue->entity->range_area[0] = -1;
+                      cur_queue->entity->range_area[1] = -1;
                       cur_queue->index = -1;
                       cur_queue->entity = NULL;
                     }
@@ -716,73 +976,40 @@ Execution Summary:
                   return 0;
                 }
                 
-                
-                static int sort_list(my_market, column)
+                int sort_get(my_market, column, index, size, entity_list)
                      market_t * my_market;
                      column_n column;
-       ##### -> {
-                  int i = 0, j = 0;
-                  int size = market_list[0].entity_list_size;
-                  entity_t *p, *q, *swap;
-                  int sort_size = sizeof(market_t *);
-                  int *ip = 0, *iq = 0, iswap = 0;
-                
-                  printf("begin sort...\n");
-                
-                  for(i=0; i<size; i++){
-                    for(j=i+1; j< size; j++){
-                      ip = my_market->sort_price_list+(j-1);
-                      p = (entity_t*)(*(my_market->sort_price_list+(j-1)));
-                      iq = my_market->sort_price_list+j;
-                      q = (entity_t *)(*(my_market->sort_price_list+j));
-                      if(p->price > q->price){
-                	iswap = *ip;
-                	*ip = *iq;
-                	*iq = iswap;
-                      }
-                    }
-                  }
-                  printf("sort complete...\n");
-                
-                  return 0;
-                }
-                
-                int display_sort(my_market)
-                     market_t * my_market;
-       ##### -> {
-                  entity_t * entity;
-                  int i = 0;
-                  char * template = "code:%s\tprice:%d\n";
-                
-                  for(; i<my_market->entity_list_size; i++){
-                    entity = (entity_t *)(*(my_market->sort_price_list+i));
-                    printf(template, entity->code, entity->price);
-                  }
-                  printf("display sort complete...\n");
-                
-                  return 0;
-                }
-                
-                int sort_get(my_market, index, size, entity_list)
-                     market_t * my_market;
                      int index;
                      int size;
                      entity_t * entity_list;
        ##### -> {
                   sort_area_t * area = NULL;
                   int cur_real_size = 0;
-                  area = &my_market->sort_area_price;
+                  switch(column){
+                  case NEW_PRICE:
+                    area = &my_market->sort_area_price;
+                    break;
+                  case RAISE:
+                    area = &my_market->sort_area_raise;
+                    break;
+                  case RANGE:
+                    area = &my_market->sort_area_range;
+                    break;
+                  default:
+                    break;
+                  }
                   entity_t * entity_target = &entity_list[0];
                   entity_t * entity = NULL;
-                  int off = index;
+                  int off      = index;
                   int off_size = size;
                   int i = 0, j = 0;
                   int entity_index = 0;
                   bool is_finish = false;
                   int begin = 1;
+                  int area_count = 0;
                 
                   if(entity_list == NULL){
-                    printf("malloc error!\n");
+                    DEBUG("error:[%s]", "malloc error!");
                     exit(-1);
                   }
                 
@@ -820,6 +1047,7 @@ Execution Summary:
                   }
                   while(off_size >0){
                     area++;
+                    area_count ++;
                     if(area == NULL) break;
                     cur_real_size = area->real_size;if(cur_real_size == 0) continue;
                     if(off_size > cur_real_size){//area all
@@ -838,41 +1066,7 @@ Execution Summary:
                 	off_size --;
                       }
                     }
-                  }
-                
-                  // entity = entity_list[0];
-                  /*
-                  for(i = 0; i< size; i++){
-                    printf("code:%s\tprice:%d\n", entity_list[i].code, entity_list[i].price);
-                    entity ++;
-                    }
-                  */
-                
-                  return 0;
-                }
-                
-                static int search_queue_index(value, begin, length, queue, column)
-                     int value;
-                     int begin;
-                     int length;
-                     sort_area_queue_t * queue;
-                     column_n column;
-       ##### -> {
-                  if( begin > length){
-                    return -1;
-                  }
-                  else{
-                    if(value == (queue+((begin + length)/2))->entity->price){
-                      return (begin+length)/2;
-                    }
-                    else{
-                      if(value < (queue+((begin + length)/2))->entity->price){
-                	return search_queue_index(value, begin, ((begin + length)/2) -1, queue, column);
-                      }
-                      else{
-                	return search_queue_index(value, ((begin + length)/2)+1, length, queue, column);
-                      }
-                    }
+                    if(area_count > AREA_NUMBER) return -1;
                   }
                 
                   return 0;
@@ -883,803 +1077,21 @@ Top 10 Lines:
 
      Line      Count
 
-       18          1
+      116        300
+      344        300
+       17          1
 
 Execution Summary:
 
-       12   Executable lines in this file
-       12   Lines executed
+        9   Executable lines in this file
+        9   Lines executed
    100.00   Percent of the file executed
 
-        1   Total number of line executions
-     0.08   Average executions per line
+      601   Total number of line executions
+    66.78   Average executions per line
 
 
-*** File /home/jim/source_code/data_api/proxy/sort/cJSON.c:
-                /*
-                  Copyright (c) 2009 Dave Gamble
-                
-                  Permission is hereby granted, free of charge, to any person obtaining a copy
-                  of this software and associated documentation files (the "Software"), to deal
-                  in the Software without restriction, including without limitation the rights
-                  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-                  copies of the Software, and to permit persons to whom the Software is
-                  furnished to do so, subject to the following conditions:
-                
-                  The above copyright notice and this permission notice shall be included in
-                  all copies or substantial portions of the Software.
-                
-                  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-                  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-                  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-                  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-                  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-                  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-                  THE SOFTWARE.
-                */
-                
-                /* cJSON */
-                /* JSON parser in C. */
-                
-                #include <string.h>
-                #include <stdio.h>
-                #include <math.h>
-                #include <stdlib.h>
-                #include <float.h>
-                #include <limits.h>
-                #include <ctype.h>
-                #include "cJSON.h"
-                
-                static const char *ep;
-                
-       ##### -> const char *cJSON_GetErrorPtr(void) {return ep;}
-                
-                static int cJSON_strcasecmp(const char *s1,const char *s2)
-        4557 -> {
-                	if (!s1) return (s1==s2)?0:1;if (!s2) return 1;
-                	for(; tolower(*s1) == tolower(*s2); ++s1, ++s2)	if(*s1 == 0)	return 0;
-                	return tolower(*(const unsigned char *)s1) - tolower(*(const unsigned char *)s2);
-                }
-                
-                static void *(*cJSON_malloc)(size_t sz) = malloc;
-                static void (*cJSON_free)(void *ptr) = free;
-                
-                static char* cJSON_strdup(const char* str)
-       ##### -> {
-                      size_t len;
-                      char* copy;
-                
-                      len = strlen(str) + 1;
-                      if (!(copy = (char*)cJSON_malloc(len))) return 0;
-                      memcpy(copy,str,len);
-                      return copy;
-                }
-                
-                void cJSON_InitHooks(cJSON_Hooks* hooks)
-       ##### -> {
-                    if (!hooks) { /* Reset hooks */
-                        cJSON_malloc = malloc;
-                        cJSON_free = free;
-                        return;
-                    }
-                
-                	cJSON_malloc = (hooks->malloc_fn)?hooks->malloc_fn:malloc;
-                	cJSON_free	 = (hooks->free_fn)?hooks->free_fn:free;
-                }
-                
-                /* Internal constructor. */
-                static cJSON *cJSON_New_Item(void)
-        4543 -> {
-                	cJSON* node = (cJSON*)cJSON_malloc(sizeof(cJSON));
-                	if (node) memset(node,0,sizeof(cJSON));
-                	return node;
-                }
-                
-                /* Delete a cJSON structure. */
-                void cJSON_Delete(cJSON *c)
-       ##### -> {
-                	cJSON *next;
-                	while (c)
-                	{
-                		next=c->next;
-                		if (!(c->type&cJSON_IsReference) && c->child) cJSON_Delete(c->child);
-                		if (!(c->type&cJSON_IsReference) && c->valuestring) cJSON_free(c->valuestring);
-                		if (!(c->type&cJSON_StringIsConst) && c->string) cJSON_free(c->string);
-                		cJSON_free(c);
-                		c=next;
-                	}
-                }
-                
-                /* Parse the input text to generate a number, and populate the result into item. */
-                static const char *parse_number(cJSON *item,const char *num)
-       ##### -> {
-                	double n=0,sign=1,scale=0;int subscale=0,signsubscale=1;
-                
-                	if (*num=='-') sign=-1,num++;	/* Has sign? */
-                	if (*num=='0') num++;			/* is zero */
-                	if (*num>='1' && *num<='9')	do	n=(n*10.0)+(*num++ -'0');	while (*num>='0' && *num<='9');	/* Number? */
-                	if (*num=='.' && num[1]>='0' && num[1]<='9') {num++;		do	n=(n*10.0)+(*num++ -'0'),scale--; while (*num>='0' && *num<='9');}	/* Fractional part? */
-                	if (*num=='e' || *num=='E')		/* Exponent? */
-                	{	num++;if (*num=='+') num++;	else if (*num=='-') signsubscale=-1,num++;		/* With sign? */
-                		while (*num>='0' && *num<='9') subscale=(subscale*10)+(*num++ - '0');	/* Number? */
-                	}
-                
-                	n=sign*n*pow(10.0,(scale+subscale*signsubscale));	/* number = +/- number.fraction * 10^+/- exponent */
-                	
-                	item->valuedouble=n;
-                	item->valueint=(int)n;
-                	item->type=cJSON_Number;
-                	return num;
-                }
-                
-       ##### -> static int pow2gt (int x)	{	--x;	x|=x>>1;	x|=x>>2;	x|=x>>4;	x|=x>>8;	x|=x>>16;	return x+1;	}
-                
-                typedef struct {char *buffer; int length; int offset; } printbuffer;
-                
-                static char* ensure(printbuffer *p,int needed)
-       ##### -> {
-                	char *newbuffer;int newsize;
-                	if (!p || !p->buffer) return 0;
-                	needed+=p->offset;
-                	if (needed<=p->length) return p->buffer+p->offset;
-                
-                	newsize=pow2gt(needed);
-                	newbuffer=(char*)cJSON_malloc(newsize);
-                	if (!newbuffer) {cJSON_free(p->buffer);p->length=0,p->buffer=0;return 0;}
-                	if (newbuffer) memcpy(newbuffer,p->buffer,p->length);
-                	cJSON_free(p->buffer);
-                	p->length=newsize;
-                	p->buffer=newbuffer;
-                	return newbuffer+p->offset;
-                }
-                
-                static int update(printbuffer *p)
-       ##### -> {
-                	char *str;
-                	if (!p || !p->buffer) return 0;
-                	str=p->buffer+p->offset;
-                	return p->offset+strlen(str);
-                }
-                
-                /* Render the number nicely from the given item into a string. */
-                static char *print_number(cJSON *item,printbuffer *p)
-       ##### -> {
-                	char *str=0;
-                	double d=item->valuedouble;
-                	if (d==0)
-                	{
-                		if (p)	str=ensure(p,2);
-                		else	str=(char*)cJSON_malloc(2);	/* special case for 0. */
-                		if (str) strcpy(str,"0");
-                	}
-                	else if (fabs(((double)item->valueint)-d)<=DBL_EPSILON && d<=INT_MAX && d>=INT_MIN)
-                	{
-                		if (p)	str=ensure(p,21);
-                		else	str=(char*)cJSON_malloc(21);	/* 2^64+1 can be represented in 21 chars. */
-                		if (str)	sprintf(str,"%d",item->valueint);
-                	}
-                	else
-                	{
-                		if (p)	str=ensure(p,64);
-                		else	str=(char*)cJSON_malloc(64);	/* This is a nice tradeoff. */
-                		if (str)
-                		{
-                			if (fabs(floor(d)-d)<=DBL_EPSILON && fabs(d)<1.0e60)sprintf(str,"%.0f",d);
-                			else if (fabs(d)<1.0e-6 || fabs(d)>1.0e9)			sprintf(str,"%e",d);
-                			else												sprintf(str,"%f",d);
-                		}
-                	}
-                	return str;
-                }
-                
-                static unsigned parse_hex4(const char *str)
-       ##### -> {
-                	unsigned h=0;
-                	if (*str>='0' && *str<='9') h+=(*str)-'0'; else if (*str>='A' && *str<='F') h+=10+(*str)-'A'; else if (*str>='a' && *str<='f') h+=10+(*str)-'a'; else return 0;
-                	h=h<<4;str++;
-                	if (*str>='0' && *str<='9') h+=(*str)-'0'; else if (*str>='A' && *str<='F') h+=10+(*str)-'A'; else if (*str>='a' && *str<='f') h+=10+(*str)-'a'; else return 0;
-                	h=h<<4;str++;
-                	if (*str>='0' && *str<='9') h+=(*str)-'0'; else if (*str>='A' && *str<='F') h+=10+(*str)-'A'; else if (*str>='a' && *str<='f') h+=10+(*str)-'a'; else return 0;
-                	h=h<<4;str++;
-                	if (*str>='0' && *str<='9') h+=(*str)-'0'; else if (*str>='A' && *str<='F') h+=10+(*str)-'A'; else if (*str>='a' && *str<='f') h+=10+(*str)-'a'; else return 0;
-                	return h;
-                }
-                
-                /* Parse the input text into an unescaped cstring, and populate item. */
-                static const unsigned char firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
-                static const char *parse_string(cJSON *item,const char *str)
-        6815 -> {
-                	const char *ptr=str+1;char *ptr2;char *out;int len=0;unsigned uc,uc2;
-                	if (*str!='\"') {ep=str;return 0;}	/* not a string! */
-                	
-                	while (*ptr!='\"' && *ptr && ++len) if (*ptr++ == '\\') ptr++;	/* Skip escaped quotes. */
-                	
-                	out=(char*)cJSON_malloc(len+1);	/* This is how long we need for the string, roughly. */
-                	if (!out) return 0;
-                	
-                	ptr=str+1;ptr2=out;
-                	while (*ptr!='\"' && *ptr)
-                	{
-                		if (*ptr!='\\') *ptr2++=*ptr++;
-                		else
-                		{
-                			ptr++;
-                			switch (*ptr)
-                			{
-                				case 'b': *ptr2++='\b';	break;
-                				case 'f': *ptr2++='\f';	break;
-                				case 'n': *ptr2++='\n';	break;
-                				case 'r': *ptr2++='\r';	break;
-                				case 't': *ptr2++='\t';	break;
-                				case 'u':	 /* transcode utf16 to utf8. */
-                					uc=parse_hex4(ptr+1);ptr+=4;	/* get the unicode char. */
-                
-                					if ((uc>=0xDC00 && uc<=0xDFFF) || uc==0)	break;	/* check for invalid.	*/
-                
-                					if (uc>=0xD800 && uc<=0xDBFF)	/* UTF16 surrogate pairs.	*/
-                					{
-                						if (ptr[1]!='\\' || ptr[2]!='u')	break;	/* missing second-half of surrogate.	*/
-                						uc2=parse_hex4(ptr+3);ptr+=6;
-                						if (uc2<0xDC00 || uc2>0xDFFF)		break;	/* invalid second-half of surrogate.	*/
-                						uc=0x10000 + (((uc&0x3FF)<<10) | (uc2&0x3FF));
-                					}
-                
-                					len=4;if (uc<0x80) len=1;else if (uc<0x800) len=2;else if (uc<0x10000) len=3; ptr2+=len;
-                					
-                					switch (len) {
-                						case 4: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
-                						case 3: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
-                						case 2: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
-                						case 1: *--ptr2 =(uc | firstByteMark[len]);
-                					}
-                					ptr2+=len;
-                					break;
-                				default:  *ptr2++=*ptr; break;
-                			}
-                			ptr++;
-                		}
-                	}
-                	*ptr2=0;
-                	if (*ptr=='\"') ptr++;
-                	item->valuestring=out;
-                	item->type=cJSON_String;
-                	return ptr;
-                }
-                
-                /* Render the cstring provided to an escaped version that can be printed. */
-                static char *print_string_ptr(const char *str,printbuffer *p)
-       ##### -> {
-                	const char *ptr;char *ptr2,*out;int len=0,flag=0;unsigned char token;
-                	
-                	for (ptr=str;*ptr;ptr++) flag|=((*ptr>0 && *ptr<32)||(*ptr=='\"')||(*ptr=='\\'))?1:0;
-                	if (!flag)
-                	{
-                		len=ptr-str;
-                		if (p) out=ensure(p,len+3);
-                		else		out=(char*)cJSON_malloc(len+3);
-                		if (!out) return 0;
-                		ptr2=out;*ptr2++='\"';
-                		strcpy(ptr2,str);
-                		ptr2[len]='\"';
-                		ptr2[len+1]=0;
-                		return out;
-                	}
-                	
-                	if (!str)
-                	{
-                		if (p)	out=ensure(p,3);
-                		else	out=(char*)cJSON_malloc(3);
-                		if (!out) return 0;
-                		strcpy(out,"\"\"");
-                		return out;
-                	}
-                	ptr=str;while ((token=*ptr) && ++len) {if (strchr("\"\\\b\f\n\r\t",token)) len++; else if (token<32) len+=5;ptr++;}
-                	
-                	if (p)	out=ensure(p,len+3);
-                	else	out=(char*)cJSON_malloc(len+3);
-                	if (!out) return 0;
-                
-                	ptr2=out;ptr=str;
-                	*ptr2++='\"';
-                	while (*ptr)
-                	{
-                		if ((unsigned char)*ptr>31 && *ptr!='\"' && *ptr!='\\') *ptr2++=*ptr++;
-                		else
-                		{
-                			*ptr2++='\\';
-                			switch (token=*ptr++)
-                			{
-                				case '\\':	*ptr2++='\\';	break;
-                				case '\"':	*ptr2++='\"';	break;
-                				case '\b':	*ptr2++='b';	break;
-                				case '\f':	*ptr2++='f';	break;
-                				case '\n':	*ptr2++='n';	break;
-                				case '\r':	*ptr2++='r';	break;
-                				case '\t':	*ptr2++='t';	break;
-                				default: sprintf(ptr2,"u%04x",token);ptr2+=5;	break;	/* escape and print */
-                			}
-                		}
-                	}
-                	*ptr2++='\"';*ptr2++=0;
-                	return out;
-                }
-                /* Invote print_string_ptr (which is useful) on an item. */
-       ##### -> static char *print_string(cJSON *item,printbuffer *p)	{return print_string_ptr(item->valuestring,p);}
-                
-                /* Predeclare these prototypes. */
-                static const char *parse_value(cJSON *item,const char *value);
-                static char *print_value(cJSON *item,int depth,int fmt,printbuffer *p);
-                static const char *parse_array(cJSON *item,const char *value);
-                static char *print_array(cJSON *item,int depth,int fmt,printbuffer *p);
-                static const char *parse_object(cJSON *item,const char *value);
-                static char *print_object(cJSON *item,int depth,int fmt,printbuffer *p);
-                
-                /* Utility to jump whitespace and cr/lf */
-       17037 -> static const char *skip(const char *in) {while (in && *in && (unsigned char)*in<=32) in++; return in;}
-                
-                /* Parse an object - create a new root, and populate. */
-                cJSON *cJSON_ParseWithOpts(const char *value,const char **return_parse_end,int require_null_terminated)
-           1 -> {
-                	const char *end=0;
-                	cJSON *c=cJSON_New_Item();
-                	ep=0;
-                	if (!c) return 0;       /* memory fail */
-                
-                	end=parse_value(c,skip(value));
-                	if (!end)	{cJSON_Delete(c);return 0;}	/* parse failure. ep is set. */
-                
-                	/* if we require null-terminated JSON without appended garbage, skip and then check for a null terminator */
-                	if (require_null_terminated) {end=skip(end);if (*end) {cJSON_Delete(c);ep=end;return 0;}}
-                	if (return_parse_end) *return_parse_end=end;
-                	return c;
-                }
-                /* Default options for cJSON_Parse */
-           1 -> cJSON *cJSON_Parse(const char *value) {return cJSON_ParseWithOpts(value,0,0);}
-                
-                /* Render a cJSON item/entity/structure to text. */
-       ##### -> char *cJSON_Print(cJSON *item)				{return print_value(item,0,1,0);}
-       ##### -> char *cJSON_PrintUnformatted(cJSON *item)	{return print_value(item,0,0,0);}
-                
-                char *cJSON_PrintBuffered(cJSON *item,int prebuffer,int fmt)
-       ##### -> {
-                	printbuffer p;
-                	p.buffer=(char*)cJSON_malloc(prebuffer);
-                	p.length=prebuffer;
-                	p.offset=0;
-                	return print_value(item,0,fmt,&p);
-                	return p.buffer;
-                }
-                
-                
-                /* Parser core - when encountering text, process appropriately. */
-                static const char *parse_value(cJSON *item,const char *value)
-        4543 -> {
-                	if (!value)						return 0;	/* Fail on null. */
-                	if (!strncmp(value,"null",4))	{ item->type=cJSON_NULL;  return value+4; }
-                	if (!strncmp(value,"false",5))	{ item->type=cJSON_False; return value+5; }
-                	if (!strncmp(value,"true",4))	{ item->type=cJSON_True; item->valueint=1;	return value+4; }
-                	if (*value=='\"')				{ return parse_string(item,value); }
-                	if (*value=='-' || (*value>='0' && *value<='9'))	{ return parse_number(item,value); }
-                	if (*value=='[')				{ return parse_array(item,value); }
-                	if (*value=='{')				{ return parse_object(item,value); }
-                
-                	ep=value;return 0;	/* failure. */
-                }
-                
-                /* Render a value to text. */
-                static char *print_value(cJSON *item,int depth,int fmt,printbuffer *p)
-       ##### -> {
-                	char *out=0;
-                	if (!item) return 0;
-                	if (p)
-                	{
-                		switch ((item->type)&255)
-                		{
-                			case cJSON_NULL:	{out=ensure(p,5);	if (out) strcpy(out,"null");	break;}
-                			case cJSON_False:	{out=ensure(p,6);	if (out) strcpy(out,"false");	break;}
-                			case cJSON_True:	{out=ensure(p,5);	if (out) strcpy(out,"true");	break;}
-                			case cJSON_Number:	out=print_number(item,p);break;
-                			case cJSON_String:	out=print_string(item,p);break;
-                			case cJSON_Array:	out=print_array(item,depth,fmt,p);break;
-                			case cJSON_Object:	out=print_object(item,depth,fmt,p);break;
-                		}
-                	}
-                	else
-                	{
-                		switch ((item->type)&255)
-                		{
-                			case cJSON_NULL:	out=cJSON_strdup("null");	break;
-                			case cJSON_False:	out=cJSON_strdup("false");break;
-                			case cJSON_True:	out=cJSON_strdup("true"); break;
-                			case cJSON_Number:	out=print_number(item,0);break;
-                			case cJSON_String:	out=print_string(item,0);break;
-                			case cJSON_Array:	out=print_array(item,depth,fmt,0);break;
-                			case cJSON_Object:	out=print_object(item,depth,fmt,0);break;
-                		}
-                	}
-                	return out;
-                }
-                
-                /* Build an array from input text. */
-                static const char *parse_array(cJSON *item,const char *value)
-           1 -> {
-                	cJSON *child;
-                	if (*value!='[')	{ep=value;return 0;}	/* not an array! */
-                
-                	item->type=cJSON_Array;
-                	value=skip(value+1);
-                	if (*value==']') return value+1;	/* empty array. */
-                
-                	item->child=child=cJSON_New_Item();
-                	if (!item->child) return 0;		 /* memory fail */
-                	value=skip(parse_value(child,skip(value)));	/* skip any spacing, get the value. */
-                	if (!value) return 0;
-                
-                	while (*value==',')
-                	{
-                		cJSON *new_item;
-                		if (!(new_item=cJSON_New_Item())) return 0; 	/* memory fail */
-                		child->next=new_item;new_item->prev=child;child=new_item;
-                		value=skip(parse_value(child,skip(value+1)));
-                		if (!value) return 0;	/* memory fail */
-                	}
-                
-                	if (*value==']') return value+1;	/* end of array */
-                	ep=value;return 0;	/* malformed. */
-                }
-                
-                /* Render an array to text */
-                static char *print_array(cJSON *item,int depth,int fmt,printbuffer *p)
-       ##### -> {
-                	char **entries;
-                	char *out=0,*ptr,*ret;int len=5;
-                	cJSON *child=item->child;
-                	int numentries=0,i=0,fail=0;
-                	size_t tmplen=0;
-                	
-                	/* How many entries in the array? */
-                	while (child) numentries++,child=child->next;
-                	/* Explicitly handle numentries==0 */
-                	if (!numentries)
-                	{
-                		if (p)	out=ensure(p,3);
-                		else	out=(char*)cJSON_malloc(3);
-                		if (out) strcpy(out,"[]");
-                		return out;
-                	}
-                
-                	if (p)
-                	{
-                		/* Compose the output array. */
-                		i=p->offset;
-                		ptr=ensure(p,1);if (!ptr) return 0;	*ptr='[';	p->offset++;
-                		child=item->child;
-                		while (child && !fail)
-                		{
-                			print_value(child,depth+1,fmt,p);
-                			p->offset=update(p);
-                			if (child->next) {len=fmt?2:1;ptr=ensure(p,len+1);if (!ptr) return 0;*ptr++=',';if(fmt)*ptr++=' ';*ptr=0;p->offset+=len;}
-                			child=child->next;
-                		}
-                		ptr=ensure(p,2);if (!ptr) return 0;	*ptr++=']';*ptr=0;
-                		out=(p->buffer)+i;
-                	}
-                	else
-                	{
-                		/* Allocate an array to hold the values for each */
-                		entries=(char**)cJSON_malloc(numentries*sizeof(char*));
-                		if (!entries) return 0;
-                		memset(entries,0,numentries*sizeof(char*));
-                		/* Retrieve all the results: */
-                		child=item->child;
-                		while (child && !fail)
-                		{
-                			ret=print_value(child,depth+1,fmt,0);
-                			entries[i++]=ret;
-                			if (ret) len+=strlen(ret)+2+(fmt?1:0); else fail=1;
-                			child=child->next;
-                		}
-                		
-                		/* If we didn't fail, try to malloc the output string */
-                		if (!fail)	out=(char*)cJSON_malloc(len);
-                		/* If that fails, we fail. */
-                		if (!out) fail=1;
-                
-                		/* Handle failure. */
-                		if (fail)
-                		{
-                			for (i=0;i<numentries;i++) if (entries[i]) cJSON_free(entries[i]);
-                			cJSON_free(entries);
-                			return 0;
-                		}
-                		
-                		/* Compose the output array. */
-                		*out='[';
-                		ptr=out+1;*ptr=0;
-                		for (i=0;i<numentries;i++)
-                		{
-                			tmplen=strlen(entries[i]);memcpy(ptr,entries[i],tmplen);ptr+=tmplen;
-                			if (i!=numentries-1) {*ptr++=',';if(fmt)*ptr++=' ';*ptr=0;}
-                			cJSON_free(entries[i]);
-                		}
-                		cJSON_free(entries);
-                		*ptr++=']';*ptr++=0;
-                	}
-                	return out;	
-                }
-                
-                /* Build an object from the text. */
-                static const char *parse_object(cJSON *item,const char *value)
-        1135 -> {
-                	cJSON *child;
-                	if (*value!='{')	{ep=value;return 0;}	/* not an object! */
-                	
-                	item->type=cJSON_Object;
-                	value=skip(value+1);
-                	if (*value=='}') return value+1;	/* empty array. */
-                	
-                	item->child=child=cJSON_New_Item();
-                	if (!item->child) return 0;
-                	value=skip(parse_string(child,skip(value)));
-                	if (!value) return 0;
-                	child->string=child->valuestring;child->valuestring=0;
-                	if (*value!=':') {ep=value;return 0;}	/* fail! */
-                	value=skip(parse_value(child,skip(value+1)));	/* skip any spacing, get the value. */
-                	if (!value) return 0;
-                	
-                	while (*value==',')
-                	{
-                		cJSON *new_item;
-                		if (!(new_item=cJSON_New_Item()))	return 0; /* memory fail */
-                		child->next=new_item;new_item->prev=child;child=new_item;
-                		value=skip(parse_string(child,skip(value+1)));
-                		if (!value) return 0;
-                		child->string=child->valuestring;child->valuestring=0;
-                		if (*value!=':') {ep=value;return 0;}	/* fail! */
-                		value=skip(parse_value(child,skip(value+1)));	/* skip any spacing, get the value. */
-                		if (!value) return 0;
-                	}
-                	
-                	if (*value=='}') return value+1;	/* end of array */
-                	ep=value;return 0;	/* malformed. */
-                }
-                
-                /* Render an object to text. */
-                static char *print_object(cJSON *item,int depth,int fmt,printbuffer *p)
-       ##### -> {
-                	char **entries=0,**names=0;
-                	char *out=0,*ptr,*ret,*str;int len=7,i=0,j;
-                	cJSON *child=item->child;
-                	int numentries=0,fail=0;
-                	size_t tmplen=0;
-                	/* Count the number of entries. */
-                	while (child) numentries++,child=child->next;
-                	/* Explicitly handle empty object case */
-                	if (!numentries)
-                	{
-                		if (p) out=ensure(p,fmt?depth+4:3);
-                		else	out=(char*)cJSON_malloc(fmt?depth+4:3);
-                		if (!out)	return 0;
-                		ptr=out;*ptr++='{';
-                		//	if (fmt) {*ptr++='\n';for (i=0;i<depth-1;i++) *ptr++='\t';}
-                		*ptr++='}';*ptr++=0;
-                		return out;
-                	}
-                	if (p)
-                	{
-                		/* Compose the output: */
-                		i=p->offset;
-                		len=fmt?2:1;	ptr=ensure(p,len+1);	if (!ptr) return 0;
-                		*ptr++='{';	
-                		//if (fmt) *ptr++='\n';	
-                		*ptr=0;	p->offset+=len;
-                		child=item->child;depth++;
-                		while (child)
-                		{
-                			if (fmt)
-                			{
-                				ptr=ensure(p,depth);	if (!ptr) return 0;
-                				//	for (j=0;j<depth;j++) *ptr++='\t';
-                				p->offset+=depth;
-                			}
-                			print_string_ptr(child->string,p);
-                			p->offset=update(p);
-                			
-                			len=fmt?2:1;
-                			ptr=ensure(p,len);	if (!ptr) return 0;
-                			*ptr++=':';if (fmt) *ptr++='\t';
-                			p->offset+=len;
-                			
-                			print_value(child,depth,fmt,p);
-                			p->offset=update(p);
-                
-                			len=(fmt?1:0)+(child->next?1:0);
-                			ptr=ensure(p,len+1); if (!ptr) return 0;
-                			if (child->next) *ptr++=',';
-                			//	if (fmt) *ptr++='\n';
-                			*ptr=0;
-                			p->offset+=len;
-                			child=child->next;
-                		}
-                		ptr=ensure(p,fmt?(depth+1):2);	 if (!ptr) return 0;
-                		//	if (fmt)	for (i=0;i<depth-1;i++) *ptr++='\t';
-                		*ptr++='}';*ptr=0;
-                		out=(p->buffer)+i;
-                	}
-                	else
-                	{
-                		/* Allocate space for the names and the objects */
-                		entries=(char**)cJSON_malloc(numentries*sizeof(char*));
-                		if (!entries) return 0;
-                		names=(char**)cJSON_malloc(numentries*sizeof(char*));
-                		if (!names) {cJSON_free(entries);return 0;}
-                		memset(entries,0,sizeof(char*)*numentries);
-                		memset(names,0,sizeof(char*)*numentries);
-                
-                		/* Collect all the results into our arrays: */
-                		child=item->child;depth++;if (fmt) len+=depth;
-                		while (child)
-                		{
-                			names[i]=str=print_string_ptr(child->string,0);
-                			entries[i++]=ret=print_value(child,depth,fmt,0);
-                			if (str && ret) len+=strlen(ret)+strlen(str)+2+(fmt?2+depth:0); else fail=1;
-                			child=child->next;
-                		}
-                		
-                		/* Try to allocate the output string */
-                		if (!fail)	out=(char*)cJSON_malloc(len);
-                		if (!out) fail=1;
-                
-                		/* Handle failure */
-                		if (fail)
-                		{
-                			for (i=0;i<numentries;i++) {if (names[i]) cJSON_free(names[i]);if (entries[i]) cJSON_free(entries[i]);}
-                			cJSON_free(names);cJSON_free(entries);
-                			return 0;
-                		}
-                		
-                		/* Compose the output: */
-                		*out='{';ptr=out+1;
-                		//if (fmt)*ptr++='\n';
-                		*ptr=0;
-                		for (i=0;i<numentries;i++)
-                		{
-                		  //	if (fmt) for (j=0;j<depth;j++) *ptr++='\t';
-                			tmplen=strlen(names[i]);memcpy(ptr,names[i],tmplen);ptr+=tmplen;
-                			*ptr++=':';//if (fmt) *ptr++='\t';
-                			strcpy(ptr,entries[i]);ptr+=strlen(entries[i]);
-                			if (i!=numentries-1) *ptr++=',';
-                			//	if (fmt) *ptr++='\n';
-                			*ptr=0;
-                			cJSON_free(names[i]);cJSON_free(entries[i]);
-                		}
-                		
-                		cJSON_free(names);cJSON_free(entries);
-                		//	if (fmt) for (i=0;i<depth-1;i++) *ptr++='\t';
-                		*ptr++='}';*ptr++=0;
-                	}
-                	return out;	
-                }
-                
-                /* Get Array size/item / object item. */
-           1 -> int    cJSON_GetArraySize(cJSON *array)							{cJSON *c=array->child;int i=0;while(c)i++,c=c->next;return i;}
-        1134 -> cJSON *cJSON_GetArrayItem(cJSON *array,int item)				{cJSON *c=array->child;  while (c && item>0) item--,c=c->next; return c;}
-        2274 -> cJSON *cJSON_GetObjectItem(cJSON *object,const char *string)	{cJSON *c=object->child; while (c && cJSON_strcasecmp(c->string,string)) c=c->next; return c;}
-                
-                /* Utility for array list handling. */
-       ##### -> static void suffix_object(cJSON *prev,cJSON *item) {prev->next=item;item->prev=prev;}
-                /* Utility for handling references. */
-       ##### -> static cJSON *create_reference(cJSON *item) {cJSON *ref=cJSON_New_Item();if (!ref) return 0;memcpy(ref,item,sizeof(cJSON));ref->string=0;ref->type|=cJSON_IsReference;ref->next=ref->prev=0;return ref;}
-                
-                /* Add item to array/object. */
-       ##### -> void   cJSON_AddItemToArray(cJSON *array, cJSON *item)						{cJSON *c=array->child;if (!item) return; if (!c) {array->child=item;} else {while (c && c->next) c=c->next; suffix_object(c,item);}}
-       ##### -> void   cJSON_AddItemToObject(cJSON *object,const char *string,cJSON *item)	{if (!item) return; if (item->string) cJSON_free(item->string);item->string=cJSON_strdup(string);cJSON_AddItemToArray(object,item);}
-       ##### -> void   cJSON_AddItemToObjectCS(cJSON *object,const char *string,cJSON *item)	{if (!item) return; if (!(item->type&cJSON_StringIsConst) && item->string) cJSON_free(item->string);item->string=(char*)string;item->type|=cJSON_StringIsConst;cJSON_AddItemToArray(object,item);}
-       ##### -> void	cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item)						{cJSON_AddItemToArray(array,create_reference(item));}
-       ##### -> void	cJSON_AddItemReferenceToObject(cJSON *object,const char *string,cJSON *item)	{cJSON_AddItemToObject(object,string,create_reference(item));}
-                
-       ##### -> cJSON *cJSON_DetachItemFromArray(cJSON *array,int which)			{cJSON *c=array->child;while (c && which>0) c=c->next,which--;if (!c) return 0;
-                	if (c->prev) c->prev->next=c->next;if (c->next) c->next->prev=c->prev;if (c==array->child) array->child=c->next;c->prev=c->next=0;return c;}
-       ##### -> void   cJSON_DeleteItemFromArray(cJSON *array,int which)			{cJSON_Delete(cJSON_DetachItemFromArray(array,which));}
-       ##### -> cJSON *cJSON_DetachItemFromObject(cJSON *object,const char *string) {int i=0;cJSON *c=object->child;while (c && cJSON_strcasecmp(c->string,string)) i++,c=c->next;if (c) return cJSON_DetachItemFromArray(object,i);return 0;}
-       ##### -> void   cJSON_DeleteItemFromObject(cJSON *object,const char *string) {cJSON_Delete(cJSON_DetachItemFromObject(object,string));}
-                
-                /* Replace array/object items with new ones. */
-       ##### -> void   cJSON_InsertItemInArray(cJSON *array,int which,cJSON *newitem)		{cJSON *c=array->child;while (c && which>0) c=c->next,which--;if (!c) {cJSON_AddItemToArray(array,newitem);return;}
-                	newitem->next=c;newitem->prev=c->prev;c->prev=newitem;if (c==array->child) array->child=newitem; else newitem->prev->next=newitem;}
-       ##### -> void   cJSON_ReplaceItemInArray(cJSON *array,int which,cJSON *newitem)		{cJSON *c=array->child;while (c && which>0) c=c->next,which--;if (!c) return;
-                	newitem->next=c->next;newitem->prev=c->prev;if (newitem->next) newitem->next->prev=newitem;
-                	if (c==array->child) array->child=newitem; else newitem->prev->next=newitem;c->next=c->prev=0;cJSON_Delete(c);}
-       ##### -> void   cJSON_ReplaceItemInObject(cJSON *object,const char *string,cJSON *newitem){int i=0;cJSON *c=object->child;while(c && cJSON_strcasecmp(c->string,string))i++,c=c->next;if(c){newitem->string=cJSON_strdup(string);cJSON_ReplaceItemInArray(object,i,newitem);}}
-                
-                /* Create basic types: */
-       ##### -> cJSON *cJSON_CreateNull(void)					{cJSON *item=cJSON_New_Item();if(item)item->type=cJSON_NULL;return item;}
-       ##### -> cJSON *cJSON_CreateTrue(void)					{cJSON *item=cJSON_New_Item();if(item)item->type=cJSON_True;return item;}
-       ##### -> cJSON *cJSON_CreateFalse(void)					{cJSON *item=cJSON_New_Item();if(item)item->type=cJSON_False;return item;}
-       ##### -> cJSON *cJSON_CreateBool(int b)					{cJSON *item=cJSON_New_Item();if(item)item->type=b?cJSON_True:cJSON_False;return item;}
-       ##### -> cJSON *cJSON_CreateNumber(double num)			{cJSON *item=cJSON_New_Item();if(item){item->type=cJSON_Number;item->valuedouble=num;item->valueint=(int)num;}return item;}
-       ##### -> cJSON *cJSON_CreateString(const char *string)	{cJSON *item=cJSON_New_Item();if(item){item->type=cJSON_String;item->valuestring=cJSON_strdup(string);}return item;}
-       ##### -> cJSON *cJSON_CreateArray(void)					{cJSON *item=cJSON_New_Item();if(item)item->type=cJSON_Array;return item;}
-       ##### -> cJSON *cJSON_CreateObject(void)					{cJSON *item=cJSON_New_Item();if(item)item->type=cJSON_Object;return item;}
-                
-                /* Create Arrays: */
-       ##### -> cJSON *cJSON_CreateIntArray(const int *numbers,int count)		{int i;cJSON *n=0,*p=0,*a=cJSON_CreateArray();for(i=0;a && i<count;i++){n=cJSON_CreateNumber(numbers[i]);if(!i)a->child=n;else suffix_object(p,n);p=n;}return a;}
-       ##### -> cJSON *cJSON_CreateFloatArray(const float *numbers,int count)	{int i;cJSON *n=0,*p=0,*a=cJSON_CreateArray();for(i=0;a && i<count;i++){n=cJSON_CreateNumber(numbers[i]);if(!i)a->child=n;else suffix_object(p,n);p=n;}return a;}
-       ##### -> cJSON *cJSON_CreateDoubleArray(const double *numbers,int count)	{int i;cJSON *n=0,*p=0,*a=cJSON_CreateArray();for(i=0;a && i<count;i++){n=cJSON_CreateNumber(numbers[i]);if(!i)a->child=n;else suffix_object(p,n);p=n;}return a;}
-       ##### -> cJSON *cJSON_CreateStringArray(const char **strings,int count)	{int i;cJSON *n=0,*p=0,*a=cJSON_CreateArray();for(i=0;a && i<count;i++){n=cJSON_CreateString(strings[i]);if(!i)a->child=n;else suffix_object(p,n);p=n;}return a;}
-                
-                /* Duplication */
-                cJSON *cJSON_Duplicate(cJSON *item,int recurse)
-       ##### -> {
-                	cJSON *newitem,*cptr,*nptr=0,*newchild;
-                	/* Bail on bad ptr */
-                	if (!item) return 0;
-                	/* Create new item */
-                	newitem=cJSON_New_Item();
-                	if (!newitem) return 0;
-                	/* Copy over all vars */
-                	newitem->type=item->type&(~cJSON_IsReference),newitem->valueint=item->valueint,newitem->valuedouble=item->valuedouble;
-                	if (item->valuestring)	{newitem->valuestring=cJSON_strdup(item->valuestring);	if (!newitem->valuestring)	{cJSON_Delete(newitem);return 0;}}
-                	if (item->string)		{newitem->string=cJSON_strdup(item->string);			if (!newitem->string)		{cJSON_Delete(newitem);return 0;}}
-                	/* If non-recursive, then we're done! */
-                	if (!recurse) return newitem;
-                	/* Walk the ->next chain for the child. */
-                	cptr=item->child;
-                	while (cptr)
-                	{
-                		newchild=cJSON_Duplicate(cptr,1);		/* Duplicate (with recurse) each item in the ->next chain */
-                		if (!newchild) {cJSON_Delete(newitem);return 0;}
-                		if (nptr)	{nptr->next=newchild,newchild->prev=nptr;nptr=newchild;}	/* If newitem->child already set, then crosswire ->prev and ->next and move on */
-                		else		{newitem->child=newchild;nptr=newchild;}					/* Set newitem->child and move to it */
-                		cptr=cptr->next;
-                	}
-                	return newitem;
-                }
-                
-                void cJSON_Minify(char *json)
-       ##### -> {
-                	char *into=json;
-                	while (*json)
-                	{
-                		if (*json==' ') json++;
-                		else if (*json=='\t') json++;	/* Whitespace characters. */
-                		else if (*json=='\r') json++;
-                		else if (*json=='\n') json++;
-                		else if (*json=='/' && json[1]=='/')  while (*json && *json!='\n') json++;	/* double-slash comments, to end of line. */
-                		else if (*json=='/' && json[1]=='*') {while (*json && !(*json=='*' && json[1]=='/')) json++;json+=2;}	/* multiline comments. */
-                		else if (*json=='\"'){*into++=*json++;while (*json && *json!='\"'){if (*json=='\\') *into++=*json++;*into++=*json++;}*into++=*json++;} /* string literals, which are \" sensitive. */
-                		else *into++=*json++;			/* All other characters. */
-                	}
-                	*into=0;	/* and null-terminate. */
-       ##### -> }
-
-
-Top 10 Lines:
-
-     Line      Count
-
-      320      17037
-      193       6815
-       40       4557
-       74       4543
-      358       4543
-      669       2274
-      515       1135
-      668       1134
-      324          1
-      339          1
-
-Execution Summary:
-
-       59   Executable lines in this file
-       59   Lines executed
-   100.00   Percent of the file executed
-
-    42042   Total number of line executions
-   712.58   Average executions per line
-
-
-*** File /home/jim/source_code/data_api/proxy/sort/main.c:
+*** File /home/jim/source_code/data-api/proxy/sort_raise_ok/main.c:
                 #include<stdio.h>
                 #include<stdlib.h>
                 #include<unistd.h>
@@ -1687,22 +1099,46 @@ Execution Summary:
                 #include <sys/socket.h>
                 #include <netinet/in.h>
                 #include <arpa/inet.h>
-                #include<fcntl.h>
-                #include<sys/stat.h>
-                #include<assert.h>
-                #include<stdbool.h>
-                #include<signal.h>
-                #include "cJSON.h"
+                #include <fcntl.h>
+                #include <sys/stat.h>
+                #include <assert.h>
+                #include <stdbool.h>
+                #include <signal.h>
+                #include <pthread.h>
+                #include <errno.h>
                 #include "comm.h"
                 #include "market.h"
-                #include <gperftools/profiler.h>
+                #include "./../comm_pipe.h"
                 
                 int last_time_market;//effective time
                 int cur_time;        //current time
                 int heart_times = 0;
                 bool may_show_sort = false;
+                app_request_t app_list[APP_SIZE] = {0};
+                pthread_mutex_t work_mutex;
+                pthread_mutex_t send_sort_mutex;
+                pthread_cond_t allow_start_app    = PTHREAD_COND_INITIALIZER;
+                pthread_cond_t allow_display_sort = PTHREAD_COND_INITIALIZER;
+                
+                //buff
+                char * g_buff = NULL;
+                #ifdef system_32
+                unsigned long g_buff_max_len = 0;
+                unsigned long g_buff_len = 0;
+                #else
+                unsigned int g_buff_max_len = 0;
+                unsigned int g_buff_len = 0;
+                #endif
+                char * g_zib_buff = NULL;
+                uLong g_zib_buff_max_len = 0;
+                uLong g_zib_buff_len = 0;
+                
+                //simulate
+                bool is_simulate = false;
                 
                 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
+                static int send_sort(app_request_t * my_app);
+                static int init_login(int socket_fd);
                 
                 bool is_exit = false;
                 int socket_fd = 0;
@@ -1716,56 +1152,103 @@ Execution Summary:
                 
                 int main()
        ##### -> {
-                  pthread_t p_id = 0;
+                  pthread_t p_socket_id = 0, p_sort_id = 0, p_app_id = 0;
                   int ret = 0;
                   int test_times = 0;
+                  void * recycle;
                 
-                  char program[1024] = {0};
-                  snprintf(program, 1023, "main_%d.prof" ,getpid());
-                  ProfilerStart(program);
+                #ifndef WIN32
+                  sigset_t signal_mask;
+                  sigemptyset(&signal_mask);
+                  sigaddset(&signal_mask, SIGPIPE);
+                  int rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
+                  if(rc != 0){
+                    DEBUG("error:[%s]", "block sigpipe error!");
+                  }
+                #endif
+                
+                  //char program[1024] = {0};
+                  //snprintf(program, 1023, "main_%d.prof" ,getpid());
+                  //ProfilerStart(program);
                   signal(SIGINT, sig_stop);
-                  //--receive both shanghhai and shenzhen market stock
-                  init_market();
-                  return 0;
-                
-                  init_socket(&socket_fd);
-                  ret = pthread_create(&p_id, NULL, (void *)init_receive, (void *)&socket_fd);
-                  printf("init_receive ret:%d\n", ret);
+                  //signal(SIGPIPE, sig_pipe);
                   //dynamic show sort area
-                  ret = pthread_create(&p_id , NULL, (void *)init_sort_display, NULL);
-                  printf("init_sort_display ret:%d\n", ret);
+                  ret = pthread_create(&p_sort_id, NULL, (void *)write_app, NULL);
+                  assert( ret == 0);
+                  //printf("init_sort_display ret:%d\n", ret);
+                  //init app
+                  ret = pthread_create(&p_app_id, NULL, (void *)init_app, NULL);
+                  assert (ret == 0);
+                  //printf("init app ret:%d\n", ret);
+                  //--receive both shanghhai and shenzhen market stock
+                  ret = init_market();
+                  DEBUG("info:[ret:%d]", ret);
+                  assert(ret == 0);
+                  ret = init_socket(&socket_fd);
+                  assert(ret == 0);
+                
+                  //init server's login
+                  ret = init_login(socket_fd);
+                  assert( ret == 0);
+                
+                  //init mutext
+                  ret = pthread_mutex_init(&work_mutex, NULL);
+                  assert( ret == 0);
+                  ret = pthread_mutex_init(&send_sort_mutex, NULL);
+                  assert( ret == 0);
+                  if(ret != 0){
+                    perror("Mutext initialization failed");
+                    exit(-1);
+                  }
+                  ret = pthread_create(&p_socket_id, NULL, (void *)init_receive, (void *)&socket_fd);
+                  assert( ret == 0);
+                  //printf("init_receive ret:%d\n", ret);
                   //---init data and sort
                   //get realtime data
-                  send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
-                  //send_realtime(socket_fd, 0, 20, 0);
+                  ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+                  assert(ret == 0);
+                  //send_realtime(socket_fd, 0, 100, 0);
                   //---auto push data---
-                  sleep(4);
+                  //sleep(4);
                   //get auto push data and resort data
-                  send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+                  //ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+                  //assert(ret == 0);
                   //send_auto_push(socket_fd, 0, 20, 0);
                 
                   int menu = 1;
-                  while(!is_exit){
+                  while(true){
                     sleep(3);
-                    send_heart(socket_fd);
+                    ret = send_heart(socket_fd);
+                    assert(ret == 0);
+                
+                    if(is_simulate){
+                      ret = send_realtime(socket_fd, 0, market_list[0].entity_list_size, 0);
+                      assert(ret == 0);
+                      sleep(5);
+                    }
                     heart_times++;
                     test_times++;
-                    if(is_exit) break;
-                    //if(test_times > 3) break;
+                    //if(is_exit) break;
+                    // if(test_times > 1000) break;
                   }
                 
-                  ProfilerStop();
-                
-                  printf("exit system...\n");
+                  //ProfilerStop();
+                  pthread_join(p_socket_id, &recycle);
+                  //pthread_join(p_sort_id, &recycle);
+                  pthread_join(p_app_id, &recycle);
+                  pthread_mutex_destroy(&work_mutex);
+                  pthread_cond_destroy(&allow_start_app);
+                  pthread_cond_destroy(&allow_display_sort);
+                  DEBUG("info:[%s]", "exit system");
                   return 0;
                 }
                 
                 int get_content(char * filename, char * buff, int buff_len)
-           1 -> {
+       ##### -> {
                   int fd;
                   fd = open(filename, O_RDONLY);
                   if( fd == -1){
-                    printf("open err!\n");
+                    DEBUG("error:[%s]", "open err!");
                     exit(-1);
                   }
                 
@@ -1774,7 +1257,7 @@ Execution Summary:
                   while(1){
                     ret = read( fd, buff, buff_len);
                     if(ret == -1){
-                      printf("read err!\n");
+                      DEBUG("error:[%s]", "read err!");
                       exit(-1);
                     }
                     length += ret;
@@ -1788,10 +1271,8 @@ Execution Summary:
                   return length;
                 }
                 
-                
-                
                 int init_socket(int * socket_fd)
-       ##### -> {
+           1 -> {
                   int c_len = 0;
                   struct sockaddr_in cli;
                 
@@ -1801,20 +1282,99 @@ Execution Summary:
                 
                   *socket_fd = socket(AF_INET, SOCK_STREAM, 0);
                   if(*socket_fd < 0){
-                    printf("socket() failrue!\n");
+                    DEBUG("info:[%s]","socket() failrue!");
                     return -1;
                   }
                 
                   if(connect(*socket_fd, (struct sockaddr*)&cli, sizeof(cli)) < 0){
-                    printf("connect() failure!\n");
+                    DEBUG("error:[%s]", "connect() failure!");
                     return -1;
                   }
-                  printf("connect() success\n");
+                  DEBUG("info:[%s]", "connect() success");
                   return 0;
                 }
                 
-                int send_realtime(int socket_fd, int index, int size, int code_type_index)
+                //init login
+                int init_login(int proxy_client_fd)
+           1 -> {
+                  char * package;
+                  int request_len = sizeof(request_login_t);
+                  int package_len = request_len ;
+                  package = (char *)malloc(package_len);
+                  memset(package, 0x00, package_len);
+                
+                  //request login
+                  request_login_t * data;
+                  data = (request_login_t *)package;
+                  memcpy(data->header_name, HEADER, 4);
+                  data->body_len = package_len - 8;
+                  data->type = TYPE_LOGIN;
+                
+                  data->key = 3;
+                  data->index = 0;
+                  strncpy(data->username, USERNAME, 64);
+                  strncpy(data->password, PASSWORD, 64);
+                
+                  write(proxy_client_fd, package, package_len);
+                  free(package);
+                  DEBUG("info:[%s]", "send login info!");
+                
+                  //response login
+                  p_response_s_t  p_response_s;
+                  char * buff;
+                  int buff_len = 8;
+                  unsigned short type;
+                  assert(buff = (char *)malloc(buff_len+1));
+                  memset(buff, 0x00, buff_len);
+                  int n = read(proxy_client_fd, buff, buff_len);
+                  DEBUG("info:[%s]", "recive login info!");
+                  if(n == 8){
+                    p_response_s = (p_response_s_t)buff;
+                    //parse head
+                    if(strncmp(p_response_s->header_name, HEADER, 4)){
+                      DEBUG("error:[%s]", "recive login head of info err!");
+                      exit(-1);
+                    }
+                    buff_len = p_response_s->body_len;
+                    free(buff);
+                    assert(buff = (char *)malloc(buff_len+1));
+                
+                    memset(buff, 0x00, buff_len+1);
+                    n = read(proxy_client_fd, buff, buff_len);
+                    if(n != buff_len){
+                      DEBUG("error:[%s]", "recive login body's length of info err!");
+                      exit(-1);
+                    }
+                
+                    type = *((unsigned short *)buff);
+                    if(type != TYPE_LOGIN){
+                      DEBUG("error:[%s]", "recive login body's type of info err!");
+                      exit(-1);
+                    }
+                
+                    DEBUG("info:[%s]", "recive login info check ok!");
+                    return 0;
+                  }
+                  else{
+                    DEBUG("error:[%s]", "recive login info err!");
+                    exit(-1);
+                  }
+                  return -1;
+                }
+                
+                void reset_socket(int * sock_fd)
        ##### -> {
+                  int ret = 0;
+                  close(socket_fd);
+                  ret = init_socket(socket_fd);
+                  assert( ret == 0);
+                  //send auto_push
+                  ret = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+                  assert(ret == 0);
+                }
+                
+                int send_realtime(int socket_fd, int index, int size, int code_type_index)
+           1 -> {
                   char * request;
                   int entity_count = market_list[0].entity_list_size;
                   int off = sizeof(RealPack);
@@ -1825,13 +1385,13 @@ Execution Summary:
                 
                   request = (char *)malloc(sizeof(RealPack) + codeinfo_length*size);
                   if(request == NULL){
-                    printf("malloc err!\n");
+                    DEBUG("error:[%s]", "malloc err!");
                     exit(-1);
                   }
                   int request_length = sizeof(RealPack)+ codeinfo_length * size;
                 
                   if(request == NULL){
-                    printf("malloc err!\n");
+                    DEBUG("error:[%s]", "malloc err!");
                     exit(-1);
                   }
                   memset(request, 0x00, sizeof(RealPack)+ codeinfo_length*size);
@@ -1848,13 +1408,13 @@ Execution Summary:
                   entity = (entity_t *)(market_list[0].list+i*entity_length);
                   for(i=index; i<(index+1)*size; i++){
                     codeinfo = (CodeInfo *)(request+off+i*codeinfo_length);
-                    codeinfo->code_type = market_list[0].code_type;
+                    codeinfo->code_type = entity->type;
                     strncpy(codeinfo->code, entity->code, 6);
                     entity ++;
                   }
                 
                   if(send(socket_fd, request, request_length, 0)){
-                    printf("send success!\n");
+                    DEBUG("info:[%s]", "send success!");
                     return 0;
                   }
                 
@@ -1864,6 +1424,7 @@ Execution Summary:
                 void init_receive(void * socket_fd)
        ##### -> {
                   char head[4];
+                  char head_buff[9];
                   char * buff = NULL;
                   int package_body_length = 0;
                   int ret_count = 0;
@@ -1872,84 +1433,308 @@ Execution Summary:
                   int off = 0;
                   int fd = *((int *)socket_fd);
                   int buff_len = 0;
+                  int max_buff = 1;
                 
                    while(1){
                      memset(&head, 0x00, 4);
-                     buff = (char *)malloc(head_length);
-                     if(buff == NULL){
-                       printf("malloc err!\n");
-                       exit(-1);
-                     }
-                     memset(buff, 0x00, head_length);
+                     memset(&head_buff, 0x00, 8);
                      //接受头部
-                     ret_count = read(fd, buff, head_length);
-                     printf("fd:%d\n", fd);
+                     ret_count = read(fd, head_buff, head_length);
+                     //printf("fd:%d\n", fd);
                      if(ret_count == 0){
-                       printf("connect close!\n");
+                       DEBUG("info:[%s]", "connect close!");
                        sleep(3);
                        return 0;
-                       //      continue;
-                       //pthread_exit();
                      }
                      else if(ret_count <0){
-                       printf("recive server err!\n");
-                       sleep(3);
+                       DEBUG("error:[%s]", "recive server err!");
+                	   exit(-1);
+                       //reset_socket(socket_fd);
+                       //sleep(3);
                        return 0;
-                       // continue;
-                       //pthread_exit(-1);
                      }else if(ret_count == head_length){
                        off = 0;
                        //receive body of package
-                       strncpy(head, buff, 4);
-                       length = *((int *)(buff+4));
+                       strncpy(head, head_buff, 4);
+                       length = *((int *)(head_buff+4));
                        buff_len = length;
-                       free(buff);
-                       buff = (char *)malloc(length);
-                       if(buff == NULL){
-                	 printf("malloc err!\n");
-                	 exit(-1);
+                       if(g_buff_len == 0){
+                	 g_buff = (char *)malloc(length);
+                	 if(g_buff == NULL){
+                	   DEBUG("error:[%s]", "malloc err!");
+                	   exit(-1);
+                	 }
+                	 memset(g_buff, 0x00, length);
+                	 g_buff_len = length;
+                	 g_buff_max_len = length;
+                       }else{
+                	 if(length > g_buff_max_len){
+                	   free(g_buff);
+                	   //remalloc
+                	   g_buff = (char *)malloc(length);
+                	   if(g_buff == NULL){
+                	     DEBUG("error:[%s]", "malloc err!");
+                	     exit(-1);
+                	   }
+                	   memset(g_buff, 0x00, length);
+                	   g_buff_len = length;
+                	   g_buff_max_len = length;
+                	 }else{
+                	   //clean
+                	   memset(g_buff, 0x00, g_buff_len);
+                	   g_buff_len = length;
+                	 }
                        }
-                       memset(buff, 0x00, length);
-                       while(length != (ret_count = read(fd, buff+off, length))){
+                       while(length != (ret_count = read(fd, g_buff+off, length))){
                 	 off += ret_count;
                 	 length -= ret_count;
                        }
                        //parse
                        //printf("%s\n", buff);
-                       printf("recive complete!\n");
-                       parse(buff, buff_len);
+                       //printf("recive complete!\n");
+                       parse(g_buff, buff_len);
                      }
                    }
                 }
                 
                 void init_sort_display(void * param)
        ##### -> {
-                  market_t * my_market = NULL;
-                  entity_t entity_list[SORT_SHOW_MAX_NUM];
-                  entity_t * cur_entity = NULL;
-                  int i = 0;
-                  int begin = 100;
+                  int i = 0, j = 0;
+                  int begin = 1000;
+                  int res = 0;
+                  const char * fifo_name = "" ;
+                  int p_id = -1;
                 
                   while(1){
                     if(may_show_sort){
-                      my_market = &market_list[0];
-                      memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
-                      sort_get(my_market, begin, SORT_SHOW_MAX_NUM, entity_list);
-                      cur_entity = &entity_list[0];
-                      for(i = 0; i< SORT_SHOW_MAX_NUM; i++){
-                	printf("code:%s, price:%d\n", cur_entity->code, cur_entity->price);
-                	cur_entity ++;
+                      //send to app
+                      for(j = 0; j < APP_SIZE; j++){
+                	if(app_list[j].app_fifo_fd > 0 && app_list[j].is_create == false){
+                	  //begin new pthread
+                	  res = pthread_create(&p_id, NULL, write_app, (void *)&app_list[i]);
+                	  assert(res == 0);
+                	  app_list[j].is_create = true;
+                	  continue;
+                	}
                       }
-                      printf("display show complete ... \n");
+                      DEBUG("info:[%s]", "display show complete");
                       sleep(2);
                     }else{
                       sleep(3);
                     }
                   }
+                
+                  for(j = 0; j < APP_SIZE; j++){
+                    if(app_list[i].app_fifo_fd > 0){
+                      close(app_list[i].app_fifo_fd);
+                      app_list[i].pid = 0;
+                    }
+                  }
+                }
+                
+                void init_app(void *param)
+       ##### -> {
+                  pthread_mutex_lock(&work_mutex);
+                  pthread_cond_wait(&allow_start_app, &work_mutex);
+                  pthread_mutex_unlock(&work_mutex);
+                
+                  int fifo_fd = -1;
+                  int res = 0;
+                  int i = 0;
+                  int app_request_len = sizeof(app_request_t);
+                  char app_request_buff[app_request_len];
+                  int app_fifo_fd = 0;
+                  char *template = PRIVATE_PIPE_TEMPLATE;
+                  char app_fifo_name[100] = {0};
+                  app_request_t * my_app = NULL, *tmp_app = NULL;
+                  bool is_exists = false;
+                  int ret = -1;
+                
+                  //open fifo
+                  fifo_fd = open(PUBLIC_PIPE, O_RDWR|O_NONBLOCK);
+                  if(fifo_fd == -1){
+                    DEBUG("error:[%s]", "open pipe error!");
+                    exit(-1);
+                  }
+                
+                  while(true){
+                    is_exists = false;
+                    res = read(fifo_fd, app_request_buff, app_request_len);
+                    if(res < 0){
+                      if(errno == EAGAIN){
+                	usleep(1000);
+                	continue;
+                      }
+                      DEBUG("error:[%s]", "receive client app request error!");
+                      exit(-1);
+                      //continue;
+                    }else if(res == 0){
+                      continue;
+                    }else{
+                      //check is exists
+                      tmp_app = (app_request_t*)app_request_buff;
+                      DEBUG("info:[index:%d]", tmp_app->index);
+                      for(i = 0; i< APP_SIZE; i++){
+                	if(app_list[i].pid >0){
+                	  if(kill(app_list[i].pid, 0) != 0){
+                	    DEBUG("info:[close pid:%d]", app_list[i].pid);
+                	    //delete pipe
+                	    ret = snprintf(app_fifo_name, 100, template, app_list[i].pid);
+                	    assert(res > 0);
+                	    ret = unlink(app_fifo_name);
+                	    DEBUG("info:[delete fifo pid:%d retL%d]", app_list[i].pid);
+                	    close(app_list[i].app_fifo_fd);
+                	    app_list[i].pid = 0;
+                	    app_list[i].app_fifo_fd = -1;
+                	    app_list[i].begin = 0;
+                	    app_list[i].size  = 0;
+                	    continue;
+                	  }
+                	}
+                	if((tmp_app->pid == app_list[i].pid)
+                	   && (tmp_app->option == app_list[i].option)){
+                	  is_exists = true;
+                	  app_list[i].begin = tmp_app->begin;
+                	  app_list[i].size  = tmp_app->size;
+                	  if(app_list[i].size > 10){
+                		app_list[i].size = 10;
+                	  }
+                	  my_app = &app_list[i];
+                	  res = send_sort(my_app);
+                	  assert(res == 0);
+                	  break;
+                	}
+                      }
+                      if(!is_exists){
+                	//not exists
+                	for(i = 0; i< APP_SIZE; i++){
+                	  my_app = &app_list[i];
+                	  //i = i % APP_SIZE;
+                	  if(my_app->pid == 0){
+                	    memset(&app_fifo_name, 0x00, 100);
+                	    //get
+                	    *my_app = *((app_request_t*)app_request_buff);
+                	    snprintf(app_fifo_name, 100, template, my_app->pid);
+                	    //open fifo
+                	    app_fifo_fd = open(app_fifo_name, O_WRONLY|O_NONBLOCK);
+                	    if(app_fifo_fd == -1){
+                	      // printf("open %s error!\n");
+                	      app_list[i].pid = 0;
+                	      app_list[i].app_fifo_fd = 0;
+                	      app_list[i].is_create = false;
+                	      break;
+                	    }
+                	    my_app->app_fifo_fd = app_fifo_fd;
+                	    DEBUG("info[pid:%d]", my_app->pid);
+                	    res = send_sort(my_app);
+                	    assert(res == 0);
+                	    break;
+                	  }
+                	}
+                      }
+                    }
+                  }
+                
+                  close(fifo_fd);
+                }
+                
+                void write_app(void *param)
+       ##### -> {
+                  int res = -1;
+                  entity_t entity_list[SORT_SHOW_MAX_NUM];
+                  market_t * my_market = NULL;
+                  int i = 0;
+                  app_request_t * my_app = NULL;
+                  char price[10];
+                
+                   while(true){
+                     pthread_mutex_lock(&work_mutex);
+                     pthread_cond_wait(&allow_display_sort, &work_mutex);
+                     for(i = 0; i < APP_SIZE; i++){
+                       my_app = &app_list[i];
+                       if(my_app->app_fifo_fd>0){
+                	 send_sort(my_app);
+                       }
+                     }
+                     pthread_mutex_unlock(&work_mutex);
+                   }
+                }
+                
+                static int send_sort(app_request_t * my_app)
+       ##### -> {
+                  int res = 0;
+                  market_t * my_market = NULL;
+                  //entity_t entity_list[SORT_SHOW_MAX_NUM];
+                  int entity_list_size = 0;
+                  int head_off = 8;
+                  char t_buff[8 + sizeof(entity_t)* SORT_SHOW_MAX_NUM] = {0};
+                  bool is_allow_send = true;
+                  char *template = PRIVATE_PIPE_TEMPLATE;
+                  int ret = 0;
+                  char app_fifo_name[100] = {0};
+                
+                  if(pthread_mutex_trylock(&send_sort_mutex) == 0){
+                    if(my_app->pid > 0){
+                      if(kill(my_app->pid, 0) != 0){
+                	is_allow_send = false;
+                	DEBUG("info:[close pid:%d]", my_app->pid);
+                	    //delete pipe
+                	ret = snprintf(app_fifo_name, 100, template, my_app->pid);
+                	assert(ret > 0);
+                	ret = unlink(app_fifo_name);
+                	DEBUG("info:[delete fifo pid:%d retL%d]", my_app->pid);
+                	close(my_app->app_fifo_fd);
+                	my_app->pid = 0;
+                	my_app->app_fifo_fd = -1;
+                	my_app->begin = 0;
+                	my_app->size  = 0;
+                	pthread_mutex_unlock(&send_sort_mutex);
+                	return 0;
+                      }
+                    }
+                
+                    if(my_app->app_fifo_fd >0 && my_app->pid > 0){
+                      //write app pipe
+                      my_market = &market_list[0];
+                      entity_list_size = my_market->entity_list_size;
+                      //memset(&entity_list, 0x00, SORT_SHOW_MAX_NUM * sizeof(entity_t));
+                      if(my_app->begin < entity_list_size
+                	 && my_app->begin + my_app->size < entity_list_size){
+                	res = sort_get(my_market,
+                		       my_app->column,
+                		       my_app->begin,
+                		       my_app->size,
+                		       t_buff + head_off);
+                      }else if(my_app->begin < entity_list_size){
+                	res = sort_get(my_market,
+                		       my_app->column,
+                		       my_app->begin,
+                		       entity_list_size - my_app->begin,
+                		       t_buff + head_off);
+                      }
+                      assert(res == 0);
+                      memcpy(t_buff, &my_app->option, 4);
+                      memcpy(t_buff+4, &my_app->begin, 4);
+                      //memcpy(t_buff+4, &entity_list, my_app->size*sizeof(entity_t));
+                      res = write(my_app->app_fifo_fd, &t_buff, my_app->size*sizeof(entity_t)+head_off);
+                      if(res == -1){
+                	DEBUG("error:[%s]", "write app fifo err!");
+                	//close pipe
+                	close(my_app->app_fifo_fd);
+                	my_app->app_fifo_fd = 0;
+                	my_app->pid = 0;
+                	my_app->begin = 0;
+                	my_app->size = 0;
+                	my_app->is_create = false;
+                      }
+                    }
+                    pthread_mutex_unlock(&send_sort_mutex);
+                  }
+                  return 0;
                 }
                 
                 int send_auto_push(int socket_fd, int index, int size, int code_type_index)
-       ##### -> {
+           1 -> {
                   char * request;
                   int off = sizeof(RealPack_ex);
                   int codeinfo_length = sizeof(CodeInfo);
@@ -1959,12 +1744,7 @@ Execution Summary:
                   int i = 0;
                   int request_length = sizeof(RealPack_ex)+codeinfo_length*size;
                 
-                  request = (char *)malloc(request_length);
-                  if(request == NULL){
-                    printf("malloc err!\n");
-                    exit(-1);
-                  }
-                  memset(request, 0x00, request_length);
+                  assert(jim_malloc(request_length, &request) == 0);
                 
                   RealPack_ex * data = (RealPack_ex *)request;
                   memcpy(data->m_head,HEADER,4);
@@ -1976,13 +1756,13 @@ Execution Summary:
                   entity = (entity_t *)(market_list[code_type_index].list+i*entity_length);
                   for(i = index; i<(index+1)*size; i++){
                     codeinfo = (CodeInfo *)(request + off + i * codeinfo_length);
-                    codeinfo->code_type = market_list[code_type_index].code_type;
+                    codeinfo->code_type = entity->type;
                     strncpy(codeinfo->code, entity->code, 6);
                     entity ++;
                   }
                 
                   if(send(socket_fd, request, request_length, 0)){
-                    printf("send auto_push success!\n");
+                    //printf("send auto_push success!\n");
                     return 0;
                   }
                 
@@ -1990,74 +1770,87 @@ Execution Summary:
                 }
                 
                 int send_heart(int socket_fd)
-       ##### -> {
+           2 -> {
                   char request[1024];
                   TestSrvData2 data ;
                   memset(&data,0x00,sizeof(TestSrvData2));
                   memcpy(data.head, HEADER,4);
-                  data.length      = sizeof(TestSrvData2) -8;
+                  data .length      = sizeof(TestSrvData2) -8;
                   data.m_nType     = TYPE_HEART;
                   data.m_nIndex= 1;
                 
                   memset(request, 0, 1024);
                   memcpy(request, &data, sizeof(data));
                   send(socket_fd, request, sizeof(data), 0);
-                  printf("send heart message...\n");
+                  //printf("send heart message...\n");
                   return 0;
                 }
-                
+                int option_times = 0;
                 int parse(char * buff, uLongf  buff_len)
-       ##### -> {
+           3 -> {
                   unsigned short type;
+                  int res = -1;
                 
                   if(buff == NULL)
                     return -2;
                   type = (*(unsigned short *)buff);
-                  printf("type:%02x\n", type);
+                  //printf("type:%02x\n", type);
                   switch(type){
                   case TYPE_REALTIME:{
-                    printf("realtime...\n");
-                    may_show_sort = false;
-                    parse_realtime(buff, buff_len);
-                    free(buff);
-                    may_show_sort = true;
+                    //printf("realtime...\n");
+                    res = parse_realtime(buff, buff_len);
+                    assert( res == 0);
+                    //may display sort
+                    if(!is_simulate){
+                      pthread_mutex_lock(&work_mutex);
+                      pthread_cond_signal(&allow_start_app);
+                      pthread_mutex_unlock(&work_mutex);
+                    }
                     //sort
                     column_n sort_column = NEW_PRICE;
-                    is_exit = true;
-                  }
-                    break;
+                    //is_exit = true;
+                    if(is_simulate){
+                      pthread_mutex_lock(&work_mutex);
+                      pthread_cond_signal(&allow_display_sort);
+                      pthread_mutex_unlock(&work_mutex);
+                    }
+                    option_times ++;
+                    DEBUG("info:[option_times:%d]", option_times);
+                    sleep(3);
+                    // is_simulate = true;
+                    res = send_auto_push(socket_fd, 0, market_list[0].entity_list_size, 0);
+                    assert(res == 0);
+                  }break;
                   case TYPE_AUTO_PUSH:{
-                    printf("recieve auto_push...\n");
-                    may_show_sort = false;
-                    parse_auto_push(buff, buff_len);
-                    may_show_sort = true;
-                    free(buff);
-                  }
-                    break;
+                    //printf("recieve auto_push...\n");
+                    res = parse_auto_push(buff, buff_len);
+                    assert( res == 0);
+                    pthread_mutex_lock(&work_mutex);
+                    pthread_cond_signal(&allow_display_sort);
+                    pthread_mutex_unlock(&work_mutex);
+                    option_times ++;
+                    DEBUG("info:[option_times:%d]", option_times);
+                  }break;
                   case TYPE_HEART:{
                     //printf("heart...\n");
                     heart_times--;
-                  }
-                    break;
+                  }break;
                   case TYPE_ZIB:{
-                    printf("bzib...\n");
-                    char * src_buff = NULL;
-                    uLongf src_buff_len = 0;
-                    assert(unpack(buff, buff_len, &src_buff, &src_buff_len) == 0);
-                    free(buff);
-                    parse(src_buff, src_buff_len);
-                  }
-                    break;
+                    //printf("bzib...\n");
+                    res = unpack(buff, buff_len);
+                    assert( res == 0);
+                    res = parse(g_zib_buff, g_zib_buff_len);
+                    assert( res == 0);
+                  }break;
                   default:{
-                    printf("unknown type:%d...\n", type);
-                  }
-                    break;
+                    DEBUG("info:[unknown type:%d]", type);
+                  }break;
                   }
                   return 0;
                 }
                 
                 int parse_realtime(char * buff, uLongf buff_len)
-       ##### -> {
+           1 -> {
                   AskData2 * data_head = (AskData2 *)(buff);
                   char code[7]={0};
                   int i= 0;
@@ -2066,15 +1859,31 @@ Execution Summary:
                   int code_len = 0;
                 
                   for(i=0; i< data_head->m_nSize; i++){
+                    memset(&code, 0x00, 7);
                     CommRealTimeData * data_type = (CommRealTimeData *)(buff
                 							+ 20
                 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-                    //    code_len = strlen(data_type->m_cCode);
+                    //code_len = strlen(data_type->m_cCode);
                     strncpy(code, data_type->m_cCode, 6);
                     code[6] = '\0';
-                    if(data_type->m_cCodeType == 0x1101){//股票
+                    //printf("code:%s\n", code);
+                    switch(data_type->m_cCodeType){
+                    case 0x1101:{
                       my_market = &market_list[index];
                       do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+                    }break;
+                    case 0x1201:{
+                      my_market = &market_list[index];
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+                    }break;
+                    case 0x1206:{
+                      my_market = &market_list[index];
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+                    }break;
+                    case 0x120b:{
+                      my_market = &market_list[index];
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, ADD);
+                    }break;
                     }
                   }
                   return 0;
@@ -2089,55 +1898,78 @@ Execution Summary:
                      char * buff;
                      int i;
                      option_n option;
-       ##### -> {
-                  int address = 0;
+         100 -> {
+                  void * address = NULL;
                   unsigned int code_type_index = 0;
                   entity_t * entity;
-                  column_n column = NEW_PRICE;
-                  if(code_type == 0x1201){
+                  // column_n column = NEW_PRICE;
+                  switch(code_type){
+                  case 0x110:{
+                    code_type_index = 0;
+                  }break;
+                  case 0x1201:{
                     code_type_index = 1;
+                  }break;
+                  case 0x1206:{
+                    code_type_index = 2;
+                  }break;
+                  case 0x120b:{
+                    code_type_index = 3;
+                  }break;
                   }
-                  assert((address = find_entity_by_key(code, 6, code_type_index)) > 0);
+                  address = find_entity_by_key(code, 6, code_type_index);
+                  assert(address != NULL);
                   entity = (entity_t *)address;
                 
                   HSStockRealTime * tmp = (HSStockRealTime *)(buff
                 					      +20
                 					      +sizeof(CommRealTimeData)
                 					      +i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
-                  /*
-                  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
-                	 i,
-                	 code_type,
-                	 code,
-                	 tmp->m_lNewPrice);
-                  */
-                  entity->price = tmp->m_lNewPrice;
+                
+                  entity->price       = tmp->m_lNewPrice;
+                  if(entity->price == 0){
+                    entity->raise = 0;
+                    entity->range = 0;
+                  }
+                  else{
+                    entity->raise  = entity->price - entity->pre_close;
+                    entity->range  = round(entity->raise *10000.0 / entity->pre_close);
+                  }
+                  entity->max         = tmp->m_lMaxPrice;
+                  entity->min         = tmp->m_lMinPrice;
+                  entity->total       = tmp->m_lTotal;
+                  entity->money       = tmp->m_fAvgPrice;
+                  DEBUG("info:[index:%d,code_type:%2x,code:%s,pre_close:%d,new_price:%d,raise:%d,range:%d]",i, code_type, code, entity->pre_close, entity->price, entity->raise, entity->range);
+                  if(is_simulate){
+                    srand(time(0));
+                    entity->price = tmp->m_lNewPrice + (rand()%10);
+                    option = UPDATE;
+                  }
                   switch(option){
                   case ADD:{
                     //add to sort
-                    sort_add(my_market, entity, column);
+                    sort_add(my_market, entity, NEW_PRICE);
+                    sort_add(my_market, entity, RAISE);
+                    sort_add(my_market, entity, RANGE);
                   }break;
                   case UPDATE:{
                     //update
-                    sort_update(my_market, entity, column);
+                    sort_update(my_market, entity, NEW_PRICE);
+                    sort_update(my_market, entity, RAISE);
+                    sort_update(my_market, entity, RANGE);
                   }break;
                   default:{
                 
                   }
                   }
-                  printf("index:%d,code_type:%2x,code:%s, new_price:%d\n",
-                	 i,
-                	 code_type,
-                	 code,
-                	 entity->price);
                 }
                 
                 int parse_auto_push(char * buff, uLong   buff_len)
        ##### -> {
-                  printf("parse auto_push...\n");
+                  //printf("parse auto_push...\n");
                   AskData2 * data_head = (AskData2 *)(buff);
                   char code[7]={0};
-                  int i=0;
+                  int i = 0;
                   int index = 0;
                   market_t * my_market = NULL;
                 
@@ -2146,60 +1978,98 @@ Execution Summary:
                 							+ 20
                 							+ i*(sizeof(CommRealTimeData)+sizeof(HSStockRealTime)));
                     memcpy(code, data_type->m_cCode, 6);
-                    if(data_type->m_cCodeType == 0x1101){//股票
+                    switch(data_type->m_cCodeType){
+                    case 0x1101:{
+                      my_market = &market_list[index];
+                      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+                    }
+                    case 0x1201:{
+                      my_market = &market_list[index];
+                      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+                    }
+                    case 0x1206:{
+                      my_market = &market_list[index];
+                      //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
+                      do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
+                    }
+                    case 0x120b:{
                       my_market = &market_list[index];
                       //printf("code_type:%2x, code:%s\n", data_type->m_cCodeType, code);
                       do_stock(my_market, data_type->m_cCodeType, code, buff, i, UPDATE);
                     }
                   }
+                  }
                 
                   return 0;
                 }
                 
-                int unpack(char * des_buff, uLongf des_buff_len, char ** src_buff, uLongf * src_buff_len)
-       ##### -> {
+                int unpack(char * des_buff, uLongf des_buff_len)
+           1 -> {
+                  uLong src_length = 0;
                   TransZipData2   * zheader;
                   zheader = (TransZipData2 *)des_buff;
                   if(zheader->m_nType != TYPE_ZIB){
-                    printf("parse zlib package type error!\n");
+                    DEBUG("error:[%s]", "parse zlib package type error!");
                     return -100;
                   }
                 
-                  *src_buff_len = (uLongf)zheader->m_lOrigLen;
-                  *src_buff = (char *)malloc(*src_buff_len);
-                  if(*src_buff == NULL){
-                    printf("malloc err!\n");
-                    return -1;
+                  src_length = (uLongf)zheader->m_lOrigLen;
+                  if(g_zib_buff_len == 0){
+                    g_zib_buff_len = src_length;
+                    g_zib_buff_max_len= src_length;
+                    g_zib_buff = (char *)malloc(g_zib_buff_len);
+                    assert(g_zib_buff != NULL);
+                    if(g_zib_buff == NULL){
+                      DEBUG("error:[%s]", "malloc err!");
+                      return -1;
+                    }
+                    memset(g_zib_buff, 0x00, g_zib_buff_len);
+                  }else{
+                    if(src_length > g_zib_buff_max_len){//remalloc
+                      free(g_zib_buff);
+                      g_zib_buff_len = src_length;
+                      g_zib_buff_max_len = src_length;
+                      g_zib_buff = (char *)malloc(g_zib_buff_len);
+                      assert(g_zib_buff != NULL);
+                      if(g_zib_buff == NULL){
+                	DEBUG("error:[%s]", "malloc err!");
+                	return -1;
+                      }
+                      memset(g_zib_buff, 0x00, g_zib_buff_len);
+                    }else{//clean
+                      memset(g_zib_buff, 0x00, g_zib_buff_len);
+                      g_zib_buff_len = src_length;
+                    }
                   }
-                  memset(*src_buff, 0 , *src_buff_len);
                 
-                  int unzip =  uncompress((Bytef *)(*src_buff), src_buff_len,
+                
+                  int unzip =  uncompress((Bytef *)(g_zib_buff), &g_zib_buff_len,
                 			  (Bytef*)zheader->m_cData, (uLongf)zheader->m_lZipLen);
                   if(unzip == Z_MEM_ERROR){
-                    printf("memory not enough\n");
+                    DEBUG("error:[%s]", "memory not enough");
                     return -2;
                   }
                   if(unzip == Z_BUF_ERROR){
-                    printf("buff not enough!\n");
+                    DEBUG("error:[%s]", "buff not enough!");
                     return -3;
                   }
                   if(unzip == Z_DATA_ERROR){
-                    printf("unpack data err!\n");
+                    DEBUG("error:[%s]", "unpack data err!");
                     return -4;
                    }
                   if(unzip == Z_OK
-                     && *((long*)src_buff_len) == zheader->m_lOrigLen){
-                    // my_buff->p_res_media_h = (p_response_meta_header)my_buff->unpack_buff;
+                     && g_zib_buff_len == zheader->m_lOrigLen){
+                    DEBUG("info:[%s]", "unpack success!");
                     return 0;
-                    //parse(my_buff);
-                    //return;
                   }
-                  printf("unzip:%d\n", unzip);
+                  DEBUG("info:[unzip:%d]", unzip);
                   return -1;
                 }
                 
                 int get_index_by_code_ascii(char ascii)
-        6804 -> {
+        1200 -> {
                   int base_digit = 0;
                   int base_alphabet = 10;
                   //digit
@@ -2217,10 +2087,13 @@ Execution Summary:
                 
                 void sig_stop(int signo)
        ##### -> {
-                  printf("abovt exit!\n");
+                  DEBUG("info:[%s]", "abovt exit!");
                   shutdown(socket_fd, SHUT_RDWR);
                   //close(socket_fd);
                   exit(-1);
+                }
+                
+       ##### -> void sig_pipe(int signo){
        ##### -> }
 
 
@@ -2228,14 +2101,22 @@ Top 10 Lines:
 
      Line      Count
 
-      520       6804
-       82          1
+      978       1200
+      807        100
+      696          3
+      679          2
+      181          1
+      205          1
+      283          1
+      643          1
+      759          1
+      915          1
 
 Execution Summary:
 
-       16   Executable lines in this file
-       16   Lines executed
+       22   Executable lines in this file
+       22   Lines executed
    100.00   Percent of the file executed
 
-     6805   Total number of line executions
-   425.31   Average executions per line
+     1311   Total number of line executions
+    59.59   Average executions per line

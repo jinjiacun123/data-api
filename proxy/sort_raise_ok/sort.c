@@ -381,6 +381,9 @@ static int find_location(my_market, entity, column, area_index, queue_index)
   }
 
   pre_area = area;
+#define FIND_WAY 1
+
+#if FIND_WAY
   //find area
   for(; i<AREA_NUMBER; i++){
     if(value.ivalue > area->max_value.ivalue){
@@ -401,6 +404,9 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     real_size = area->real_size;
     queue = area->cur;
   }
+#else
+  
+#endif
   //find queue
   if(area->real_size == 0){
     *queue_index = 0;

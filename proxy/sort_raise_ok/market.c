@@ -28,7 +28,7 @@ int init_market(){
   fseek(fp, 0L, SEEK_SET);
   //stock
   //size = 3050;
-  size = 100;
+  size = 1000;
   get_market(index, fp, size);
   close(fp);
   return 0;

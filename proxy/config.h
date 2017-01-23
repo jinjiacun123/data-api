@@ -35,6 +35,9 @@
 #define PASSWORD "zjw_android"
 #define HEADER   "ZJHR"
 
+//#define DEBUG(fmt, ...) printf("%s(%d)-<%s>:"#fmt"\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define DEBUG(fmt, ...) WriteErrLog("%s(%d)-<%s>:"#fmt"\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+
 #define MAX_BUFF 1024*1024
 
 #define TYPE_EMPTY 0x0D03

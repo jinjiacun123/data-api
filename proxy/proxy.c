@@ -192,7 +192,7 @@ void main(int argc,char *argv[])
   //创建代理服务端套接字
   proxyServerSocketId = PassiveSock();
   if(proxyServerSocketId<0){
-    WriteErrLog("创建sock在服务%s失败/n",cService);
+    DEBUG("创建sock在服务%s失败",cService);
     exit(-1);
   }
 
@@ -205,12 +205,12 @@ void main(int argc,char *argv[])
 
     //等待客户端的连接
     if((clientSocketId = accept(proxyServerSocketId,(struct sockaddr *)&sAddrIn,&iAddrLen))<(long)0){
-      WriteErrLog("Accept error (%d):%s/n",errno,strerror(errno));
+      DEBUG("Accept error (%d):%s",errno,strerror(errno));
       //连接出错 1 秒后继续服务
       sleep(1);
       continue;
     }
-    WriteErrLog("accept client connection!\n");
+    DEBUG("%s", "accept client connection!");
     /*
 #define SOCKET_ERROR (-1)
     int keepAlive = 1;   //设定keepalive
@@ -220,46 +220,45 @@ void main(int argc,char *argv[])
 
 
     if(setsockopt(clientSocketId, SOL_SOCKET, SO_KEEPALIVE,(void*)&keepAlive, sizeof(keepAlive)) == SOCKET_ERROR){
-      WriteErrLog("Call setsockopt error,error is %d\n", errno);
+      DEBUG("Call setsockopt error,error is %d", errno);
       exit(-1);
     }
     if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPIDLE, (void*)keepInterval, sizeof(keepInterval)) == SOCKET_ERROR){
-      WriteErrLog("call setsockopt error,error is %d\n", errno);
+      DEBUG("call setsockopt error,error is %d", errno);
       exit(-1);
     }
     if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval)) == SOCKET_ERROR){
-      WriteErrLog("call setsocket error, error is%d\n", errno);
+      DEBUG("call setsocket error, error is%d", errno);
       exit(-1);
     }
     if(setsockopt(clientSocketId, SOL_TCP, TCP_KEEPCNT,(void *)&keepCount, sizeof(keepCount)) == SOCKET_ERROR){
-      WriteErrLog("call setsocketopt error, error is %d\n", errno);
+      DEBUG("call setsocketopt error, error is %d", errno);
       exit(-1);
     }
     */
-
     //进程数量大于iPNum时 1秒后继续服务
     if(g_iCltNum > iPNum - 1){
-      WriteErrLog("g_iCltNum is too much\n");
+      DEBUG("g_iCltNum is too much\n");
       close(clientSocketId);
-      sleep(1); 
+      sleep(1);
       continue;
     }
-    
+
     //check ip is connected
     /*
     if((i=is_connected(clientSocketId, process_ip_list)) < 0){
-      WriteErrLog("this client is connected!\n");
+      DEBUG("%s","this client is connected!");
       close(clientSocketId);
       continue;
     }
     */
     i = add_connected(clientSocketId, process_ip_list);
-    
-    
-    WriteErrLog("create child process!\n");
+
+
+    DEBUG("%s", "create child process!");
     //创建进程
     if((iChildPid=fork()) < 0){
-      WriteErrLog("Fork error :%s!!/n",strerror(errno));
+      DEBUG("Fork error :%s!!",strerror(errno));
       close(clientSocketId);
       //出错1秒后 继续服务
       sleep(1); 
@@ -276,7 +275,7 @@ void main(int argc,char *argv[])
     //连接到服务器
     proxyClientSocketId = ConnectSock();
     if (proxyClientSocketId < 0){
-      WriteErrLog("连接(%s:%s)失败(%d):%s/n",
+      DEBUG("连接(%s:%s)失败(%d):%s",
 		  cHost,
 		  cPort,
 		  errno,
@@ -284,7 +283,7 @@ void main(int argc,char *argv[])
       close(clientSocketId);
       exit(0);
     }
-    WriteErrLog("connection to server!\n");
+    DEBUG("%s", "connection to server!");
 
     deal_proxy(proxyClientSocketId, clientSocketId);
   }
@@ -296,12 +295,12 @@ void WriteErrLog(const char *i_sFormat,...)
   char  *sLogFile="/tmp/err.log";
   FILE  *fLogFile;
   time_t tWriteTime;
-  char  sWriteTime[20];
+  char  sWriteTime[20] = {0};
   pid_t ThisPid;
 
   ThisPid=getpid();
   time(&tWriteTime);
-  //  cftime(sWriteTime,"%Y/%m/%d %H:%M:%S",&tWriteTime);
+  strftime(sWriteTime, 20, "%Y/%m/%d %H:%M:%S", localtime(&tWriteTime));
   //sLogFile=getenv("ERRFILE");
   // printf("log:%s\n", sLogFile);
 
@@ -309,7 +308,7 @@ void WriteErrLog(const char *i_sFormat,...)
     fLogFile=fopen(sLogFile,"a+");
 
   if(sLogFile != NULL && fLogFile !=NULL)
-    fprintf(fLogFile,"[%6d]%s : ",ThisPid,sWriteTime);
+    fprintf(fLogFile, "[%6d]%s : ", ThisPid, sWriteTime);
   va_start(args,i_sFormat);
   if(sLogFile != NULL && fLogFile !=NULL)
     vfprintf(fLogFile,i_sFormat,args);
@@ -334,23 +333,23 @@ PassiveSock()
 
   s = socket(AF_INET, SOCK_STREAM, 0);
   if (s<0)
-    WriteErrLog("Can't create socket/r/n");
+    DEBUG("%s", "Can't create socket");
 
   optval = 1;
   optlen = sizeof(optval);
   if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(opt)) == -1)
-     WriteErrLog("Waring:setsockopt so_reuseaddr error:%s\n", strerror(errno));
+    DEBUG("Waring:setsockopt so_reuseaddr error:%s\n", strerror(errno));
   //  if(setsockopt(s,SOL_SOCKET,SO_REUSEPORT,(char *)&optval,optlen) == -1)
-  //  WriteErrLog("Warning:setsockopt error:%s/n",strerror(errno));
+  //  DEBUG("Warning:setsockopt error:%s",strerror(errno));
 
 
   /*        bind the socket        */
   if (bind(s,(struct sockaddr *)&sin,sizeof(sin))<0)
-    WriteErrLog("Warning:Can't bind to %s port: %s!!\n", "127.0.0.1", PROXY_PORT);
+    DEBUG("Warning:Can't bind to %s port: %s!!", "127.0.0.1", PROXY_PORT);
 
   if(listen(s, LISTENMAX)<0)
-    WriteErrLog("Warning:Can't listen on port!!:%s/n",strerror(errno));
-  WriteErrLog("SockRecvServer:Listening on port %s.......\n","8001");
+    DEBUG("Warning:Can't listen on port!!:%s",strerror(errno));
+  DEBUG("Listening on port %d...", 8001);
 
   return s;
 }
@@ -367,12 +366,12 @@ ConnectSock()
   proxy_client_addr.sin_port = htons(SERVER_PORT);
 
   if((proxy_client_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
-    WriteErrLog("error proxy_client_addr!\n");
+    DEBUG("%s", "error proxy_client_addr!");
     exit(1);
   }
 
   if(connect(proxy_client_fd, (void *)&proxy_client_addr ,sizeof(proxy_client_addr)) == -1){
-    WriteErrLog("error proxy connection to server!\n");
+    DEBUG("%s", "error proxy connection to server!");
     exit(1);
   }
 
@@ -441,7 +440,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
     }
 
     if(nfds == 0){//timeout
-      WriteErrLog("%s\tprocess timeout\n", client_ip);
+      DEBUG("%s\tprocess timeout", client_ip);
       close(proxyClientSocketId);
       shutdown(proxyClientSocketId,2);
       close(clientSocketId);
@@ -450,19 +449,18 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
-/*
     if(alive_times>20){
-      WriteErrLog("%s\tclient is die\n", client_ip);
+      DEBUG("%s\tclient is die\n", client_ip);
       exit(-1);
     }
-    */
+  
     for(i = 0; i< nfds; i++){
       //if(!(events[i].events & EPOLLIN)){
 	if((events[i].events & EPOLLERR) ||
 	   // (events[i].events & EPOLLHUP) ||
 	   (events[i].events & EPOLLRDHUP) ||
 	   (!(events[i].events & EPOLLIN))){
-	  WriteErrLog("%s\tepoll err!\n", client_ip);
+	  DEBUG("%s\tepoll err!", client_ip);
 	  close(proxyClientSocketId);
 	  shutdown(proxyClientSocketId,2);
 	  close(clientSocketId);
@@ -483,7 +481,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 &is_create_pipe);
 	  assert(ret == 0);
 	  if(ret != 0){
-	    WriteErrLog("%s\tdeal client info err!\n", client_ip);
+	    DEBUG("%s\tdeal client info err!", client_ip);
 	    exit(-1);
 	  }
 	}
@@ -495,7 +493,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 				 client_ip);
 	  assert(ret == 0);
 	  if(ret != 0){
-	    WriteErrLog("%s\tdeal server info err!\n", client_ip);
+	    DEBUG("%s\tdeal server info err!", client_ip);
 	    exit(-1);
 	  }
 	}
@@ -506,7 +504,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 			       &alive_times,
 			       client_ip);
 	  if(ret != 0){
-	    WriteErrLog("%s\tdeal sort info err!\n", client_ip);
+	    DEBUG("%s\tdeal sort info err!", client_ip);
 	    exit(-1);
 	  }
 	}
@@ -535,29 +533,29 @@ static int deal_server_info(client_socket_fd,
 
   //recive server info
   *alive_times++;
-  WriteErrLog("%s:recive info from server!\n", client_ip);
+  DEBUG("%s:recive info from server!", client_ip);
 L1:  length = 8;
   while(true){
     n = 0;
     while((nread = read(proxy_client_socket_fd, tmp_buff, BUFSIZ-1))>0){
       n += nread;
       int off_len = 0;
-      int write_len = nread;      	
+      int write_len = nread;
       while(wret = write(client_socket_fd, tmp_buff+off_len, write_len)){
       	if(wret <= 0){
-		if(errno == EAGAIN){
-            	usleep(1000);
-	    	continue;
-		}else{
-			WriteErrLog("%s write to client err!errno:%d\n", client_ip, errno);
-			exit(-1);
-		}
-      	}        
-	
+	  if(errno == EAGAIN){
+	    usleep(1000);
+	    continue;
+	  }else{
+	    DEBUG("%s write to client err!errno:%d", client_ip, errno);
+	    exit(-1);
+	  }
+      	}
+
         if(wret == write_len){
-		break;
+	  break;
 	}
-	
+
         off_len += wret;
 	write_len -= wret;
       }
@@ -572,23 +570,23 @@ L1:  length = 8;
       /*
       if(n == -1){
 	if(errno != EAGAIN){
-	  WriteErrLog("%s\ttread server err!\n", client_ip);
+	  DEBUG("%s\ttread server err!", client_ip);
 	  return 0;
 	}
 	continue;
       }
       if(n == 0){
-	WriteErrLog("%s\tserver deal finish!\n", client_ip);
+	DEBUG("%s\tserver deal finish!", client_ip);
 	break;
       }
       else if(n == length){
       //send to client
-      WriteErrLog("%s\tsend to client\n", client_ip);
+      DEBUG("%s\tsend to client", client_ip);
       //write(client[1].fd, cDataBuf, n);
       //recive head from server
       p_header = (p_response_header)header_buff;
       if(strncmp(p_header->str, HEADER, 4)){
-	WriteErrLog("%s\tcompare header err!\n", client_ip);
+	DEBUG("%s\tcompare header err!", client_ip);
 	exit(-1);
       }
       length = p_header->length;
@@ -604,7 +602,7 @@ L1:  length = 8;
 	  continue;
 	}
 	else if(n == 0){
-	  WriteErrLog("%s\tserver deal finish!\n", client_ip);
+	  DEBUG("%s\tserver deal finish!", client_ip);
 	  return 0;
 	}
 	else if(n == last_length){
@@ -619,7 +617,7 @@ L1:  length = 8;
 	  }
 	  if(n == -1 && errno == EAGAIN){}
 	  else{
-	    WriteErrLog("%s\tWrite to client error!errno:%d\n", client_ip, errno);
+	    DEBUG("%s\tWrite to client error!errno:%d", client_ip, errno);
 	    exit(-1);
 	    //return 0;
 	  }
@@ -678,7 +676,7 @@ static int deal_client_info(client_socket_fd,
     n = 0;
     package_length = 0;
     while((nread = read(client_socket_fd, tmp_buff,  BUFSIZ-1)) > 0){
-      WriteErrLog("%s read client info!\n", client_ip);
+      DEBUG("%s read client info!", client_ip);
       app_off = 0;
       packages = 0;
       //      while(true){
@@ -695,7 +693,7 @@ static int deal_client_info(client_socket_fd,
 	  //init sort of request
 	  my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
 	  if(my_app_request_data == NULL){
-	    WriteErrLog("malloc my_app_request_data error!\n");
+	    DEBUG("%s","malloc my_app_request_data error!");
 	    exit(-1);
 	  }
 	  memset(my_app_request_data, 0x00, sizeof(app_request_data));
@@ -725,7 +723,7 @@ static int deal_client_info(client_socket_fd,
 		  tmp_buff + package_length * packages,
 		  nread - package_length * packages);
       if(ret <= 0){
-	WriteErrLog("%s write to proxy err!\n", client_ip);
+	DEBUG("%s write to proxy err!", client_ip);
 	exit(-1);
       }
       if(nread < BUFSIZ -1)
@@ -738,28 +736,28 @@ static int deal_client_info(client_socket_fd,
     /*
     if((n = read(client_socket_fd, header_buff, length))<0){
       if(n == -1 && errno == EAGAIN){
-	WriteErrLog("%s\tread client head err!\n", client_ip);
+	DEBUG("%s\tread client head err!", client_ip);
 	return 0;
       }
       exit(-1);
     }
     else if(n == 0){
-      WriteErrLog("%s\tclient deal finish!\n", client_ip);
+      DEBUG("%s\tclient deal finish!", client_ip);
       return 0;
     }
     else if(n == length){
       //send to server
-      //WriteErrLog("send to server\n");
+      //DEBUG("%s","send to server");
       //write(client[0].fd, cDataBuf, n);
       //send to client
-      WriteErrLog("%s\tread client info!\n", client_ip);
+      DEBUG("%s\tread client info!", client_ip);
       //write(client[1].fd, cDataBuf, n);
       //recive head from server
       p_header = (p_response_header)header_buff;
       if(strncmp(p_header->str, HEADER_EX, 4) == 0){
 	is_custom = true;
       }else if(strncmp(p_header->str, HEADER, 4)){
-	WriteErrLog("%s\tcompare header err!\n", client_ip);
+	DEBUG("%s\tcompare header err!", client_ip);
 	exit(-1);
       }
 
@@ -771,12 +769,12 @@ static int deal_client_info(client_socket_fd,
 	  if(n == -1 && errno == EAGAIN){
 	    //close(client_socket_fd);
 	    //client_socket_fd = -1;
-	    WriteErrLog("%s\tclient read body error!\n", client_ip);
+	    DEBUG("%s\tclient read body error!", client_ip);
 	    return 0;
 	  }
 	  continue;
 	}else if(n == 0){
-	  WriteErrLog("%s\tclient read finish!\n", client_ip);
+	  DEBUG("%s\tclient read finish!", client_ip);
 	  return 0;
 	}else if(n == last_length){
 	  if(!is_custom){
@@ -808,7 +806,7 @@ static int deal_client_info(client_socket_fd,
 	    //init sort of request
 	    my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
 	    if(my_app_request_data == NULL){
-	      WriteErrLog("malloc my_app_request_data error!\n");
+	      DEBUG("%s", "malloc my_app_request_data error!");
 	      exit(-1);
 	    }
 	    memset(my_app_request_data, 0x00, sizeof(app_request_data));
@@ -830,7 +828,7 @@ static int deal_client_info(client_socket_fd,
     }
     */
   }
-  WriteErrLog("%s\trecive client info complete!\n", client_ip);
+  DEBUG("%s\trecive client info complete!", client_ip);
   //body of package
   //assert(deal_from_client_to_server(client[0].fd, buff, length) == 0);
 
@@ -860,14 +858,14 @@ static int deal_sort_info(clientSocketId,
     exit(-1);
   }
   memset(sort_buff, 0x00, sort_buff_len + 8);
-  WriteErrLog("read pipe...\n");
+  DEBUG("%s", "read pipe...");
   //read sort
   res = read(pipe_read_fd, sort_buff+8, sort_buff_len);
   if(res == -1){
-    WriteErrLog("read error!\n");
+    DEBUG("%s", "read error!");
     exit(-1);
   }else if(res == 0){
-    WriteErrLog("read complete...\n");
+    DEBUG("%s", "read complete...");
     exit(-1);
   }
 
@@ -888,7 +886,7 @@ static int deal_sort_info(clientSocketId,
       off += res;
     }
   }
-  WriteErrLog("res=%d\n", res);
+  DEBUG("res=%d", res);
   assert(res > 0);
 
   return 0;
@@ -943,7 +941,7 @@ int init_login(int proxy_client_fd)
 
   write(proxy_client_fd, package, package_len);
   free(package);
-  WriteErrLog("send login info!\n");
+  DEBUG("%s", "send login info!");
 
   //response login
   p_response_s_t  p_response_s;
@@ -953,12 +951,12 @@ int init_login(int proxy_client_fd)
   assert(buff = (char *)malloc(buff_len+1));
   memset(buff, 0x00, buff_len);
   int n = read(proxy_client_fd, buff, buff_len);
-  WriteErrLog("recive login info!\n");
+  DEBUG("%s", "recive login info!");
   if(n == 8){
     p_response_s = (p_response_s_t)buff;
     //parse head
     if(strncmp(p_response_s->header_name, HEADER, 4)){
-      WriteErrLog("recive login head of info err!\n");
+      DEBUG("%s", "recive login head of info err!");
       exit(-1);
     }
     buff_len = p_response_s->body_len;
@@ -968,21 +966,21 @@ int init_login(int proxy_client_fd)
     memset(buff, 0x00, buff_len+1);
     n = read(proxy_client_fd, buff, buff_len);
     if(n != buff_len){
-      WriteErrLog("recive login body's length of info err!\n");
+      DEBUG("%s", "recive login body's length of info err!");
       exit(-1);
     }
 
     type = *((unsigned short *)buff);
     if(type != TYPE_LOGIN){
-      WriteErrLog("recive login body's type of info err!\n");
+      DEBUG("%s", "recive login body's type of info err!");
       exit(-1);
     }
 
-    WriteErrLog("recive login info check ok!\n");
+    DEBUG("%s", "recive login info check ok!");
     return 0;
   }
   else{
-    WriteErrLog("recive login info err!\n");
+    DEBUG("%s", "recive login info err!");
     exit(-1);
   }
   return -1;
@@ -994,7 +992,7 @@ int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
      const char * buff;
      unsigned long buff_len;
 {
-  WriteErrLog("send message from client to server!\n");
+  DEBUG("%s", "send message from client to server!");
   //parse client's request
   unsigned short type = 0;
   //get type
@@ -1017,9 +1015,9 @@ int deal_from_client_to_server(proxy_client_fd, buff, buff_len)
     REQUEST_DEAL(history)(proxy_client_fd,buff, buff_len);
     break;
   }
-  
+
   //send request of server
-  
+
   return 0;
 }
 
@@ -1030,7 +1028,7 @@ int deal_from_server_to_client(client_fd, buff, buff_len)
      unsigned long buff_len;
 {
   //recive from server
-  WriteErrLog("send message from server to client!\n");
+  DEBUG("%s", "send message from server to client!");
   unsigned short type = 0;
   //get type
   type = *((unsigned short*)buff);
@@ -1038,7 +1036,7 @@ int deal_from_server_to_client(client_fd, buff, buff_len)
   if(type == TYPE_ZIB){
 
   }
-  
+
   switch(type){
   case TYPE_HEART:
     RESPONSE_DEAL(heart)(client_fd, buff, buff_len);
@@ -1073,7 +1071,7 @@ static int deal_request_of_realtime(int proxy_client_socket_fd,
   //get entity_list from client
   request_c_realtime_t * request_c_realtime = (request_c_realtime_t *)buff;
   if(request_c_realtime->type != TYPE_REALTIME){
-    WriteErrLog("Type err in request");
+    DEBUG("%s", "Type err in request");
     exit(-1);
   }
   size = request_c_realtime->size;
@@ -1238,18 +1236,18 @@ static int init_request_sort(pid_t p_id, int *pipe_write_fd)
   if(access(cur_app_pipe, F_OK) == -1){
     res = mkfifo(cur_app_pipe, 0777);
     if(res != 0){
-      WriteErrLog("count not create fifo %s\n", cur_app_pipe);
+      DEBUG("count not create fifo %s", cur_app_pipe);
       exit(-1);
     }
   }
 
   if(access(fifo_name, F_OK) == -1){
-    WriteErrLog("fifo is not exists!\n");
+    DEBUG("%s", "fifo is not exists!");
     exit(-1);
   }
   *pipe_write_fd = open(fifo_name, O_RDWR);
   if(*pipe_write_fd == -1){
-    WriteErrLog("open pipe err!\n");
+    DEBUG("%s", "open pipe err!");
     exit(-1);
   }
 
@@ -1300,13 +1298,13 @@ void * deal_request_of_sort(pid,
   /*
   sort_buff = (sort_entity_t *)malloc(sort_buff_len+1);
   if(sort_buff == NULL){
-    WriteErrLog("malloc error!\n");
+    DEBUG("%s", "malloc error!");
     exit(-1);
   }
   memset(sort_buff, 0x00, sort_buff_len);
   */
 
-  WriteErrLog("begin:%d,size:%d,option:%d,column:%d,index:%d\n", begin, size, option,column,index);
+  DEBUG("begin:%d,size:%d,option:%d,column:%d,index:%d", begin, size, option,column,index);
   app_request_t app_request;
   memset(&app_request, 0x00, sizeof(app_request_t));
   //request
@@ -1318,11 +1316,11 @@ void * deal_request_of_sort(pid,
   app_request.index  = index;
   res = write(pipe_write_fd, &app_request, app_request_len);
   assert(res >0);
-  WriteErrLog("send pipe request...\n");
+  DEBUG("%s", "send pipe request...");
   if(*pipe_read_fd <= 0){
     *pipe_read_fd = open(cur_app_pipe, O_RDWR);
     if(*pipe_read_fd == -1){
-      WriteErrLog("open pipe read fd error!\n");
+      DEBUG("%s", "open pipe read fd error!");
       exit(-1);
     }
   }
@@ -1368,7 +1366,7 @@ static int deal_response_of_realtime(int client_socket_fd, char * my_buff,int bu
 //处理外汇
 static void do_foreign_exchange(char * code, buff_t * my_buff, int i)
 {
-  WriteErrLog("do_foreign_exchange...\n");
+  DEBUG("%s", "do_foreign_exchange...");
   response_realtime_price_foreign_exchange_t * entity = (response_realtime_price_foreign_exchange_t*)(my_buff->buff
 					    + 28
 					  + sizeof(response_realtime_price_t)
@@ -1378,20 +1376,20 @@ static void do_foreign_exchange(char * code, buff_t * my_buff, int i)
 //处理非外汇
 static void do_no_foreign_exchange(char * code, buff_t * my_buff, int i)
 {
-  WriteErrLog("do_no_foreign_exchange...\n");
-  
+  DEBUG("%s", "do_no_foreign_exchange...");
+
   response_realtime_price_no_foreign_exchange_t * entity = (response_realtime_price_no_foreign_exchange_t*)(my_buff->buff
 					    +28
 					    +sizeof(response_realtime_price_ex_t)
 					    +i*(sizeof(response_realtime_price_ex_t)+sizeof(response_realtime_price_no_foreign_exchange_t)));
-  // WriteErrLog("品种:%s, 最新价:%d\n", code, entity->new_price);
-  
+  // DEBUG("品种:%s, 最新价:%d", code, entity->new_price);
+
 }
 
 //处理指数
 static void do_exponent(char * code, buff_t * my_buff, int i)
 {
-  WriteErrLog("处理指标...\n");
+  DEBUG("%s", "处理指标...");
   response_realtime_price_exponent_t * tmp = (response_realtime_price_exponent_t*)(my_buff->buff
 					          +28
 					     +sizeof(response_realtime_price_t)
@@ -1401,7 +1399,7 @@ static void do_exponent(char * code, buff_t * my_buff, int i)
 //处理股票
 static void do_stock(char * code, buff_t * my_buff, int i)
 {
-  WriteErrLog("处理股票...\n");
+  DEBUG("%s", "处理股票...");
   response_realtime_price_stock_t * tmp = (response_realtime_price_stock_t *)(my_buff->buff
 					            +28
 					      +sizeof(response_realtime_price_t)
@@ -1417,7 +1415,7 @@ int deal_response_of_auto_push()
 //response of time_share
 int deal_response_of_time_share(int client_socket_fd, char * my_buff, int buff_len)
 {
-  WriteErrLog("解析分时数据\n");
+  DEBUG("%s", "解析分时数据");
   char code[7];
   memset(code, 0, 7);
   response_time_share_t * time_share = (response_time_share_t *)my_buff;
@@ -1431,7 +1429,7 @@ int deal_response_of_time_share(int client_socket_fd, char * my_buff, int buff_l
     response_time_share_price_t * price = (response_time_share_price_t *)time_share->his_data;
     int i = 0;
     for(i=0; i<time_share->his_len; i++){
-      WriteErrLog("第%d条数据 收到code_type:%d\tcode:%s\tnew_price:%d\ttotal:%d\n",
+      DEBUG("第%d条数据 收到code_type:%d\tcode:%s\tnew_price:%d\ttotal:%d",
 		  i+1,
 		  time_share->code_type,
 		  time_share->code,
@@ -1450,7 +1448,7 @@ int deal_response_of_history(int client_socket_fd, char * my_buff, int buff_lenx
   unsigned short code_type;
   char my_code[7];
   memset(my_code, 0, 7);
-  WriteErrLog("client_parse_history\n");
+  DEBUG("%s", "client_parse_history");
   type = ((unsigned short*)my_buff);
   response_s_t * response_s = (response_s_t*)my_buff;
   if(type == TYPE_HISTORY){
@@ -1462,7 +1460,7 @@ int deal_response_of_history(int client_socket_fd, char * my_buff, int buff_lenx
     code_type = history->code_type;
     int i = 0;
     for (i =0; i<history->size; i++){
-	    WriteErrLog("index:%d\t code:%.6s\t date:%ld\t open:%ld\t max:%ld\t  min:%ld\t close:%d\t money:%d\t total:%ld\n",
+	    DEBUG("index:%d\t code:%.6s\t date:%ld\t open:%ld\t max:%ld\t  min:%ld\t close:%d\t money:%d\t total:%ld",
 		   i+1,
 		   my_code,
 		   price->date,
