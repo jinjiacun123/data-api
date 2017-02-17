@@ -62,6 +62,7 @@ int main()
   int ret = 0;
   int test_times = 0;
   void * recycle;
+  //  is_simulate = true;
 
 #ifndef WIN32
   sigset_t signal_mask;
@@ -546,6 +547,7 @@ void init_app(void *param)
 
 void write_app(void *param)
 {
+  /*
   int res = -1;
   entity_t entity_list[SORT_SHOW_MAX_NUM];
   market_t * my_market = NULL;
@@ -564,6 +566,7 @@ void write_app(void *param)
      }
      pthread_mutex_unlock(&work_mutex);
    }
+  */
 }
 
 static int send_sort(app_request_t * my_app)
@@ -584,7 +587,7 @@ static int send_sort(app_request_t * my_app)
       if(kill(my_app->pid, 0) != 0){
 	is_allow_send = false;
 	DEBUG("info:[close pid:%d]", my_app->pid);
-	    //delete pipe
+	//delete pipe
 	ret = snprintf(app_fifo_name, 100, template, my_app->pid);
 	assert(ret > 0);
 	ret = unlink(app_fifo_name);
@@ -717,7 +720,8 @@ int parse(char * buff, uLongf  buff_len)
     //is_exit = true;
     if(is_simulate){
       pthread_mutex_lock(&work_mutex);
-      pthread_cond_signal(&allow_display_sort);
+      //pthread_cond_signal(&allow_display_sort);
+      pthread_cond_signal(&allow_start_app);
       pthread_mutex_unlock(&work_mutex);
     }
     option_times ++;

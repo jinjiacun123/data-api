@@ -297,9 +297,11 @@ void WriteErrLog(const char *i_sFormat,...)
   time_t tWriteTime;
   char  sWriteTime[20] = {0};
   pid_t ThisPid;
+  struct timeval tWriteTimeEx;
 
   ThisPid=getpid();
   time(&tWriteTime);
+  gettimeofday(&tWriteTimeEx, NULL);
   strftime(sWriteTime, 20, "%Y/%m/%d %H:%M:%S", localtime(&tWriteTime));
   //sLogFile=getenv("ERRFILE");
   // printf("log:%s\n", sLogFile);
@@ -308,7 +310,7 @@ void WriteErrLog(const char *i_sFormat,...)
     fLogFile=fopen(sLogFile,"a+");
 
   if(sLogFile != NULL && fLogFile !=NULL)
-    fprintf(fLogFile, "[%6d]%s : ", ThisPid, sWriteTime);
+    fprintf(fLogFile, "[%6d]%s.%d : ", ThisPid, sWriteTime, tWriteTimeEx.tv_usec);
   va_start(args,i_sFormat);
   if(sLogFile != NULL && fLogFile !=NULL)
     vfprintf(fLogFile,i_sFormat,args);
@@ -430,15 +432,18 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
   assert(get_client_ip(clientSocketId, &client_ip) == 0);
 
   while(1){
-    nfds = epoll_wait(epfd, events, 3, -1);
+    nfds = epoll_wait(epfd, events, 3, 10000);
     is_custom = false;
 
     if((nfds == -1) && (errno == EINTR))
       continue;
     else if(nfds == -1){
-      break;
+       close(proxyClientSocketId);
+       shutdown(proxyClientSocketId,2);
+       close(clientSocketId);
+       shutdown(clientSocketId,2);
+       break;
     }
-
     if(nfds == 0){//timeout
       DEBUG("%s\tprocess timeout", client_ip);
       close(proxyClientSocketId);
@@ -449,11 +454,16 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
       //send heart to server
       //assert(send_heart_to_server(proxyClientSocketId, &heart_times) == 0);
     }
-    if(alive_times>20){
+
+    if(alive_times>4){
       DEBUG("%s\tclient is die\n", client_ip);
-      exit(-1);
-    }
-  
+	close(proxyClientSocketId);
+	shutdown(proxyClientSocketId,2);
+        close(clientSocketId);
+       shutdown(clientSocketId,2);
+	exit(-1);
+     }
+
     for(i = 0; i< nfds; i++){
       //if(!(events[i].events & EPOLLIN)){
 	if((events[i].events & EPOLLERR) ||
@@ -469,8 +479,19 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	}
 	//}
       if(events[i].events & EPOLLIN){
+	//check is sort info
+	if(events[i].data.fd == pipe_read_fd){
+	  ret = deal_sort_info(clientSocketId,
+			       pipe_read_fd,
+			       &alive_times,
+			       client_ip);
+	  if(ret != 0){
+	    DEBUG("%s\tdeal sort info err!", client_ip);
+	    exit(-1);
+	  }
+	}
 	//check is client info
-	if(events[i].data.fd == clientSocketId){
+	else if(events[i].data.fd == clientSocketId){
 	  ret = deal_client_info(clientSocketId,
 				 proxyClientSocketId,
 				 &alive_times,
@@ -497,17 +518,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	    exit(-1);
 	  }
 	}
-	//check is sort info
-	else if(events[i].data.fd == pipe_read_fd){
-	  ret = deal_sort_info(clientSocketId,
-			       pipe_read_fd,
-			       &alive_times,
-			       client_ip);
-	  if(ret != 0){
-	    DEBUG("%s\tdeal sort info err!", client_ip);
-	    exit(-1);
-	  }
-	}
+	
       }
     }
   }
@@ -680,43 +691,65 @@ static int deal_client_info(client_socket_fd,
       app_off = 0;
       packages = 0;
       //      while(true){
-	//check is request of sort
-	if(strncmp(tmp_buff+app_off, HEADER_EX, 4) == 0){
-	  	  packages ++;
-	  package_length = *(int*)(tmp_buff+4+app_off) + 8;
-	  memcpy(sort_buff, tmp_buff+8, package_length -8);
-	  if(-1 == * pipe_write_fd){
-	    //open sort pipe
-	    ret = init_request_sort(getpid(), pipe_write_fd);
-	    assert(ret == 0);
-	  }
-	  //init sort of request
-	  my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
-	  if(my_app_request_data == NULL){
-	    DEBUG("%s","malloc my_app_request_data error!");
+
+      if(strncmp(tmp_buff + app_off, HEADER, 4) == 0 ){
+	//	DEBUG("%s,%d", "heart request", *(unsigned short*)(tmp_buff+app_off+8));
+	//if(0x0905 == *(unsigned short *)(tmp_buff+app_off+8)){
+
+	if(500 > *(int*)(tmp_buff+app_off+4)){
+	  if(0x0304 != *(unsigned short *)(tmp_buff+app_off+8)){
+	  ret = write(proxy_client_socket_fd,
+		  tmp_buff + app_off,
+		      (*(int *)(tmp_buff+app_off+4))+8);
+	  if(ret <= 0){
+	    DEBUG("%s write to proxy err!", client_ip);
 	    exit(-1);
 	  }
-	  memset(my_app_request_data, 0x00, sizeof(app_request_data));
-	  my_app_request_data->socket_fd = client_socket_fd;
-	  my_app_request_data->buff      = sort_buff;
-	  my_app_request_data->buff_len  = package_length-8;
-	  my_app_request_data->start     = true;
-	  deal_request_of_sort(getpid(),
-			       my_app_request_data,
-			       *pipe_write_fd,
-			       pipe_read_fd,
-			       epfd,
-			       is_create_pipe);
-	  free(my_app_request_data);
+	  DEBUG("ret:%d", ret);
+	  app_off += *(int *)(tmp_buff+app_off+4);
+	  app_off += 8;
+	  DEBUG("%s,app_off:%d", "heart parse", app_off);
+	  }
 	}
-	//else{
-	// break;
+ 
 	  //}
-	//if(nread > package_length){
-	//  app_off += package_length;
-	//}
-	//}
-
+      }
+      //check is request of sort
+      if(strncmp(tmp_buff+app_off, HEADER_EX, 4) == 0){
+	packages ++;
+	package_length = *(int*)(tmp_buff+4+app_off) + 8;
+	memcpy(sort_buff, tmp_buff+app_off+8, package_length -8);
+	if(-1 == * pipe_write_fd){
+	  //open sort pipe
+	  ret = init_request_sort(getpid(), pipe_write_fd);
+	  assert(ret == 0);
+	}
+	//init sort of request
+	my_app_request_data = (app_request_data*)malloc(sizeof(app_request_data));
+	if(my_app_request_data == NULL){
+	  DEBUG("%s","malloc my_app_request_data error!");
+	  exit(-1);
+	}
+	memset(my_app_request_data, 0x00, sizeof(app_request_data));
+	my_app_request_data->socket_fd = client_socket_fd;
+	my_app_request_data->buff      = sort_buff;
+	my_app_request_data->buff_len  = package_length-8;
+	my_app_request_data->start     = true;
+	deal_request_of_sort(getpid(),
+			     my_app_request_data,
+			     *pipe_write_fd,
+			     pipe_read_fd,
+			     epfd,
+			     is_create_pipe);
+	free(my_app_request_data);
+      }
+      //else{
+      // break;
+      //}
+      //if(nread > package_length){
+      //  app_off += package_length;
+      //}
+      //}
       n  += nread;
       if((nread - package_length) == 0)return 0;
       ret = write(proxy_client_socket_fd,
@@ -835,6 +868,7 @@ static int deal_client_info(client_socket_fd,
   return 0;
 }
 
+int sort_times = 1;
 //deal sort info with proxy
 static int deal_sort_info(clientSocketId,
 			  pipe_read_fd,
@@ -887,6 +921,7 @@ static int deal_sort_info(clientSocketId,
     }
   }
   DEBUG("res=%d", res);
+  DEBUG("sort_time:%d\n", sort_times++);
   assert(res > 0);
 
   return 0;

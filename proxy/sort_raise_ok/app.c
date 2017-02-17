@@ -5,12 +5,18 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<stdbool.h>
+#include<sys/time.h>
 #include "config.h"
 #include "market.h"
 #include "./../comm_pipe.h"
 
 #define MAX_BUFF_SIZE 4*1024
-
+int times = 0;
+int max_time = 0;
+struct timeval start_time;
+struct timeval end_time;
+struct timeval diff_time;
+int   timeval_subtract(struct   timeval*   result,   struct   timeval*   x,   struct   timeval*   y);
 int main(int argc, char * argv[])
 {
   int my_begin = 0;
@@ -24,7 +30,7 @@ int main(int argc, char * argv[])
   //my_size = 10;
   char * buff = NULL;
   int entity_len = sizeof(entity_t);
-  int buff_len = entity_len *my_size + sizeof(int);
+  int buff_len = entity_len *my_size + 2*sizeof(int);
   char cur_app_pipe[100];
   const char *fifo_name = PUBLIC_PIPE;
   char *template = PRIVATE_PIPE_TEMPLATE;
@@ -64,23 +70,13 @@ int main(int argc, char * argv[])
     exit(-1);
   }
 
-  printf("begin:%d,size:%d\n", my_begin, my_size);
-  app_request_t app_request;
-  memset(&app_request, 0x00, sizeof(app_request_t));
-  //request
-  app_request.pid = pid;
-  app_request.begin = my_begin;
-  app_request.size = my_size;
-  app_request.column = column;
-  app_request.index  = -100;
-  app_request.option = 0;
-  res = write(pipe_write_fd, &app_request, app_request_len);
+  request_sort(pipe_write_fd, my_begin, my_size, column, pid, app_request_len);
+  gettimeofday(&start_time, 0);
   /*
   app_request.option = 1;
   app_request.begin = my_begin+1;
   res = write(pipe_write_fd, &app_request, app_request_len);
   */
-  close(pipe_write_fd);
 
   pipe_read_fd = open(cur_app_pipe, O_RDONLY);
   if(pipe_read_fd == -1){
@@ -118,9 +114,71 @@ int main(int argc, char * argv[])
       entity ++;
     }
     printf("------------------------------------\n");
+    printf("times:%d\n", ++times);
+    gettimeofday(&end_time, 0);
+    timeval_subtract(&diff_time, &start_time, &end_time);
+    printf("总计用时:%d微妙\n", diff_time.tv_usec);
+    if(max_time < diff_time.tv_usec)
+      max_time = diff_time.tv_usec;
+    printf("到目前为止最大时间:%d\n", max_time);
     sleep(1);
+    request_sort(pipe_write_fd, my_begin, my_size, column, pid, app_request_len);
   }
   close(pipe_read_fd);
+  close(pipe_write_fd);
 
   return 0;
+}
+
+void request_sort(pipe_write_fd, my_begin, my_size, column, pid, app_request_len)
+  int pipe_write_fd;
+  int my_begin;
+  int my_size;
+  int column;
+  int pid;
+  int app_request_len;
+{
+  gettimeofday(&start_time, 0);
+  int res = 0;
+  printf("begin:%d,size:%d\n", my_begin, my_size);
+  app_request_t app_request;
+  memset(&app_request, 0x00, sizeof(app_request_t));
+  //request
+  app_request.pid = pid;
+  app_request.begin = my_begin;
+  app_request.size = my_size;
+  app_request.column = column;
+  app_request.index  = -100;
+  app_request.option = 0;
+  res = write(pipe_write_fd, &app_request, app_request_len);
+  printf("write res:%d\n", res);
+}
+
+ /**
+      *   计算两个时间的间隔，得到时间差
+      *   @param   struct   timeval*   resule   返回计算出来的时间
+      *   @param   struct   timeval*   x             需要计算的前一个时间
+      *   @param   struct   timeval*   y             需要计算的后一个时间
+      *   return   -1   failure   ,0   success
+      **/
+int   timeval_subtract(struct   timeval*   result,   struct   timeval*   x,   struct   timeval*   y)
+{
+  int   nsec;
+
+  if   (   x->tv_sec>y->tv_sec   )
+    return   -1;
+
+  if   (   (x->tv_sec==y->tv_sec)   &&   (x->tv_usec>y->tv_usec)   )
+    return   -1;
+
+  result->tv_sec   =   (   y->tv_sec-x->tv_sec   );
+  result->tv_usec   =   (   y->tv_usec-x->tv_usec   );
+
+  if   (result->tv_usec<0)
+    {
+      result->tv_sec--;
+      result->tv_usec+=1000000;
+    }
+
+  return   0;
 }

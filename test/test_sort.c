@@ -135,6 +135,10 @@ int main()
   //send sort request
   ret = request_sort(client);
   assert(ret == 0);
+  //ret = send_heart(client);
+  //assert(ret == 0);
+  sleep(3);
+  return 0;
   /*
   sleep(3);
   option = 1;
@@ -232,9 +236,21 @@ static int request_sort(int socket_fd)
   my_request_sort.app_request.begin = option;
   my_request_sort.app_request.size = 10;
 
-  ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
+  char request[1024];
+  TestSrvData2 data ;
+  memset(&data,0x00,sizeof(TestSrvData2));
+  memcpy(data.head, HEADER,4);
+  data .length      = sizeof(TestSrvData2) -8;
+  data.m_nType     = TYPE_HEART;
+  data.m_nIndex= 1;
+
+  memset(request, 0, 1024);
+  memcpy(request, &data, sizeof(data));
+  memcpy(request+sizeof(data), &my_request_sort, sizeof(request_sort_t));
+  ret = write(socket_fd, request, sizeof(data)+sizeof(request_sort_t));
+  //ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
-  
+
   /*
   sleep(3);
   my_request_sort.app_request.begin = 200;
@@ -338,6 +354,7 @@ static void *init_receive(void * param)
 	}
 	free(body_buff);
 	printf("----------------------------------\n");
+	break;
 	if(is_new){
 //	  sleep(2);
 	  option += 10;

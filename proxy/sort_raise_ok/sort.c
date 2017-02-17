@@ -405,7 +405,8 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     queue = area->cur;
   }
 #else
-  
+  int low = 0;
+  int hight = 
 #endif
   //find queue
   if(area->real_size == 0){
