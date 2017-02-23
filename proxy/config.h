@@ -259,7 +259,7 @@ typedef struct{
   long national_debt_ratio;//国债利率，基金净值
 
 }response_realtime_price_stock_t;
-
+#define __system32 0
 //解析实时数据包
 typedef struct{
   short code_type;       //品种类型

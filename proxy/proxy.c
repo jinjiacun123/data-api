@@ -30,7 +30,7 @@ typedef struct
 
 int g_iCltNum=0;
 extern int errno;
-void WriteErrLog(const char * i_sFormat,...);
+static void WriteErrLog(const char * i_sFormat,...);
 int PassiveSock();
 //char *cftime(char *s, const char *format, time_t *time);
 int ConnectSock();
@@ -159,7 +159,7 @@ void catchcld(int sig)
         允许最大连接数
 */
 process_ip_t process_ip_list[MAX_CONNECTS]={};
-pthread_key_t key_sort;
+ pthread_key_t key_sort;
 void main(int argc,char *argv[])
 {
   int proxyClientSocketId;
@@ -288,7 +288,7 @@ void main(int argc,char *argv[])
     deal_proxy(proxyClientSocketId, clientSocketId);
   }
 }
-
+#ifdef __system32
 void WriteErrLog(const char *i_sFormat,...)
 {
   va_list args;
@@ -317,6 +317,39 @@ void WriteErrLog(const char *i_sFormat,...)
   va_end(args);
   if(sLogFile != NULL && fLogFile != NULL) fclose(fLogFile);
 }
+#else
+#define BUFLEN 255
+char tmpBuf[BUFLEN] = {0};
+#include<time.h>
+#include<xlocale.h>
+static void WriteErrLog(const char *i_sFormat,...)
+{
+  va_list args;
+  char  *sLogFile="/tmp/err.log";
+  FILE  *fLogFile;
+  time_t tWriteTime;
+  pid_t ThisPid;
+  struct tm dummy_time;
+			 
+  ThisPid=getpid();
+  time_t t = time(0);
+  memcpy(&dummy_time, localtime(&t), sizeof(struct tm));
+  strftime(tmpBuf, BUFLEN, "%Y/%m/%d %H:%M:%S", &dummy_time);
+  //sLogFile=getenv("ERRFILE");
+  // printf("log:%s\n", sLogFile);
+
+  if(sLogFile != NULL)
+    fLogFile=fopen(sLogFile,"a+"); 
+ 
+   if(sLogFile != NULL && fLogFile !=NULL)
+    fprintf(fLogFile,"[%d]%s : ",ThisPid, tmpBuf);
+  va_start(args,i_sFormat);
+  if(sLogFile != NULL && fLogFile !=NULL)
+    vfprintf(fLogFile,i_sFormat,args);
+  va_end(args);
+  if(sLogFile != NULL && fLogFile != NULL) fclose(fLogFile);
+}
+#endif
 
 /*        passivesock        allocate & bind a server socket using tcp or ucp */
 int
@@ -691,28 +724,28 @@ static int deal_client_info(client_socket_fd,
       app_off = 0;
       packages = 0;
       //      while(true){
-
       if(strncmp(tmp_buff + app_off, HEADER, 4) == 0 ){
 	//	DEBUG("%s,%d", "heart request", *(unsigned short*)(tmp_buff+app_off+8));
 	//if(0x0905 == *(unsigned short *)(tmp_buff+app_off+8)){
-
-	if(500 > *(int*)(tmp_buff+app_off+4)){
-	  if(0x0304 != *(unsigned short *)(tmp_buff+app_off+8)){
-	  ret = write(proxy_client_socket_fd,
-		  tmp_buff + app_off,
-		      (*(int *)(tmp_buff+app_off+4))+8);
-	  if(ret <= 0){
-	    DEBUG("%s write to proxy err!", client_ip);
-	    exit(-1);
-	  }
-	  DEBUG("ret:%d", ret);
-	  app_off += *(int *)(tmp_buff+app_off+4);
-	  app_off += 8;
-	  DEBUG("%s,app_off:%d", "heart parse", app_off);
+		if(0x0201 == *(unsigned short *)(tmp_buff+app_off+8)
+	   || 0x0905 == *(unsigned short *)(tmp_buff+app_off+8)
+	   || 0x0a01 == *(unsigned short *)(tmp_buff+app_off+8)){
+	  if(100 > *(int*)(tmp_buff+app_off+4)){
+	    ret = write(proxy_client_socket_fd,
+			tmp_buff + app_off,
+			(*(int *)(tmp_buff+app_off+4))+8);
+	    if(ret <= 0){
+	      DEBUG("%s write to proxy err!", client_ip);
+	      exit(-1);
+	    }
+	    DEBUG("length:%d,ret:%d",*(int *)(tmp_buff+app_off+4)+8, ret);
+	    app_off += *(int *)(tmp_buff+app_off+4);
+	    app_off += 8;
+	    DEBUG("%s,app_off:%d", "heart parse", app_off);
 	  }
 	}
- 
-	  //}
+
+	//}
       }
       //check is request of sort
       if(strncmp(tmp_buff+app_off, HEADER_EX, 4) == 0){
@@ -752,9 +785,10 @@ static int deal_client_info(client_socket_fd,
       //}
       n  += nread;
       if((nread - package_length) == 0)return 0;
+      DEBUG("app_off:%d,package_length:%d,packages:%d", app_off, package_length, packages);
       ret = write(proxy_client_socket_fd,
-		  tmp_buff + package_length * packages,
-		  nread - package_length * packages);
+		  tmp_buff+ packages * package_length,
+		  nread  - packages * package_length);
       if(ret <= 0){
 	DEBUG("%s write to proxy err!", client_ip);
 	exit(-1);
