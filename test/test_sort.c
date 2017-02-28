@@ -6,16 +6,17 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<assert.h>
-#define SERVER_HOST "127.0.0.1"
+//#define SERVER_HOST "127.0.0.1"
 //#define SERVER_HOST "192.168.1.131"
-//#define SERVER_HOST "122.144.139.237"
+#define SERVER_HOST "122.144.139.237"
+//#define SERVER_HOST "192.168.1.140"
 #define SERVER_PORT 8001
 //#define SERVER_PORT 8800
 #define HEADER   "ZJHR"
 #define HEADER_EX "SERV"
 #define TYPE_HEART      0x0905 //heart tick
 #pragma pack (4)
-int option = 0;
+int option = 10;
 int times  = 0;
 typedef struct{
   bool is_create;
@@ -100,12 +101,13 @@ int send_realtime(int socket_fd);
 static int send_test(int socket_fd);
 static void printhex(unsigned char *src,int len);
 
-int main()
+int main(int argc, char * argv[])
 {
   int ret = -1;
   pthread_t t_id;
   void *thread_result;
 
+  //option = atoi(argv[1]);
   //signal(SIGUSR2, send_request);
   struct sockaddr_in cli;
   signal(SIGINT, stop);
@@ -137,8 +139,9 @@ int main()
   assert(ret == 0);
   //ret = send_heart(client);
   //assert(ret == 0);
-  sleep(3);
-  return 0;
+  //pthread_join(t_id, NULL);
+  //sleep(10);
+  //return 0;
   /*
   sleep(3);
   option = 1;
@@ -170,7 +173,7 @@ int main()
   //pthread_join(t_id, &thread_result);
   while(true){
     sleep(8);
-    //    send_heart(client);
+        send_heart(client);
    // sleep(7);
   // ret = request_sort(client);
    // assert(ret == 0);
@@ -236,6 +239,7 @@ static int request_sort(int socket_fd)
   my_request_sort.app_request.begin = option;
   my_request_sort.app_request.size = 10;
 
+  /*
   char request[1024];
   TestSrvData2 data ;
   memset(&data,0x00,sizeof(TestSrvData2));
@@ -243,12 +247,16 @@ static int request_sort(int socket_fd)
   data .length      = sizeof(TestSrvData2) -8;
   data.m_nType     = TYPE_HEART;
   data.m_nIndex= 1;
+  */
 
+  /*
   memset(request, 0, 1024);
   memcpy(request, &data, sizeof(data));
   memcpy(request+sizeof(data), &my_request_sort, sizeof(request_sort_t));
   ret = write(socket_fd, request, sizeof(data)+sizeof(request_sort_t));
-  //ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
+  */
+  //memcpy(request, &my_request_sort, sizeof(request_sort_t));
+  ret = write(socket_fd, &my_request_sort, sizeof(request_sort_t));
   assert(ret >0);
 
   /*

@@ -121,8 +121,10 @@ int main(int argc, char * argv[])
     if(max_time < diff_time.tv_usec)
       max_time = diff_time.tv_usec;
     printf("到目前为止最大时间:%d\n", max_time);
+    /*
     sleep(1);
     request_sort(pipe_write_fd, my_begin, my_size, column, pid, app_request_len);
+    */
   }
   close(pipe_read_fd);
   close(pipe_write_fd);

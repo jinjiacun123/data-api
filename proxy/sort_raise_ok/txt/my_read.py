@@ -62,6 +62,7 @@ def main():
         template_json = "%s.txt"
         template_data = dir_prefix + "proxy/sort_raise_ok/txt/%s.txt"
         file_name_list = ["1101", "1201", "1206", "120b"]
+        #file_name_list = ["1101", "1201"]
 	#["1101", "1201", "1206", "120b"]
 	data_file_name = dir_prefix + "proxy/sort_raise_ok/txt/my_data"
 

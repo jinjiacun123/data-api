@@ -14,7 +14,8 @@
 #b do_stock if i == 7 
 #b do_stock if i = 5
 #b do_stock if i == 422
-#b do_stock if((int)$gdb_strcmp(code, "600008") == 0)
+b do_stock if i == 1600
+#b do_stock if((int)$gdb_strcmp(code, "000900") == 0)
 #b do_stock if((int)strcmp(600010", code)) == 0
 #b sort_add
 #b sort_get
@@ -35,4 +36,4 @@
 #b write_app
 #b sort_update
 #b remove_entity
-#r
+r

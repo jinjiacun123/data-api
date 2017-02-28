@@ -28,11 +28,11 @@ int init_sort_area(my_market)
   //range_step_len = ceilf(0.4 * 10000/AREA_NUMBER)/10000;
   //snprintf(tmp_range, "%.4f", (float)(0.4/AREA_NUMBER), 6);
   //range_step_len = (float)atoll(tmp_range);
-  range_step_len = 4000/AREA_NUMBER;
+  range_step_len = 400000/AREA_NUMBER;
   //range_step_len = ( (float)( (int)( (range_step_len+0.005)*100 ) ) )/100;
   //range_step_len = ceilf(37.777779*100)/100;
   int raise_min = (-1)*(my_market->yestoday_max * 0.1);
-  float range_min = -2000;
+  float range_min = -200000;
   int price_area_queue_len = 0;
   int raise_area_queue_len = 0;
   int range_area_queue_len = 0;
@@ -381,9 +381,6 @@ static int find_location(my_market, entity, column, area_index, queue_index)
   }
 
   pre_area = area;
-#define FIND_WAY 1
-
-#if FIND_WAY
   //find area
   for(; i<AREA_NUMBER; i++){
     if(value.ivalue > area->max_value.ivalue){
@@ -404,10 +401,6 @@ static int find_location(my_market, entity, column, area_index, queue_index)
     real_size = area->real_size;
     queue = area->cur;
   }
-#else
-  int low = 0;
-  int hight = 
-#endif
   //find queue
   if(area->real_size == 0){
     *queue_index = 0;

@@ -45,6 +45,7 @@ bool is_simulate = false;
 static void do_stock(market_t * my_market, unsigned short, char *, char *, int, option_n);
 static int send_sort(app_request_t * my_app);
 static int init_login(int socket_fd);
+static int write_data(char * buff, uLongf buff_len);
 
 bool is_exit = false;
 int socket_fd = 0;
@@ -456,6 +457,11 @@ void init_app(void *param)
   app_request_t * my_app = NULL, *tmp_app = NULL;
   bool is_exists = false;
   int ret = -1;
+  int max_time = 0;
+
+  struct timeval start_time;
+  struct timeval end_time;
+  struct timeval diff_time;
 
   //open fifo
   fifo_fd = open(PUBLIC_PIPE, O_RDWR|O_NONBLOCK);
@@ -469,7 +475,7 @@ void init_app(void *param)
     res = read(fifo_fd, app_request_buff, app_request_len);
     if(res < 0){
       if(errno == EAGAIN){
-	usleep(1000);
+	usleep(500);
 	continue;
       }
       DEBUG("error:[%s]", "receive client app request error!");
@@ -507,8 +513,15 @@ void init_app(void *param)
 		app_list[i].size = 10;
 	  }
 	  my_app = &app_list[i];
+	  gettimeofday(&start_time, 0);
 	  res = send_sort(my_app);
 	  assert(res == 0);
+	  gettimeofday(&end_time, 0);
+	  timeval_subtract(&diff_time, &start_time, &end_time);
+	  printf("总计用时:%d微妙\n", diff_time.tv_usec);
+	  if(max_time < diff_time.tv_usec)
+	    max_time = diff_time.tv_usec;
+	  printf("到目前为止最大时间:%d\n", max_time);
 	  break;
 	}
       }
@@ -748,14 +761,58 @@ int parse(char * buff, uLongf  buff_len)
   case TYPE_ZIB:{
     //printf("bzib...\n");
     res = unpack(buff, buff_len);
-    assert( res == 0);
-    res = parse(g_zib_buff, g_zib_buff_len);
-    assert( res == 0);
+    if(res == -4){
+      res = write_data(buff, buff_len);
+      assert(res == 0);
+    }else{
+      assert( res == 0);
+      res = parse(g_zib_buff, g_zib_buff_len);
+      assert( res == 0);
+    }
   }break;
   default:{
     DEBUG("info:[unknown type:%d]", type);
   }break;
   }
+  return 0;
+}
+
+static int write_data(char * buff, uLongf buff_len){
+  int fd = -1;
+  char file_name[100] = {0};
+  #define SIMULATE_FILE "./data/%d.data"
+  int ret = -1;
+  uLongf off = 0;
+  char head[8] = {0};
+
+  //calculate current time
+  int seconds;
+  seconds = time((time_t*)NULL);
+  ret = snprintf(file_name, 100, SIMULATE_FILE, seconds);
+  if((fd = open(file_name, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR)) == -1){
+    printf("open simulate file err!\n");
+    exit(-1);
+  }
+
+  memcpy(head, HEADER, 4);
+  memcpy(head+4, &buff_len, 4);
+  ret = write(fd, &head, 8);
+  if(ret == -1){
+    printf("write head err!\n");
+    return -1;
+  }
+
+  while(ret == write(fd, buff+off, buff_len-off)){
+    if(ret == -1){
+	break;
+   }
+   else if(ret >0){
+	off += ret;
+  }
+  }
+
+  close(fd);
+  printf("%d write finish\n", seconds);
   return 0;
 }
 
@@ -812,6 +869,7 @@ do_stock(my_market, code_type, code, buff, i, option)
   void * address = NULL;
   unsigned int code_type_index = 0;
   entity_t * entity;
+  int tmp_range = 0;
   // column_n column = NEW_PRICE;
   switch(code_type){
   case 0x110:{
@@ -843,13 +901,29 @@ do_stock(my_market, code_type, code, buff, i, option)
   }
   else{
     entity->raise  = entity->price - entity->pre_close;
-    entity->range  = round(entity->raise *10000.0 / entity->pre_close);
+    //entity->range = round(entity->raise * 100000 * 1.0 /entity->pre_close); 
+    tmp_range  = round(entity->raise * 100000 * 1.0 / entity->pre_close);
+    
+    if(entity->raise * tmp_range < 0){
+      tmp_range = round((unsigned int)entity->raise * 100000 * 1.0 / entity->pre_close);
+      if(entity->raise < 0){
+        entity->range = tmp_range * (-1);
+      }
+      else{
+        entity->range = tmp_range;
+      }
+    }
+    else{
+      entity->range = tmp_range;
+    }
+     
+    //entity->range  = ceil(entity->raise *10000*1.0) / entity->pre_close;
   }
   entity->max         = tmp->m_lMaxPrice;
   entity->min         = tmp->m_lMinPrice;
   entity->total       = tmp->m_lTotal;
   entity->money       = tmp->m_fAvgPrice;
-  DEBUG("info:[index:%d,code_type:%2x,code:%s,pre_close:%d,new_price:%d,raise:%d,range:%d]",i, code_type, code, entity->pre_close, entity->price, entity->raise, entity->range);
+  DEBUG("info:[index:%d,code_type:%2x,code:%s,pre_close:%d,new_price:%d,raise:%d,range:%d,tmp_range:%d]",i, code_type, code, entity->pre_close, entity->price, entity->raise, entity->range,tmp_range);
   if(is_simulate){
     srand(time(0));
     entity->price = tmp->m_lNewPrice + (rand()%10);

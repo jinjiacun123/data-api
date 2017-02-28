@@ -28,7 +28,7 @@ int init_market(){
   fseek(fp, 0L, SEEK_SET);
   //stock
   //size = 3050;
-  size = 1000;
+  // size = 1000;
   get_market(index, fp, size);
   close(fp);
   return 0;
@@ -52,7 +52,7 @@ int get_market(int index, FILE * fp, int size)
   entity = market_list[index].list;
   int * yestoday_max_price = &market_list[index].yestoday_max;
   int * yestoday_min_price = &market_list[index].yestoday_min;
-  *yestoday_min_price      = 100000;
+  *yestoday_min_price      = 10000;
   char * code = NULL;
   unsigned short code_type = 0;
   int max = 0;

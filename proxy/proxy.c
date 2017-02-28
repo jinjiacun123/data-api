@@ -493,7 +493,7 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	close(proxyClientSocketId);
 	shutdown(proxyClientSocketId,2);
         close(clientSocketId);
-       shutdown(clientSocketId,2);
+	shutdown(clientSocketId,2);
 	exit(-1);
      }
 
@@ -551,7 +551,6 @@ void deal_proxy(proxyClientSocketId, clientSocketId)
 	    exit(-1);
 	  }
 	}
-	
       }
     }
   }

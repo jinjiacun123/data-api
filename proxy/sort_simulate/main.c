@@ -736,7 +736,8 @@ int parse(char * buff, uLongf  buff_len)
   return 0;
 }
 
-static int write_data(char * buff, uLongf buff_len){
+static int write_data(char * buff, uLongf buff_len)
+{
   int fd = -1;
   char file_name[100] = {0};
   #define SIMULATE_FILE "./data/%d.data"
