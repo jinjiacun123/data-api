@@ -692,6 +692,10 @@ int sort_get(my_market, column, index, size, entity_list)
     area++;
     area_count ++;
     if(area == NULL) break;
+    /**
+     *area slop over control
+     */
+    if(area->real_size > market_list[0].entity_list_size) break;
     cur_real_size = area->real_size;if(cur_real_size == 0) continue;
     if(off_size > cur_real_size){//area all
       for(j = 0; j< cur_real_size; j++){
